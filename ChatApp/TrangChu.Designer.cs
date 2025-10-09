@@ -40,9 +40,15 @@
             this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnIcon = new System.Windows.Forms.Button();
             this.btnGui = new System.Windows.Forms.Button();
+            this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
+            this.guna2CirclePictureBox1 = new Guna.UI2.WinForms.Guna2CirclePictureBox();
+            this.guna2CirclePictureBox2 = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.flowLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel4.SuspendLayout();
+            this.guna2Panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.guna2CirclePictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.guna2CirclePictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // flowLayoutPanel1
@@ -50,7 +56,7 @@
             this.flowLayoutPanel1.Controls.Add(this.txtTimKiem);
             this.flowLayoutPanel1.Controls.Add(this.btnTimKiem);
             this.flowLayoutPanel1.Controls.Add(this.flowLayoutPanel2);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 12);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(9, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(264, 37);
             this.flowLayoutPanel1.TabIndex = 0;
@@ -106,9 +112,9 @@
             // 
             // rtbNhanTin
             // 
-            this.rtbNhanTin.Location = new System.Drawing.Point(282, 12);
+            this.rtbNhanTin.Location = new System.Drawing.Point(276, 3);
             this.rtbNhanTin.Name = "rtbNhanTin";
-            this.rtbNhanTin.Size = new System.Drawing.Size(628, 468);
+            this.rtbNhanTin.Size = new System.Drawing.Size(619, 383);
             this.rtbNhanTin.TabIndex = 2;
             this.rtbNhanTin.Text = "";
             // 
@@ -149,9 +155,9 @@
             // 
             this.flowLayoutPanel4.Controls.Add(this.txtNhanTin);
             this.flowLayoutPanel4.Controls.Add(this.tableLayoutPanel1);
-            this.flowLayoutPanel4.Location = new System.Drawing.Point(282, 486);
+            this.flowLayoutPanel4.Location = new System.Drawing.Point(276, 392);
             this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-            this.flowLayoutPanel4.Size = new System.Drawing.Size(628, 97);
+            this.flowLayoutPanel4.Size = new System.Drawing.Size(644, 97);
             this.flowLayoutPanel4.TabIndex = 5;
             // 
             // btnIcon
@@ -174,20 +180,53 @@
             this.btnGui.TabIndex = 6;
             this.btnGui.UseVisualStyleBackColor = true;
             // 
+            // guna2Panel1
+            // 
+            this.guna2Panel1.Controls.Add(this.flowLayoutPanel1);
+            this.guna2Panel1.Controls.Add(this.rtbNhanTin);
+            this.guna2Panel1.Controls.Add(this.flowLayoutPanel4);
+            this.guna2Panel1.Location = new System.Drawing.Point(12, 96);
+            this.guna2Panel1.Name = "guna2Panel1";
+            this.guna2Panel1.Size = new System.Drawing.Size(898, 502);
+            this.guna2Panel1.TabIndex = 6;
+            // 
+            // guna2CirclePictureBox1
+            // 
+            this.guna2CirclePictureBox1.ImageRotate = 0F;
+            this.guna2CirclePictureBox1.Location = new System.Drawing.Point(12, 12);
+            this.guna2CirclePictureBox1.Name = "guna2CirclePictureBox1";
+            this.guna2CirclePictureBox1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.guna2CirclePictureBox1.Size = new System.Drawing.Size(64, 64);
+            this.guna2CirclePictureBox1.TabIndex = 7;
+            this.guna2CirclePictureBox1.TabStop = false;
+            // 
+            // guna2CirclePictureBox2
+            // 
+            this.guna2CirclePictureBox2.ImageRotate = 0F;
+            this.guna2CirclePictureBox2.Location = new System.Drawing.Point(846, 12);
+            this.guna2CirclePictureBox2.Name = "guna2CirclePictureBox2";
+            this.guna2CirclePictureBox2.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.guna2CirclePictureBox2.Size = new System.Drawing.Size(64, 64);
+            this.guna2CirclePictureBox2.TabIndex = 8;
+            this.guna2CirclePictureBox2.TabStop = false;
+            // 
             // TrangChu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ClientSize = new System.Drawing.Size(920, 595);
-            this.Controls.Add(this.flowLayoutPanel4);
-            this.Controls.Add(this.rtbNhanTin);
-            this.Controls.Add(this.flowLayoutPanel1);
+            this.ClientSize = new System.Drawing.Size(923, 616);
+            this.Controls.Add(this.guna2CirclePictureBox2);
+            this.Controls.Add(this.guna2CirclePictureBox1);
+            this.Controls.Add(this.guna2Panel1);
             this.Name = "TrangChu";
             this.Text = "TrangChu";
             this.flowLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel4.ResumeLayout(false);
+            this.guna2Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.guna2CirclePictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.guna2CirclePictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -205,5 +244,8 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel4;
         private System.Windows.Forms.Button btnIcon;
         private System.Windows.Forms.Button btnGui;
+        private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
+        private Guna.UI2.WinForms.Guna2CirclePictureBox guna2CirclePictureBox1;
+        private Guna.UI2.WinForms.Guna2CirclePictureBox guna2CirclePictureBox2;
     }
 }
