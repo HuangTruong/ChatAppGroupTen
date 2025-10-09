@@ -74,7 +74,6 @@
             this.pnlDangKy.Name = "pnlDangKy";
             this.pnlDangKy.Size = new System.Drawing.Size(462, 429);
             this.pnlDangKy.TabIndex = 1;
-            this.pnlDangKy.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // btnQuayLaiDangNhap
             // 
@@ -155,7 +154,6 @@
             this.lblXacNhanMatKhau.Size = new System.Drawing.Size(158, 23);
             this.lblXacNhanMatKhau.TabIndex = 15;
             this.lblXacNhanMatKhau.Text = "Xác nhận mật khẩu";
-            this.lblXacNhanMatKhau.Click += new System.EventHandler(this.label1_Click);
             // 
             // lblGioiTinh
             // 
@@ -206,7 +204,6 @@
             this.lblTaiKhoan.Size = new System.Drawing.Size(129, 23);
             this.lblTaiKhoan.TabIndex = 0;
             this.lblTaiKhoan.Text = "Tên Đăng Nhập";
-            this.lblTaiKhoan.Click += new System.EventHandler(this.lblTaiKhoan_Click);
             // 
             // lblMatKhau
             // 
