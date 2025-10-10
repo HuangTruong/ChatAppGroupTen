@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.guna2CustomGradientPanel1 = new Guna.UI2.WinForms.Guna2CustomGradientPanel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtTaiKhoan = new System.Windows.Forms.TextBox();
             this.btnQuayLaiDangNhap = new Guna.UI2.WinForms.Guna2Button();
             this.btnGuiMaXacNhan = new Guna.UI2.WinForms.Guna2Button();
             this.txtMaXacNhan = new Guna.UI2.WinForms.Guna2TextBox();
@@ -42,6 +44,8 @@
             // guna2CustomGradientPanel1
             // 
             this.guna2CustomGradientPanel1.BackColor = System.Drawing.Color.White;
+            this.guna2CustomGradientPanel1.Controls.Add(this.label1);
+            this.guna2CustomGradientPanel1.Controls.Add(this.txtTaiKhoan);
             this.guna2CustomGradientPanel1.Controls.Add(this.btnQuayLaiDangNhap);
             this.guna2CustomGradientPanel1.Controls.Add(this.btnGuiMaXacNhan);
             this.guna2CustomGradientPanel1.Controls.Add(this.txtMaXacNhan);
@@ -54,6 +58,22 @@
             this.guna2CustomGradientPanel1.Name = "guna2CustomGradientPanel1";
             this.guna2CustomGradientPanel1.Size = new System.Drawing.Size(415, 426);
             this.guna2CustomGradientPanel1.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(42, 114);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(97, 17);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "Nhập tài khoản";
+            // 
+            // txtTaiKhoan
+            // 
+            this.txtTaiKhoan.Location = new System.Drawing.Point(146, 114);
+            this.txtTaiKhoan.Name = "txtTaiKhoan";
+            this.txtTaiKhoan.Size = new System.Drawing.Size(229, 25);
+            this.txtTaiKhoan.TabIndex = 8;
             // 
             // btnQuayLaiDangNhap
             // 
@@ -70,6 +90,7 @@
             this.btnQuayLaiDangNhap.Size = new System.Drawing.Size(180, 45);
             this.btnQuayLaiDangNhap.TabIndex = 7;
             this.btnQuayLaiDangNhap.Text = "Quay Lại Đăng Nhập";
+            this.btnQuayLaiDangNhap.Click += new System.EventHandler(this.btnQuayLaiDangNhap_Click);
             // 
             // btnGuiMaXacNhan
             // 
@@ -84,7 +105,8 @@
             this.btnGuiMaXacNhan.Name = "btnGuiMaXacNhan";
             this.btnGuiMaXacNhan.Size = new System.Drawing.Size(180, 45);
             this.btnGuiMaXacNhan.TabIndex = 6;
-            this.btnGuiMaXacNhan.Text = "Gửi Mã Xác Nhận";
+            this.btnGuiMaXacNhan.Text = "Gửi Mật khẩu";
+            this.btnGuiMaXacNhan.Click += new System.EventHandler(this.btnGuiMaXacNhan_Click);
             // 
             // txtMaXacNhan
             // 
@@ -164,6 +186,7 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.guna2CustomGradientPanel1);
             this.Name = "QuenMatKhau";
+            this.Load += new System.EventHandler(this.QuenMatKhau_Load);
             this.guna2CustomGradientPanel1.ResumeLayout(false);
             this.guna2CustomGradientPanel1.PerformLayout();
             this.ResumeLayout(false);
@@ -180,5 +203,7 @@
         private System.Windows.Forms.Label lblTieuDe;
         private System.Windows.Forms.Label lblMaXacNhan;
         private System.Windows.Forms.Label lblEmail;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtTaiKhoan;
     }
 }

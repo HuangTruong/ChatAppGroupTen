@@ -91,6 +91,7 @@
             this.btnQuayLaiDangNhap.Size = new System.Drawing.Size(180, 45);
             this.btnQuayLaiDangNhap.TabIndex = 20;
             this.btnQuayLaiDangNhap.Text = "Quay lại đăng nhập";
+            this.btnQuayLaiDangNhap.Click += new System.EventHandler(this.btnQuayLaiDangNhap_Click);
             // 
             // btnDangKy
             // 
@@ -106,6 +107,7 @@
             this.btnDangKy.Size = new System.Drawing.Size(180, 45);
             this.btnDangKy.TabIndex = 19;
             this.btnDangKy.Text = "Đăng Ký";
+            this.btnDangKy.Click += new System.EventHandler(this.btnDangKy_Click);
             // 
             // dtpNgaySinh
             // 
@@ -335,6 +337,7 @@
             this.Name = "DangKy";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DangKy";
+            this.Load += new System.EventHandler(this.DangKy_Load);
             this.pnlDangKy.ResumeLayout(false);
             this.pnlDangKy.PerformLayout();
             this.ResumeLayout(false);

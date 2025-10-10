@@ -29,14 +29,14 @@
         private void InitializeComponent()
         {
             this.pnlDangNhap = new System.Windows.Forms.Panel();
-            this.lblTieuDe = new System.Windows.Forms.Label();
-            this.lblTaiKhoan = new System.Windows.Forms.Label();
-            this.lblMatKhau = new System.Windows.Forms.Label();
-            this.txtMatKhau = new Guna.UI2.WinForms.Guna2TextBox();
-            this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
-            this.btnDangNhap = new Guna.UI2.WinForms.Guna2Button();
-            this.btnDangKy = new Guna.UI2.WinForms.Guna2Button();
             this.lnkQuenMatKhau = new System.Windows.Forms.LinkLabel();
+            this.btnDangKy = new Guna.UI2.WinForms.Guna2Button();
+            this.btnDangNhap = new Guna.UI2.WinForms.Guna2Button();
+            this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtMatKhau = new Guna.UI2.WinForms.Guna2TextBox();
+            this.lblMatKhau = new System.Windows.Forms.Label();
+            this.lblTaiKhoan = new System.Windows.Forms.Label();
+            this.lblTieuDe = new System.Windows.Forms.Label();
             this.pnlDangNhap.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,54 +57,50 @@
             this.pnlDangNhap.Size = new System.Drawing.Size(419, 426);
             this.pnlDangNhap.TabIndex = 0;
             // 
-            // lblTieuDe
+            // lnkQuenMatKhau
             // 
-            this.lblTieuDe.AutoSize = true;
-            this.lblTieuDe.Font = new System.Drawing.Font("Segoe UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTieuDe.Location = new System.Drawing.Point(80, 68);
-            this.lblTieuDe.Name = "lblTieuDe";
-            this.lblTieuDe.Size = new System.Drawing.Size(277, 31);
-            this.lblTieuDe.TabIndex = 1;
-            this.lblTieuDe.Text = "ĐĂNG NHẬP HỆ THỐNG";
+            this.lnkQuenMatKhau.AutoSize = true;
+            this.lnkQuenMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lnkQuenMatKhau.Location = new System.Drawing.Point(148, 376);
+            this.lnkQuenMatKhau.Name = "lnkQuenMatKhau";
+            this.lnkQuenMatKhau.Size = new System.Drawing.Size(129, 23);
+            this.lnkQuenMatKhau.TabIndex = 8;
+            this.lnkQuenMatKhau.TabStop = true;
+            this.lnkQuenMatKhau.Text = "Quên mật khẩu";
+            this.lnkQuenMatKhau.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkQuenMatKhau_LinkClicked);
             // 
-            // lblTaiKhoan
+            // btnDangKy
             // 
-            this.lblTaiKhoan.AutoSize = true;
-            this.lblTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTaiKhoan.Location = new System.Drawing.Point(27, 176);
-            this.lblTaiKhoan.Name = "lblTaiKhoan";
-            this.lblTaiKhoan.Size = new System.Drawing.Size(129, 23);
-            this.lblTaiKhoan.TabIndex = 2;
-            this.lblTaiKhoan.Text = "Tên Đăng Nhập";
+            this.btnDangKy.BorderRadius = 4;
+            this.btnDangKy.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnDangKy.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnDangKy.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnDangKy.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnDangKy.FillColor = System.Drawing.Color.Gray;
+            this.btnDangKy.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnDangKy.ForeColor = System.Drawing.Color.White;
+            this.btnDangKy.Location = new System.Drawing.Point(222, 313);
+            this.btnDangKy.Name = "btnDangKy";
+            this.btnDangKy.Size = new System.Drawing.Size(180, 45);
+            this.btnDangKy.TabIndex = 7;
+            this.btnDangKy.Text = "Đăng Ký";
+            this.btnDangKy.Click += new System.EventHandler(this.btnDangKy_Click);
             // 
-            // lblMatKhau
+            // btnDangNhap
             // 
-            this.lblMatKhau.AutoSize = true;
-            this.lblMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblMatKhau.Location = new System.Drawing.Point(72, 225);
-            this.lblMatKhau.Name = "lblMatKhau";
-            this.lblMatKhau.Size = new System.Drawing.Size(84, 23);
-            this.lblMatKhau.TabIndex = 3;
-            this.lblMatKhau.Text = "Mật Khẩu";
-            // 
-            // txtMatKhau
-            // 
-            this.txtMatKhau.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtMatKhau.DefaultText = "";
-            this.txtMatKhau.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtMatKhau.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtMatKhau.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtMatKhau.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtMatKhau.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtMatKhau.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtMatKhau.Location = new System.Drawing.Point(173, 215);
-            this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtMatKhau.Name = "txtMatKhau";
-            this.txtMatKhau.PlaceholderText = "";
-            this.txtMatKhau.SelectedText = "";
-            this.txtMatKhau.Size = new System.Drawing.Size(202, 33);
-            this.txtMatKhau.TabIndex = 4;
+            this.btnDangNhap.BorderRadius = 4;
+            this.btnDangNhap.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnDangNhap.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnDangNhap.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnDangNhap.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnDangNhap.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnDangNhap.ForeColor = System.Drawing.Color.White;
+            this.btnDangNhap.Location = new System.Drawing.Point(23, 313);
+            this.btnDangNhap.Name = "btnDangNhap";
+            this.btnDangNhap.Size = new System.Drawing.Size(180, 45);
+            this.btnDangNhap.TabIndex = 6;
+            this.btnDangNhap.Text = "Đăng Nhập";
+            this.btnDangNhap.Click += new System.EventHandler(this.btnDangNhap_Click);
             // 
             // txtTaiKhoan
             // 
@@ -125,47 +121,54 @@
             this.txtTaiKhoan.Size = new System.Drawing.Size(202, 33);
             this.txtTaiKhoan.TabIndex = 5;
             // 
-            // btnDangNhap
+            // txtMatKhau
             // 
-            this.btnDangNhap.BorderRadius = 4;
-            this.btnDangNhap.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangNhap.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangNhap.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnDangNhap.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnDangNhap.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnDangNhap.ForeColor = System.Drawing.Color.White;
-            this.btnDangNhap.Location = new System.Drawing.Point(23, 313);
-            this.btnDangNhap.Name = "btnDangNhap";
-            this.btnDangNhap.Size = new System.Drawing.Size(180, 45);
-            this.btnDangNhap.TabIndex = 6;
-            this.btnDangNhap.Text = "Đăng Nhập";
+            this.txtMatKhau.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtMatKhau.DefaultText = "";
+            this.txtMatKhau.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtMatKhau.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtMatKhau.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtMatKhau.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtMatKhau.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtMatKhau.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtMatKhau.Location = new System.Drawing.Point(173, 215);
+            this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtMatKhau.Name = "txtMatKhau";
+            this.txtMatKhau.PlaceholderText = "";
+            this.txtMatKhau.SelectedText = "";
+            this.txtMatKhau.Size = new System.Drawing.Size(202, 33);
+            this.txtMatKhau.TabIndex = 4;
             // 
-            // btnDangKy
+            // lblMatKhau
             // 
-            this.btnDangKy.BorderRadius = 4;
-            this.btnDangKy.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangKy.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangKy.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnDangKy.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnDangKy.FillColor = System.Drawing.Color.Gray;
-            this.btnDangKy.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnDangKy.ForeColor = System.Drawing.Color.White;
-            this.btnDangKy.Location = new System.Drawing.Point(222, 313);
-            this.btnDangKy.Name = "btnDangKy";
-            this.btnDangKy.Size = new System.Drawing.Size(180, 45);
-            this.btnDangKy.TabIndex = 7;
-            this.btnDangKy.Text = "Đăng Ký";
+            this.lblMatKhau.AutoSize = true;
+            this.lblMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMatKhau.Location = new System.Drawing.Point(72, 225);
+            this.lblMatKhau.Name = "lblMatKhau";
+            this.lblMatKhau.Size = new System.Drawing.Size(84, 23);
+            this.lblMatKhau.TabIndex = 3;
+            this.lblMatKhau.Text = "Mật Khẩu";
             // 
-            // lnkQuenMatKhau
+            // lblTaiKhoan
             // 
-            this.lnkQuenMatKhau.AutoSize = true;
-            this.lnkQuenMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lnkQuenMatKhau.Location = new System.Drawing.Point(148, 376);
-            this.lnkQuenMatKhau.Name = "lnkQuenMatKhau";
-            this.lnkQuenMatKhau.Size = new System.Drawing.Size(129, 23);
-            this.lnkQuenMatKhau.TabIndex = 8;
-            this.lnkQuenMatKhau.TabStop = true;
-            this.lnkQuenMatKhau.Text = "Quên mật khẩu";
+            this.lblTaiKhoan.AutoSize = true;
+            this.lblTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTaiKhoan.Location = new System.Drawing.Point(27, 176);
+            this.lblTaiKhoan.Name = "lblTaiKhoan";
+            this.lblTaiKhoan.Size = new System.Drawing.Size(129, 23);
+            this.lblTaiKhoan.TabIndex = 2;
+            this.lblTaiKhoan.Text = "Tên Đăng Nhập";
+            // 
+            // lblTieuDe
+            // 
+            this.lblTieuDe.AutoSize = true;
+            this.lblTieuDe.Font = new System.Drawing.Font("Segoe UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTieuDe.Location = new System.Drawing.Point(80, 68);
+            this.lblTieuDe.Name = "lblTieuDe";
+            this.lblTieuDe.Size = new System.Drawing.Size(277, 31);
+            this.lblTieuDe.TabIndex = 1;
+            this.lblTieuDe.Text = "ĐĂNG NHẬP HỆ THỐNG";
             // 
             // DangNhap
             // 
@@ -177,6 +180,7 @@
             this.Name = "DangNhap";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DangNhap";
+            this.Load += new System.EventHandler(this.DangNhap_Load);
             this.pnlDangNhap.ResumeLayout(false);
             this.pnlDangNhap.PerformLayout();
             this.ResumeLayout(false);
