@@ -37,9 +37,9 @@
             this.rtbNhanTin = new System.Windows.Forms.RichTextBox();
             this.txtNhanTin = new Guna.UI2.WinForms.Guna2TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnIcon = new System.Windows.Forms.Button();
             this.btnGui = new System.Windows.Forms.Button();
+            this.btnIcon = new System.Windows.Forms.Button();
+            this.flowLayoutPanel4 = new System.Windows.Forms.FlowLayoutPanel();
             this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
             this.guna2CirclePictureBox1 = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.guna2CirclePictureBox2 = new Guna.UI2.WinForms.Guna2CirclePictureBox();
@@ -56,9 +56,10 @@
             this.flowLayoutPanel1.Controls.Add(this.txtTimKiem);
             this.flowLayoutPanel1.Controls.Add(this.btnTimKiem);
             this.flowLayoutPanel1.Controls.Add(this.flowLayoutPanel2);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(9, 3);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 4);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(264, 37);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(352, 46);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
             // txtTimKiem
@@ -72,32 +73,36 @@
             this.txtTimKiem.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtTimKiem.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtTimKiem.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtTimKiem.Location = new System.Drawing.Point(3, 3);
+            this.txtTimKiem.Location = new System.Drawing.Point(4, 5);
+            this.txtTimKiem.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtTimKiem.Name = "txtTimKiem";
             this.txtTimKiem.PlaceholderText = "";
             this.txtTimKiem.SelectedText = "";
-            this.txtTimKiem.Size = new System.Drawing.Size(200, 36);
+            this.txtTimKiem.Size = new System.Drawing.Size(267, 44);
             this.txtTimKiem.TabIndex = 0;
             // 
             // btnTimKiem
             // 
             this.btnTimKiem.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnTimKiem.BackgroundImage")));
             this.btnTimKiem.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.btnTimKiem.Location = new System.Drawing.Point(209, 3);
+            this.btnTimKiem.Location = new System.Drawing.Point(279, 4);
+            this.btnTimKiem.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnTimKiem.Name = "btnTimKiem";
-            this.btnTimKiem.Size = new System.Drawing.Size(38, 34);
+            this.btnTimKiem.Size = new System.Drawing.Size(51, 42);
             this.btnTimKiem.TabIndex = 1;
             this.btnTimKiem.UseVisualStyleBackColor = true;
             // 
             // flowLayoutPanel2
             // 
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 45);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(4, 58);
+            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(200, 100);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(267, 123);
             this.flowLayoutPanel2.TabIndex = 2;
             // 
             // guna2ContextMenuStrip1
             // 
+            this.guna2ContextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.guna2ContextMenuStrip1.Name = "guna2ContextMenuStrip1";
             this.guna2ContextMenuStrip1.RenderStyle.ArrowColor = System.Drawing.Color.FromArgb(((int)(((byte)(151)))), ((int)(((byte)(143)))), ((int)(((byte)(255)))));
             this.guna2ContextMenuStrip1.RenderStyle.BorderColor = System.Drawing.Color.Gainsboro;
@@ -112,9 +117,10 @@
             // 
             // rtbNhanTin
             // 
-            this.rtbNhanTin.Location = new System.Drawing.Point(276, 3);
+            this.rtbNhanTin.Location = new System.Drawing.Point(368, 4);
+            this.rtbNhanTin.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.rtbNhanTin.Name = "rtbNhanTin";
-            this.rtbNhanTin.Size = new System.Drawing.Size(619, 383);
+            this.rtbNhanTin.Size = new System.Drawing.Size(824, 470);
             this.rtbNhanTin.TabIndex = 2;
             this.rtbNhanTin.Text = "";
             // 
@@ -129,11 +135,12 @@
             this.txtNhanTin.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtNhanTin.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtNhanTin.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtNhanTin.Location = new System.Drawing.Point(3, 3);
+            this.txtNhanTin.Location = new System.Drawing.Point(4, 5);
+            this.txtNhanTin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtNhanTin.Name = "txtNhanTin";
             this.txtNhanTin.PlaceholderText = "";
             this.txtNhanTin.SelectedText = "";
-            this.txtNhanTin.Size = new System.Drawing.Size(558, 82);
+            this.txtNhanTin.Size = new System.Drawing.Size(744, 101);
             this.txtNhanTin.TabIndex = 3;
             // 
             // tableLayoutPanel1
@@ -143,82 +150,90 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.Controls.Add(this.btnGui, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.btnIcon, 0, 0);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(567, 3);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(756, 4);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(58, 82);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(77, 101);
             this.tableLayoutPanel1.TabIndex = 4;
-            // 
-            // flowLayoutPanel4
-            // 
-            this.flowLayoutPanel4.Controls.Add(this.txtNhanTin);
-            this.flowLayoutPanel4.Controls.Add(this.tableLayoutPanel1);
-            this.flowLayoutPanel4.Location = new System.Drawing.Point(276, 392);
-            this.flowLayoutPanel4.Name = "flowLayoutPanel4";
-            this.flowLayoutPanel4.Size = new System.Drawing.Size(644, 97);
-            this.flowLayoutPanel4.TabIndex = 5;
-            // 
-            // btnIcon
-            // 
-            this.btnIcon.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnIcon.BackgroundImage")));
-            this.btnIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnIcon.Location = new System.Drawing.Point(3, 3);
-            this.btnIcon.Name = "btnIcon";
-            this.btnIcon.Size = new System.Drawing.Size(49, 32);
-            this.btnIcon.TabIndex = 0;
-            this.btnIcon.UseVisualStyleBackColor = true;
             // 
             // btnGui
             // 
             this.btnGui.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnGui.BackgroundImage")));
             this.btnGui.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.btnGui.Location = new System.Drawing.Point(3, 44);
+            this.btnGui.Location = new System.Drawing.Point(4, 54);
+            this.btnGui.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnGui.Name = "btnGui";
-            this.btnGui.Size = new System.Drawing.Size(49, 32);
+            this.btnGui.Size = new System.Drawing.Size(65, 39);
             this.btnGui.TabIndex = 6;
             this.btnGui.UseVisualStyleBackColor = true;
+            // 
+            // btnIcon
+            // 
+            this.btnIcon.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnIcon.BackgroundImage")));
+            this.btnIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.btnIcon.Location = new System.Drawing.Point(4, 4);
+            this.btnIcon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnIcon.Name = "btnIcon";
+            this.btnIcon.Size = new System.Drawing.Size(65, 39);
+            this.btnIcon.TabIndex = 0;
+            this.btnIcon.UseVisualStyleBackColor = true;
+            // 
+            // flowLayoutPanel4
+            // 
+            this.flowLayoutPanel4.Controls.Add(this.txtNhanTin);
+            this.flowLayoutPanel4.Controls.Add(this.tableLayoutPanel1);
+            this.flowLayoutPanel4.Location = new System.Drawing.Point(368, 482);
+            this.flowLayoutPanel4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.flowLayoutPanel4.Name = "flowLayoutPanel4";
+            this.flowLayoutPanel4.Size = new System.Drawing.Size(859, 119);
+            this.flowLayoutPanel4.TabIndex = 5;
             // 
             // guna2Panel1
             // 
             this.guna2Panel1.Controls.Add(this.flowLayoutPanel1);
             this.guna2Panel1.Controls.Add(this.rtbNhanTin);
             this.guna2Panel1.Controls.Add(this.flowLayoutPanel4);
-            this.guna2Panel1.Location = new System.Drawing.Point(12, 96);
+            this.guna2Panel1.Location = new System.Drawing.Point(16, 118);
+            this.guna2Panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2Panel1.Name = "guna2Panel1";
-            this.guna2Panel1.Size = new System.Drawing.Size(898, 502);
+            this.guna2Panel1.Size = new System.Drawing.Size(1197, 618);
             this.guna2Panel1.TabIndex = 6;
             // 
             // guna2CirclePictureBox1
             // 
             this.guna2CirclePictureBox1.ImageRotate = 0F;
-            this.guna2CirclePictureBox1.Location = new System.Drawing.Point(12, 12);
+            this.guna2CirclePictureBox1.Location = new System.Drawing.Point(16, 15);
+            this.guna2CirclePictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2CirclePictureBox1.Name = "guna2CirclePictureBox1";
             this.guna2CirclePictureBox1.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.guna2CirclePictureBox1.Size = new System.Drawing.Size(64, 64);
+            this.guna2CirclePictureBox1.Size = new System.Drawing.Size(85, 79);
             this.guna2CirclePictureBox1.TabIndex = 7;
             this.guna2CirclePictureBox1.TabStop = false;
             // 
             // guna2CirclePictureBox2
             // 
             this.guna2CirclePictureBox2.ImageRotate = 0F;
-            this.guna2CirclePictureBox2.Location = new System.Drawing.Point(846, 12);
+            this.guna2CirclePictureBox2.Location = new System.Drawing.Point(1128, 15);
+            this.guna2CirclePictureBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.guna2CirclePictureBox2.Name = "guna2CirclePictureBox2";
             this.guna2CirclePictureBox2.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.guna2CirclePictureBox2.Size = new System.Drawing.Size(64, 64);
+            this.guna2CirclePictureBox2.Size = new System.Drawing.Size(85, 79);
             this.guna2CirclePictureBox2.TabIndex = 8;
             this.guna2CirclePictureBox2.TabStop = false;
             // 
             // TrangChu
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.ClientSize = new System.Drawing.Size(923, 616);
+            this.ClientSize = new System.Drawing.Size(1231, 758);
             this.Controls.Add(this.guna2CirclePictureBox2);
             this.Controls.Add(this.guna2CirclePictureBox1);
             this.Controls.Add(this.guna2Panel1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "TrangChu";
             this.Text = "TrangChu";
             this.flowLayoutPanel1.ResumeLayout(false);
