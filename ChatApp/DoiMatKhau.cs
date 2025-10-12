@@ -17,12 +17,12 @@ namespace ChatApp
             _taiKhoan = taiKhoan;
 
             // Thiết lập cấu hình kết nối Firebase
-            var MinhHoangDaLamCaiNay = new FirebaseConfig
+            var config = new FirebaseConfig
             {
                 AuthSecret = "RBVYwGVpeA360cuFw7YcoiPKAf07ZpFHrZma2mx0",
                 BasePath = "https://fir-client-1d344-default-rtdb.firebaseio.com/"
             };
-            _firebase = new FireSharp.FirebaseClient(MinhHoangDaLamCaiNay);
+            _firebase = new FireSharp.FirebaseClient(config);
 
             
         }

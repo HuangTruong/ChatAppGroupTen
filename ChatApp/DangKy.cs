@@ -17,14 +17,14 @@ namespace ChatApp
             InitializeComponent();
 
             // Cấu hình Firebase (gồm khóa bảo mật và đường dẫn database)
-            IFirebaseConfig MinhHoangDaCodeCaiNay = new FirebaseConfig
+            IFirebaseConfig config = new FirebaseConfig
             {
                 AuthSecret = "RBVYwGVpeA360cuFw7YcoiPKAf07ZpFHrZma2mx0",
                 BasePath = "https://fir-client-1d344-default-rtdb.firebaseio.com/"
             };
 
             // Tạo đối tượng FirebaseClient để giao tiếp với Firebase
-            firebaseClient = new FireSharp.FirebaseClient(MinhHoangDaCodeCaiNay);
+            firebaseClient = new FireSharp.FirebaseClient(config);
 
             // Nếu kết nối thất bại thì báo lỗi
             if (firebaseClient == null)

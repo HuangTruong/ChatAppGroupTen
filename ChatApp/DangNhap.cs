@@ -16,7 +16,7 @@ namespace ChatApp
             InitializeComponent();
 
             // Cấu hình Firebase (gồm AuthSecret và BasePath)
-            IFirebaseConfig MinhHoangDaVietCaiNay = new FirebaseConfig
+            IFirebaseConfig config = new FirebaseConfig
             {
                 // AuthSecret là khóa bí mật để xác thực kết nối tới database (Copy trong dự án firebase)
                 AuthSecret = "RBVYwGVpeA360cuFw7YcoiPKAf07ZpFHrZma2mx0",
@@ -26,7 +26,7 @@ namespace ChatApp
             };
 
             // Tạo đối tượng FirebaseClient để làm việc với database
-            firebaseClient = new FireSharp.FirebaseClient(MinhHoangDaVietCaiNay);
+            firebaseClient = new FireSharp.FirebaseClient(config);
 
             // Kiểm tra nếu không kết nối được thì báo lỗi
             if (firebaseClient == null)
