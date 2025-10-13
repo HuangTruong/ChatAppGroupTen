@@ -1,0 +1,145 @@
+Modern Blue UI
+
+Form 
+	StartPosition : CenterScreen
+
+Nền Gradient Form	
+	FillColor1 : #74B9FF 	Xanh nhạt
+	FillColor2 : #0984E3	Xanh dương đậm
+	GradientMode : Vertical
+	Dock: Fill
+	
+Panel Đăng Nhập 
+	BackColor                     : #FFFFFF
+	FillColor                     : (Khung trắng)	#FFFFFF	Trắng tinh khiết
+	BorderRadius                  : 15
+	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
+	ShadowDecoration.BorderRadius : 15
+	ShadowDecoration.Enabled      : True
+	ShadowDecoration.Depth        : 20
+	Anchor                        : none
+
+Textbox 	
+	BorderRadius             : 10
+	FillColor                :  #F5F6FA	Gần trắng, mềm mắt
+	BorderColor              : #DADCE0	Xám nhạt
+	FocusedState.BorderColor : #0984E3	Xanh chủ đạo
+	PasswordChar             : '●' (DÙNG CHO MẬT KHẨU)
+Nút Chính 
+	BorderRadius                  : 10
+	FillColor                     : #0984E3	Xanh chủ đạo
+	HoverState.FillColor          : #74B9FF	Xanh sáng hơn
+	Font                          : Segoe UI, 10pt, SemiBold
+	ForeColor                     : White
+	ShadowDecoration.Enabled      : True
+	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
+	ShadowDecoration.BorderRadius : 10
+	ShadowDecoration.Depth        : 10
+Nút phụ
+	BorderRadius                  : 10
+	FillColor                     : #2D3436	Xám đậm hơn
+	HoverState.FillColor          : #636E72	Xám hiện đại
+	Font                          : Segoe UI, 10pt, SemiBold
+	ForeColor                     : White
+	ShadowDecoration.Enabled      : True
+	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
+	ShadowDecoration.BorderRadius : 10
+	ShadowDecoration.Depth        : 10
+
+label Tiêu đề 
+	Font      : Segoe UI Semibold,16pt
+	ForeColor : #2D3436	Đen xám	Rõ ràng
+
+label chữ chính	
+	Font      : Segoe UI Semibold,10pt
+	ForeColor : #2D3436	Đen xám	Rõ ràng
+
+Link “Quên mật khẩu”	
+	LinkColor       : #0D47A1	Xanh đậm
+	ActiveLinkColor : #0984E3	Xanh chủ đạo
+	Font            : Segoe UI, 10pt, Italic
+
+DateTimePicker 
+	BorderRadius	10
+	FillColor	#F5F6FA
+	BorderColor	#DADCE0
+	FocusedColor	#0984E3
+	ForeColor	#2D3436
+	Font	Segoe UI, 9pt
+	Format	Short
+	HoverState.FillColor	#E3F2FD
+
+usercontrol CuocTroChuyen
+Form
+	size : 600 x 30
+	backcolor : white
+	Padding : (8, 5, 8, 5)
+
+picAnhDaiDien	
+	10, 7	
+	45 x 45	
+lblTen	
+	65, 8	
+	200 x 20	
+	Font: Segoe UI, 10pt, Bold
+lblTinNhanCuoiCung	
+	65, 30	
+	200 x 20	
+	Font: Segoe UI, 9pt, semibold, màu xám nhạt
+pnlNganCach
+	Màu Color.LightGray
+	Dock = Bottom	
+
+usercontrol TinNhanCuaBan
+Form
+	Size	400 x 65
+	BackColor	Transparent
+picAnhDaiDien	
+	10, 10
+	45x45	
+	SizeMode = Zoom
+pnlBubble	
+	BorderRadius = 12
+	FillColor : 235, 235, 235
+	60, 10
+	AutoSize = True	
+lblMessage	
+	MaximumSize = 250 x 0
+	AutoSize = True
+	lblMessage.Font	Segoe UI, 10pt	
+	lblMessage.ForeColor	Black	
+	lblMessage.Padding	(8, 5, 8, 5)
+
+usercontrol TinNhanCuaToi
+Form
+	Size	400 x 65
+	BackColor	Transparent
+picAnhDaiDien
+	345, 10
+	45x45
+	SizeMode = Zoom
+pnlKhungTinNhan
+	BorderRadius = 12
+	FillColor : (0, 120, 255)
+	AutoSize = True
+	Anchor = Top, Right
+lblTinNhan
+	AutoSize = True
+	ForeColor	White	
+	Font	Segoe UI, 10pt	
+	Padding	(8, 5, 8, 5)	
+	MaximumSize	250 x 0
+
+Form
+	Size	400 x 65
+	BackColor	Transparent
+FormChat
+flpDanhSachChat
+	AutoScroll	True
+	FlowDirection	TopDown
+	WrapContents	False
+	Padding	        (0, 5, 0, 5)
+	BackColor	Color.White
+flbKhungChat
+	FlowDirection	TopDown
+	WrapContents	False
