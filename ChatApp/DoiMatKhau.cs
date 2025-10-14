@@ -24,9 +24,13 @@ namespace ChatApp
                 AuthSecret = "RBVYwGVpeA360cuFw7YcoiPKAf07ZpFHrZma2mx0",
                 BasePath = "https://fir-client-1d344-default-rtdb.firebaseio.com/"
             };
+
+            // Tạo client Firebase
             _firebase = new FireSharp.FirebaseClient(MinhHoangDaLamCaiNay);
 
-            
+            // Gắn lại event
+            btnDoiMatKhau.Click -= btnDoiMatKhau_Click_1;
+            btnDoiMatKhau.Click += btnDoiMatKhau_Click;
         }
 
         // Hàm chuyển ký tự đặc biệt trong tài khoản thành key hợp lệ của Firebase
@@ -100,6 +104,12 @@ namespace ChatApp
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void DoiMatKhau_Load(object sender, EventArgs e) { }
+
+        private void btnDoiMatKhau_Click_1(object sender, EventArgs e)
+        {
+            // Event trống để tránh xung đột
+        }
     }
 }

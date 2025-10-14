@@ -13,6 +13,11 @@ namespace ChatApp
 {
     public partial class TrangChu : Form
     {
+        // [ADDED] chỉ mở 1 cửa sổ NhanTin
+        private NhanTin _nhanTinForm;
+        // [ADDED] chống double-click spam
+        private bool _isOpeningNhanTin = false;
+
         public TrangChu()
         {
             InitializeComponent();
@@ -21,16 +26,73 @@ namespace ChatApp
         // Nhấn vào panel + picturebox + label Nhan Tin
         private void pnlNhanTin_Click(object sender, EventArgs e)
         {
-            NhanTin f = new NhanTin();
-            f.Show();
+            // [ADDED] nếu đang mở thì bỏ qua
+            if (_isOpeningNhanTin) return;
+            _isOpeningNhanTin = true;
+
+            try
+            {
+                // [ADDED] nếu đã có thì bring-to-front thay vì tạo mới
+                if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+                {
+                    _nhanTinForm.WindowState = FormWindowState.Normal;
+                    _nhanTinForm.Show();       // đảm bảo visible
+                    _nhanTinForm.Activate();   // focus
+                    _nhanTinForm.BringToFront();
+                    return;
+                }
+
+                // [ADDED] tạo mới, gắn Owner để quản lý vòng đời
+                _nhanTinForm = new NhanTin();
+                _nhanTinForm.StartPosition = FormStartPosition.CenterParent;
+                _nhanTinForm.FormClosed += (s, args) =>
+                {
+                    // [ADDED] khi đóng thì cho phép tạo lại
+                    _nhanTinForm = null;
+                };
+
+                // [ADDED] trong lúc show, tạm khóa click để khỏi spam
+                ToggleNhanTinTargets(false);
+                _nhanTinForm.Show(this);
+            }
+            finally
+            {
+                // [ADDED] mở lại click
+                _isOpeningNhanTin = false;
+                ToggleNhanTinTargets(true);
+            }
+        }
+
+        // [ADDED] tiện ích bật/tắt click trên 3 control
+        private void ToggleNhanTinTargets(bool enabled)
+        {
+            try
+            {
+                pnlNhanTin.Enabled = enabled;
+                picNhanTin.Enabled = enabled;
+                lblNhanTin.Enabled = enabled;
+                this.UseWaitCursor = !enabled;
+            }
+            catch { /* an toàn */ }
         }
 
         // Gắn sự kiện cho cả panel, picturebox, label
         private void TrangChu_Load(object sender, EventArgs e)
         {
+            // [NOTE] Load chạy 1 lần/instance, nên attach ở đây là ổn
             pnlNhanTin.Click += pnlNhanTin_Click;
             picNhanTin.Click += pnlNhanTin_Click;
             lblNhanTin.Click += pnlNhanTin_Click;
+
+            // [ADDED] cũng bắt luôn double-click nếu có
+            pnlNhanTin.DoubleClick += pnlNhanTin_Click;
+            picNhanTin.DoubleClick += pnlNhanTin_Click;
+            lblNhanTin.DoubleClick += pnlNhanTin_Click;
+        }
+
+        private void guna2GradientPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
