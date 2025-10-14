@@ -33,7 +33,8 @@ namespace ChatApp
 
         private void DangKy_Load(object sender, EventArgs e)
         {
-            
+            // Gán sự kiện ẩn hiện mật khẩu cho cả Xác Nhận Mật Khẩu để mở đồng thời cả hai
+            txtXacNhanMatKhau.IconRightClick += txtMatKhau_IconRightClick;
         }
 
         // Nút “Quay lại đăng nhập”
@@ -153,6 +154,27 @@ namespace ChatApp
                 // Nếu có lỗi trong quá trình xử lý (ví dụ lỗi mạng, Firebase lỗi)
                 MessageBox.Show("Đã xảy ra lỗi: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        bool isMatKhau = true;  // Ban đầu đang ẩn
+        private void txtMatKhau_IconRightClick(object sender, EventArgs e)
+        {
+            if (isMatKhau)
+            {
+                txtMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
+                txtMatKhau.IconRight = Properties.Resources.HienMatKhau; // đổi icon sang mắt mở
+                txtXacNhanMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
+                txtXacNhanMatKhau.IconRight = Properties.Resources.HienMatKhau; // đổi icon sang mắt mở
+                isMatKhau = false;
+            }
+            else
+            {
+                txtMatKhau.PasswordChar = '●'; // Ẩn mật khẩu
+                txtMatKhau.IconRight = Properties.Resources.AnMatKhau; // đổi lại icon mắt đóng
+                txtXacNhanMatKhau.PasswordChar = '●'; // Ẩn mật khẩu
+                txtXacNhanMatKhau.IconRight = Properties.Resources.AnMatKhau; // đổi lại icon mắt đóng
+                isMatKhau = true;
             }
         }
     }

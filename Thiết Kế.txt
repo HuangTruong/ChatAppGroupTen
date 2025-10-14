@@ -1,7 +1,10 @@
 Modern Blue UI
 
-Form 
+Form (frmDangNhap)
+	Size : 800,500
+	FromBorderStyle : FixedSingle
 	StartPosition : CenterScreen
+
 
 Nền Gradient Form	
 	FillColor1 : #74B9FF 	Xanh nhạt
@@ -9,23 +12,56 @@ Nền Gradient Form
 	GradientMode : Vertical
 	Dock: Fill
 	
-Panel Đăng Nhập 
+Panel 
 	BackColor                     : #FFFFFF
 	FillColor                     : (Khung trắng)	#FFFFFF	Trắng tinh khiết
-	BorderRadius                  : 15
+	BorderRadius                  : 20
 	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
-	ShadowDecoration.BorderRadius : 15
+	ShadowDecoration.BorderRadius : 20
 	ShadowDecoration.Enabled      : True
 	ShadowDecoration.Depth        : 20
 	Anchor                        : none
+	Dock			      : none
+	Size                          : 400,350 (frmDangNhap)
+	Size : 400,420 (frmDangKy)
 
-Textbox 	
-	BorderRadius             : 10
-	FillColor                :  #F5F6FA	Gần trắng, mềm mắt
+Textbox 
+	BorderRadius             : 15
+	FillColor                : 245, 248, 255
 	BorderColor              : #DADCE0	Xám nhạt
-	FocusedState.BorderColor : #0984E3	Xanh chủ đạo
+	HoverState.FillColor : 235, 240, 255
+	FocusedState.BorderColor : #2193b0
+	Size : 270,40 
+	
+Textbox (txtMatKhau)
+	BorderRadius             : 15
+	FillColor                : 245, 248, 255
+	BorderColor              : #DADCE0	Xám nhạt
+	HoverState.FillColor : 235, 240, 255
+	FocusedState.BorderColor : #2193b0
+	Size : 270,40
 	PasswordChar             : '●' (DÙNG CHO MẬT KHẨU)
-Nút Chính 
+	IconRight		 : AnMatKhau(icon)
+	IconRightCursor          : Hand
+ComboBox
+	BorderRadius             : 15
+	FillColor                : 245, 248, 255
+	BorderColor              : #DADCE0	
+	HoverState.FillColor : 235, 240, 255
+	FocusedState.BorderColor : #2193b0
+	Size : 270,40
+
+DateTimePicker 
+	BorderRadius	15
+	FillColor                : 245, 248, 255
+	BorderColor	#DADCE0
+	FocusedColor	#2193b0
+	ForeColor	#2D3436
+	HoverState.FillColor : 235, 240, 255
+	Font	Segoe UI, 9pt
+	Format	Short
+	
+Nút Chính (btnDangNhap)
 	BorderRadius                  : 10
 	FillColor                     : #0984E3	Xanh chủ đạo
 	HoverState.FillColor          : #74B9FF	Xanh sáng hơn
@@ -35,7 +71,8 @@ Nút Chính
 	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
 	ShadowDecoration.BorderRadius : 10
 	ShadowDecoration.Depth        : 10
-Nút phụ
+	Size : 150,45
+Nút phụ (btnDangKy(formDangKy))
 	BorderRadius                  : 10
 	FillColor                     : #2D3436	Xám đậm hơn
 	HoverState.FillColor          : #636E72	Xám hiện đại
@@ -45,9 +82,10 @@ Nút phụ
 	ShadowDecoration.FillColor    : #B0BEC5 (opacity nhẹ)	Xám lam nhạt
 	ShadowDecoration.BorderRadius : 10
 	ShadowDecoration.Depth        : 10
+	Size : 150,45
 
-label Tiêu đề 
-	Font      : Segoe UI Semibold,16pt
+label Tiêu đề (lblTieuDe)
+	Font      : Segoe UI, Bold, 14pt
 	ForeColor : #2D3436	Đen xám	Rõ ràng
 
 label chữ chính	
@@ -59,15 +97,6 @@ Link “Quên mật khẩu”
 	ActiveLinkColor : #0984E3	Xanh chủ đạo
 	Font            : Segoe UI, 10pt, Italic
 
-DateTimePicker 
-	BorderRadius	10
-	FillColor	#F5F6FA
-	BorderColor	#DADCE0
-	FocusedColor	#0984E3
-	ForeColor	#2D3436
-	Font	Segoe UI, 9pt
-	Format	Short
-	HoverState.FillColor	#E3F2FD
 
 usercontrol CuocTroChuyen
 Form

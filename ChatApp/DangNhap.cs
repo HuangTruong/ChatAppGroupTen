@@ -123,6 +123,23 @@ namespace ChatApp
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        bool isMatKhau = true;  // Ban đầu đang ẩn
+        private void txtMatKhau_IconRightClick(object sender, EventArgs e)
+        {
+            if (isMatKhau)
+            {
+                txtMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
+                txtMatKhau.IconRight = Properties.Resources.HienMatKhau; // đổi icon sang mắt mở
+                isMatKhau = false;
+            }
+            else
+            {
+                txtMatKhau.PasswordChar = '●'; // Ẩn mật khẩu
+                txtMatKhau.IconRight = Properties.Resources.AnMatKhau; // đổi lại icon mắt đóng
+                isMatKhau = true;
+            }
+        }
     }
 
     // Class này đại diện cho thông tin người dùng lưu trên Firebase
