@@ -18,6 +18,10 @@ namespace ChatApp
             InitializeComponent();
             _taiKhoan = taiKhoan;
 
+            // gắn lại event
+            btnDoiMatKhau.Click -= btnDoiMatKhau_Click_1;
+            btnDoiMatKhau.Click += btnDoiMatKhau_Click;
+
             try
             {
                 // Thiết lập cấu hình Firebase
@@ -109,5 +113,10 @@ namespace ChatApp
         }
 
         private void DoiMatKhau_Load(object sender, EventArgs e) { }
+
+        private void btnDoiMatKhau_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

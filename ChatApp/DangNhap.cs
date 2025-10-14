@@ -4,12 +4,20 @@ using FireSharp.Response;
 using System;
 using System.Windows.Forms;
 
+// [ADDED] chống re-entry & async hỗ trợ
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace ChatApp
 {
     public partial class DangNhap : Form
     {
         // Biến để kết nối tới Firebase
         private IFirebaseClient firebaseClient;
+
+        // [ADDED] — chặn spam click (double/triple click)
+        private bool _isLoggingIn = false;
+        private readonly SemaphoreSlim _loginGate = new SemaphoreSlim(1, 1);
 
         public DangNhap()
         {
@@ -37,7 +45,7 @@ namespace ChatApp
 
         private void DangNhap_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         // Khi bấm nút “Đăng ký” thì mở form Đăng Ký
@@ -61,27 +69,43 @@ namespace ChatApp
         // Xử lý đăng nhập khi bấm nút “Đăng nhập”
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
-            string taiKhoan = txtTaiKhoan.Text;
-            string matKhau = txtMatKhau.Text;
+            // [ADDED] — nếu đang có phiên đăng nhập chạy, bỏ qua click mới
+            if (_isLoggingIn) return;
 
-            // Kiểm tra người dùng có để trống tài khoản không
-            if (string.IsNullOrWhiteSpace(taiKhoan))
-            {
-                MessageBox.Show("Vui lòng nhập tên đăng nhập!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            // [ADDED] — set cờ ngay lập tức để chặn double-click trước khi await
+            _isLoggingIn = true;
 
-            // Kiểm tra mật khẩu có bị bỏ trống không
-            if (string.IsNullOrWhiteSpace(matKhau))
-            {
-                MessageBox.Show("Vui lòng nhập mật khẩu!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            // [ADDED] — vô hiệu hóa nút & Enter, hiển thị wait cursor
+            var oldAccept = this.AcceptButton;
+            this.AcceptButton = null;
+            bool oldEnabled = btnDangNhap.Enabled;
+            btnDangNhap.Enabled = false;
+            this.UseWaitCursor = true;
 
             try
             {
+                // [ADDED] — đảm bảo tuyệt đối chỉ 1 luồng đăng nhập chạy
+                await _loginGate.WaitAsync();
+
+                string taiKhoan = txtTaiKhoan.Text;
+                string matKhau = txtMatKhau.Text;
+
+                // Kiểm tra người dùng có để trống tài khoản không
+                if (string.IsNullOrWhiteSpace(taiKhoan))
+                {
+                    MessageBox.Show("Vui lòng nhập tên đăng nhập!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Kiểm tra mật khẩu có bị bỏ trống không
+                if (string.IsNullOrWhiteSpace(matKhau))
+                {
+                    MessageBox.Show("Vui lòng nhập mật khẩu!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 // Gửi yêu cầu GET đến Firebase để lấy thông tin người dùng theo tài khoản
                 FirebaseResponse userResponse = await firebaseClient.GetAsync($"users/{taiKhoan}");
 
@@ -113,8 +137,28 @@ namespace ChatApp
                 txtMatKhau.Clear();
 
                 // Ẩn form đăng nhập và mở form Trang Chủ
+                // [ADDED] — không tạo nhiều TrangChu, nếu có rồi thì Activate
+                Form existed = null;
+                foreach (Form f in Application.OpenForms)
+                {
+                    if (f is TrangChu && !f.IsDisposed)
+                    {
+                        existed = f;
+                        break;
+                    }
+                }
+
                 this.Hide();
-                new TrangChu().Show();
+
+                if (existed != null)
+                {
+                    existed.Show();
+                    existed.Activate();
+                }
+                else
+                {
+                    new TrangChu().Show();
+                }
             }
             catch (Exception ex)
             {
@@ -122,6 +166,22 @@ namespace ChatApp
                 MessageBox.Show("Lỗi đăng nhập: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                // [ADDED] — nhả khóa và khôi phục UI
+                if (_loginGate.CurrentCount == 0)
+                    _loginGate.Release();
+
+                _isLoggingIn = false;
+                btnDangNhap.Enabled = oldEnabled;
+                this.AcceptButton = oldAccept;
+                this.UseWaitCursor = false;
+            }
+        }
+
+        private void pnlBackground_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 

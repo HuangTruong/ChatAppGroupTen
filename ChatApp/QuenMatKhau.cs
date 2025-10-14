@@ -8,6 +8,10 @@ using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
+// Thư viện để sài SemaphoreSlim (chống double click) chống re-entry & async hỗ trợ
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace ChatApp
 {
     public partial class QuenMatKhau : Form
@@ -19,9 +23,23 @@ namespace ChatApp
         private DateTime hanSuDungMa;        // Thời hạn của mã OTP
         private string taiKhoanDangXacNhan;  // Tài khoản đang khôi phục mật khẩu
 
+        // chống spam gửi OTP / xác nhận OTP
+        private bool _isSendingOtp = false;
+        private readonly SemaphoreSlim _otpGate = new SemaphoreSlim(1, 1);
+        private bool _isConfirming = false;
+        private readonly SemaphoreSlim _confirmGate = new SemaphoreSlim(1, 1);
+
+        // cooldown để hạn chế gửi OTP liên tục
+        private DateTime _nextOtpAt = DateTime.MinValue;
+        private static readonly TimeSpan _otpCooldown = TimeSpan.FromSeconds(60);
+
+        // chỉ mở 1 form đổi mật khẩu
+        private DoiMatKhau _doiMatKhauForm;
+
         public QuenMatKhau()
         {
             InitializeComponent();
+            this.Load += new System.EventHandler(this.QuenMatKhau_Load);
 
             // Cấu hình Firebase
             IFirebaseConfig cauHinh = new FirebaseConfig
@@ -33,132 +51,209 @@ namespace ChatApp
             ketNoiFirebase = new FireSharp.FirebaseClient(cauHinh);
         }
 
-        
-
         // Gửi mã xác nhận qua email
         private async void btnGuiMaXacNhan_Click(object sender, EventArgs e)
         {
-            string emailNhap = txtEmail.Text.Trim();
-            string taiKhoanNhap = txtTaiKhoan.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(emailNhap) || string.IsNullOrWhiteSpace(taiKhoanNhap))
+            // chống double click & cooldown
+            if (_isSendingOtp) return;
+            if (DateTime.UtcNow < _nextOtpAt)
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var remain = (_nextOtpAt - DateTime.UtcNow);
+                MessageBox.Show($"Bạn vừa gửi OTP rồi. Vui lòng thử lại sau {Math.Ceiling(remain.TotalSeconds)} giây.",
+                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            _isSendingOtp = true;
+
+            // khoá UI trong lúc xử lý
+            var oldEnabled = btnGuiMaXacNhan.Enabled;
+            btnGuiMaXacNhan.Enabled = false;
+            var oldAccept = this.AcceptButton;
+            this.AcceptButton = null;
+            this.UseWaitCursor = true;
 
             try
             {
-                if (ketNoiFirebase == null)
+                await _otpGate.WaitAsync();
+
+                string emailNhap = txtEmail.Text.Trim();
+                string taiKhoanNhap = txtTaiKhoan.Text.Trim();
+
+                if (string.IsNullOrWhiteSpace(emailNhap) || string.IsNullOrWhiteSpace(taiKhoanNhap))
                 {
-                    MessageBox.Show("Không thể kết nối Firebase!", "Lỗi",
+                    MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                string taiKhoanKey = ChuyenKeyHopLe(taiKhoanNhap);
-
-                // Lấy thông tin người dùng từ Firebase
-                FirebaseResponse phanHoi = await ketNoiFirebase.GetAsync($"users/{taiKhoanKey}");
-                if (phanHoi.Body == "null")
+                try
                 {
-                    MessageBox.Show("Tài khoản không tồn tại!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                    if (ketNoiFirebase == null)
+                    {
+                        MessageBox.Show("Không thể kết nối Firebase!", "Lỗi",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                var nguoiDung = phanHoi.ResultAs<NguoiDungFirebase>();
-                if (!string.Equals(nguoiDung.Email?.Trim(), emailNhap, StringComparison.OrdinalIgnoreCase))
+                    string taiKhoanKey = ChuyenKeyHopLe(taiKhoanNhap);
+
+                    // Lấy thông tin người dùng từ Firebase
+                    FirebaseResponse phanHoi = await ketNoiFirebase.GetAsync($"users/{taiKhoanKey}");
+                    if (phanHoi.Body == "null")
+                    {
+                        MessageBox.Show("Tài khoản không tồn tại!", "Lỗi",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    var nguoiDung = phanHoi.ResultAs<NguoiDungFirebase>();
+                    if (!string.Equals(nguoiDung.Email?.Trim(), emailNhap, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show("Email không trùng với tài khoản!", "Lỗi",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Tạo mã xác nhận ngẫu nhiên và đặt hạn sử dụng
+                    maXacNhanHienTai = new Random().Next(100000, 999999).ToString();
+                    hanSuDungMa = DateTime.UtcNow.AddMinutes(5);
+                    taiKhoanDangXacNhan = taiKhoanNhap;
+
+                    // Lưu mã OTP lên Firebase (nếu cần)
+                    var thongTinMa = new { Ma = maXacNhanHienTai, HetHanLuc = hanSuDungMa.ToString("o") };
+                    await ketNoiFirebase.SetAsync($"otp/{taiKhoanKey}", thongTinMa);
+
+                    // Gửi mã OTP qua email
+                    GuiEmailXacNhan(emailNhap, maXacNhanHienTai);
+
+                    // đặt cooldown
+                    _nextOtpAt = DateTime.UtcNow.Add(_otpCooldown);
+
+                    MessageBox.Show("Đã gửi mã xác nhận qua email (có hạn trong 5 phút).", "Thông báo",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    txtMaXacNhan.Focus();
+                    txtMaXacNhan.SelectAll();
+                }
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Email không trùng với tài khoản!", "Lỗi",
+                    MessageBox.Show("Lỗi gửi mã xác nhận: " + ex.Message, "Lỗi",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
                 }
-
-                // Tạo mã xác nhận ngẫu nhiên và đặt hạn sử dụng
-                maXacNhanHienTai = new Random().Next(100000, 999999).ToString();
-                hanSuDungMa = DateTime.UtcNow.AddMinutes(5);
-                taiKhoanDangXacNhan = taiKhoanNhap;
-
-                // Lưu mã OTP lên Firebase (nếu cần)
-                var thongTinMa = new { Ma = maXacNhanHienTai, HetHanLuc = hanSuDungMa.ToString("o") };
-                await ketNoiFirebase.SetAsync($"otp/{taiKhoanKey}", thongTinMa);
-
-                // Gửi mã OTP qua email
-                GuiEmailXacNhan(emailNhap, maXacNhanHienTai);
-
-                MessageBox.Show("Đã gửi mã xác nhận qua email (có hạn trong 5 phút).", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                txtMaXacNhan.Focus();
-                txtMaXacNhan.SelectAll();
             }
-            catch (Exception ex)
+            finally
             {
-                MessageBox.Show("Lỗi gửi mã xác nhận: " + ex.Message, "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (_otpGate.CurrentCount == 0) _otpGate.Release();
+
+                _isSendingOtp = false;
+                btnGuiMaXacNhan.Enabled = oldEnabled;
+                this.AcceptButton = oldAccept;
+                this.UseWaitCursor = false;
             }
         }
 
         // Xác nhận mã người dùng nhập
         private async void btnXacNhan_Click(object sender, EventArgs e)
         {
-            string maNguoiDungNhap = txtMaXacNhan.Text.Trim();
+            // chống double click
+            if (_isConfirming) return;
+            _isConfirming = true;
 
-            if (string.IsNullOrWhiteSpace(maNguoiDungNhap))
-            {
-                MessageBox.Show("Vui lòng nhập mã xác nhận!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(taiKhoanDangXacNhan))
-            {
-                MessageBox.Show("Bạn chưa gửi mã xác nhận!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            // khoá UI nhẹ
+            var oldEnabled = btnXacNhan.Enabled;
+            btnXacNhan.Enabled = false;
+            var oldAccept = this.AcceptButton;
+            this.AcceptButton = null;
+            this.UseWaitCursor = true;
 
             try
             {
-                // Kiểm tra mã có hợp lệ và còn hạn không
-                bool maHopLe = (DateTime.UtcNow <= hanSuDungMa) && (maNguoiDungNhap == maXacNhanHienTai);
+                await _confirmGate.WaitAsync();
 
-                string taiKhoanKey = ChuyenKeyHopLe(taiKhoanDangXacNhan);
-                var phanHoiMa = await ketNoiFirebase.GetAsync($"otp/{taiKhoanKey}");
-                if (phanHoiMa.Body != "null")
-                {
-                    var maTuFirebase = phanHoiMa.ResultAs<ThongTinMaFirebase>();
-                    if (DateTime.TryParse(maTuFirebase?.HetHanLuc, out DateTime thoiGianHetHan))
-                    {
-                        bool conHan = DateTime.UtcNow <= thoiGianHetHan;
-                        bool dungMa = string.Equals(maTuFirebase?.Ma, maNguoiDungNhap, StringComparison.Ordinal);
-                        maHopLe = maHopLe || (conHan && dungMa);
-                    }
-                }
+                string maNguoiDungNhap = txtMaXacNhan.Text.Trim();
 
-                if (!maHopLe)
+                if (string.IsNullOrWhiteSpace(maNguoiDungNhap))
                 {
-                    MessageBox.Show("Mã xác nhận không đúng hoặc đã hết hạn!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Vui lòng nhập mã xác nhận!", "Thông báo",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                MessageBox.Show("Xác nhân thành công, Vui lòng đổi mật khẩu mới!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (string.IsNullOrWhiteSpace(taiKhoanDangXacNhan))
+                {
+                    MessageBox.Show("Bạn chưa gửi mã xác nhận!", "Thông báo",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                // Mở form đổi mật khẩu
-                var formDoiMatKhau = new DoiMatKhau(taiKhoanDangXacNhan);
-                formDoiMatKhau.Tag = this;
-                formDoiMatKhau.Show();
-                this.Hide();
+                try
+                {
+                    // Kiểm tra mã có hợp lệ và còn hạn không
+                    bool maHopLe = (DateTime.UtcNow <= hanSuDungMa) && (maNguoiDungNhap == maXacNhanHienTai);
+
+                    string taiKhoanKey = ChuyenKeyHopLe(taiKhoanDangXacNhan);
+                    var phanHoiMa = await ketNoiFirebase.GetAsync($"otp/{taiKhoanKey}");
+                    if (phanHoiMa.Body != "null")
+                    {
+                        var maTuFirebase = phanHoiMa.ResultAs<ThongTinMaFirebase>();
+                        if (DateTime.TryParse(maTuFirebase?.HetHanLuc, out DateTime thoiGianHetHan))
+                        {
+                            bool conHan = DateTime.UtcNow <= thoiGianHetHan;
+                            bool dungMa = string.Equals(maTuFirebase?.Ma, maNguoiDungNhap, StringComparison.Ordinal);
+                            maHopLe = maHopLe || (conHan && dungMa);
+                        }
+                    }
+
+                    if (!maHopLe)
+                    {
+                        MessageBox.Show("Mã xác nhận không đúng hoặc đã hết hạn!", "Lỗi",
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    MessageBox.Show("Xác nhân thành công, Vui lòng đổi mật khẩu mới!", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Mở form đổi mật khẩu
+                    // không mở trùng nhiều form
+                    if (_doiMatKhauForm != null && !_doiMatKhauForm.IsDisposed)
+                    {
+                        _doiMatKhauForm.Show();
+                        _doiMatKhauForm.Activate();
+                    }
+                    else
+                    {
+                        _doiMatKhauForm = new DoiMatKhau(taiKhoanDangXacNhan);
+                        _doiMatKhauForm.Tag = this;
+                        _doiMatKhauForm.FormClosed += (s, args) => _doiMatKhauForm = null; // khi đóng thì cho mở lại
+                        _doiMatKhauForm.Show();
+                    }
+
+                    this.Hide();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lỗi khi xác nhận mã: " + ex.Message, "Lỗi",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
+            finally
             {
-                MessageBox.Show("Lỗi khi xác nhận mã: " + ex.Message, "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (_confirmGate.CurrentCount == 0) _confirmGate.Release();
+
+                _isConfirming = false;
+                btnXacNhan.Enabled = oldEnabled;
+                this.AcceptButton = oldAccept;
+                this.UseWaitCursor = false;
             }
+        }
+        private void QuenMatKhau_Load(object sender, EventArgs e)
+        {
+            btnGuiMaXacNhan.Click -= btnGuiMaXacNhan_Click; // tránh double-wire
+            btnGuiMaXacNhan.Click += btnGuiMaXacNhan_Click;
+
+            btnXacNhan.Click -= btnXacNhan_Click;
+            btnXacNhan.Click += btnXacNhan_Click;
         }
 
         // Chuyển ký tự đặc biệt trong tài khoản thành dạng hợp lệ với Firebase
@@ -208,6 +303,16 @@ namespace ChatApp
                 formMoi.Show();
                 this.Close();
             }
+        }
+
+        private void guna2GradientPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void btnXacNhan_Click_1(object sender, EventArgs e)
+        {
+
         }
     }
 
