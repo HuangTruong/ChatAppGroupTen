@@ -179,11 +179,6 @@ namespace ChatApp
             }
         }
 
-        private void pnlBackground_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
         bool isMatKhau = true;  // Ban đầu đang ẩn
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {

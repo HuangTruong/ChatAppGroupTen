@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TrangChu));
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlFooter = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlBody = new Guna.UI2.WinForms.Guna2Panel();
@@ -126,6 +125,7 @@
             // picCaiDat
             // 
             this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picCaiDat.Image = global::ChatApp.Properties.Resources.CaiDat;
             this.picCaiDat.ImageRotate = 0F;
             this.picCaiDat.Location = new System.Drawing.Point(0, 0);
             this.picCaiDat.Name = "picCaiDat";
@@ -159,6 +159,7 @@
             // picNhanTin
             // 
             this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picNhanTin.Image = global::ChatApp.Properties.Resources.NhanTin;
             this.picNhanTin.ImageRotate = 0F;
             this.picNhanTin.Location = new System.Drawing.Point(0, 0);
             this.picNhanTin.Name = "picNhanTin";
@@ -203,7 +204,7 @@
             // picDangXuat
             // 
             this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picDangXuat.Image = ((System.Drawing.Image)(resources.GetObject("picDangXuat.Image")));
+            this.picDangXuat.Image = global::ChatApp.Properties.Resources.DangXuat;
             this.picDangXuat.ImageRotate = 0F;
             this.picDangXuat.Location = new System.Drawing.Point(0, 0);
             this.picDangXuat.Name = "picDangXuat";

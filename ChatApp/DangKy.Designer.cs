@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DangKy));
             this.btnQuayLaiDangNhap = new Guna.UI2.WinForms.Guna2Button();
             this.btnDangKy = new Guna.UI2.WinForms.Guna2Button();
             this.dtpNgaySinh = new Guna.UI2.WinForms.Guna2DateTimePicker();
@@ -188,7 +187,7 @@
             this.txtTen.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtTen.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtTen.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtTen.IconLeft = ((System.Drawing.Image)(resources.GetObject("txtTen.IconLeft")));
+            this.txtTen.IconLeft = global::ChatApp.Properties.Resources.HoTen;
             this.txtTen.Location = new System.Drawing.Point(65, 101);
             this.txtTen.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtTen.Name = "txtTen";
@@ -212,6 +211,8 @@
             this.txtXacNhanMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtXacNhanMatKhau.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtXacNhanMatKhau.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtXacNhanMatKhau.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+            this.txtXacNhanMatKhau.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtXacNhanMatKhau.IconRightCursor = System.Windows.Forms.Cursors.Hand;
             this.txtXacNhanMatKhau.Location = new System.Drawing.Point(65, 185);
             this.txtXacNhanMatKhau.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
@@ -237,6 +238,7 @@
             this.txtEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.txtEmail.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtEmail.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtEmail.IconLeft = global::ChatApp.Properties.Resources.Email;
             this.txtEmail.Location = new System.Drawing.Point(65, 227);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PlaceholderText = "Email";
@@ -259,6 +261,7 @@
             this.txtTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtTaiKhoan.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtTaiKhoan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtTaiKhoan.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
             this.txtTaiKhoan.Location = new System.Drawing.Point(65, 58);
             this.txtTaiKhoan.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtTaiKhoan.Name = "txtTaiKhoan";
@@ -282,6 +285,8 @@
             this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtMatKhau.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtMatKhau.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtMatKhau.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+            this.txtMatKhau.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtMatKhau.IconRightCursor = System.Windows.Forms.Cursors.Hand;
             this.txtMatKhau.Location = new System.Drawing.Point(65, 143);
             this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
