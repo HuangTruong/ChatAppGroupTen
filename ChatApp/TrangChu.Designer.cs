@@ -72,6 +72,7 @@
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Size = new System.Drawing.Size(1182, 653);
             this.pnlBackground.TabIndex = 1;
+            this.pnlBackground.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlBackground_Paint);
             // 
             // pnlFooter
             // 
@@ -125,7 +126,6 @@
             // picCaiDat
             // 
             this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picCaiDat.Image = global::ChatApp.Properties.Resources.CaiDat;
             this.picCaiDat.ImageRotate = 0F;
             this.picCaiDat.Location = new System.Drawing.Point(0, 0);
             this.picCaiDat.Name = "picCaiDat";
@@ -159,7 +159,6 @@
             // picNhanTin
             // 
             this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picNhanTin.Image = global::ChatApp.Properties.Resources.NhanTin;
             this.picNhanTin.ImageRotate = 0F;
             this.picNhanTin.Location = new System.Drawing.Point(0, 0);
             this.picNhanTin.Name = "picNhanTin";
@@ -204,7 +203,6 @@
             // picDangXuat
             // 
             this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picDangXuat.Image = global::ChatApp.Properties.Resources.DangXuat;
             this.picDangXuat.ImageRotate = 0F;
             this.picDangXuat.Location = new System.Drawing.Point(0, 0);
             this.picDangXuat.Name = "picDangXuat";

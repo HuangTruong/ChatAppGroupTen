@@ -64,7 +64,7 @@ namespace ChatApp
                 }
 
                 // [ADDED] tạo mới, gắn Owner để quản lý vòng đời
-                _nhanTinForm = new NhanTin();
+                _nhanTinForm = new NhanTin(_ten);
                 _nhanTinForm.StartPosition = FormStartPosition.CenterParent;
                 _nhanTinForm.FormClosed += (s, args) =>
                 {
@@ -152,6 +152,11 @@ namespace ChatApp
         private static string ChuyenKeyHopLe(string text)
         {
             return Regex.Replace(text, @"[.#$\[\]/]", "_");
+        }
+
+        private void pnlBackground_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
     public class UserTrangChu

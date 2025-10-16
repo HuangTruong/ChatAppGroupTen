@@ -30,36 +30,36 @@
         {
             this.pnlTrai = new Guna.UI2.WinForms.Guna2Panel();
             this.flpDanhSachChat = new System.Windows.Forms.FlowLayoutPanel();
-            this.guna2TextBox1 = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtTimKiem = new Guna.UI2.WinForms.Guna2TextBox();
             this.pnlGiua = new Guna.UI2.WinForms.Guna2Panel();
             this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnGui = new Guna.UI2.WinForms.Guna2CircleButton();
             this.txtNhapTinNhan = new Guna.UI2.WinForms.Guna2TextBox();
             this.flbKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlNguoiChat = new Guna.UI2.WinForms.Guna2Panel();
+            this.lblTenDangNhapGiua = new System.Windows.Forms.Label();
+            this.picAnhDaiDienGiua = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlPhai = new Guna.UI2.WinForms.Guna2Panel();
+            this.lblTrangThai = new System.Windows.Forms.Label();
+            this.btnLichSuTroChuyen = new Guna.UI2.WinForms.Guna2Button();
             this.lblTenDangNhapPhai = new System.Windows.Forms.Label();
             this.picAnhDaiDienPhai = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
-            this.picAnhDaiDienGiua = new Guna.UI2.WinForms.Guna2CirclePictureBox();
-            this.lblTenDangNhapGiua = new System.Windows.Forms.Label();
-            this.btnGui = new Guna.UI2.WinForms.Guna2CircleButton();
-            this.btnLichSuTroChuyen = new Guna.UI2.WinForms.Guna2Button();
-            this.lblTrangThai = new System.Windows.Forms.Label();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.guna2Panel1.SuspendLayout();
             this.pnlNguoiChat.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).BeginInit();
             this.pnlPhai.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienPhai)).BeginInit();
             this.pnlBackground.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlTrai
             // 
             this.pnlTrai.BorderRadius = 10;
             this.pnlTrai.Controls.Add(this.flpDanhSachChat);
-            this.pnlTrai.Controls.Add(this.guna2TextBox1);
+            this.pnlTrai.Controls.Add(this.txtTimKiem);
             this.pnlTrai.Location = new System.Drawing.Point(12, 12);
             this.pnlTrai.Name = "pnlTrai";
             this.pnlTrai.Size = new System.Drawing.Size(256, 629);
@@ -78,26 +78,26 @@
             this.flpDanhSachChat.TabIndex = 3;
             this.flpDanhSachChat.WrapContents = false;
             // 
-            // guna2TextBox1
+            // txtTimKiem
             // 
-            this.guna2TextBox1.BorderRadius = 10;
-            this.guna2TextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.guna2TextBox1.DefaultText = "";
-            this.guna2TextBox1.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.guna2TextBox1.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.guna2TextBox1.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.guna2TextBox1.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.guna2TextBox1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.guna2TextBox1.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.guna2TextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.guna2TextBox1.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.guna2TextBox1.Location = new System.Drawing.Point(0, 0);
-            this.guna2TextBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.guna2TextBox1.Name = "guna2TextBox1";
-            this.guna2TextBox1.PlaceholderText = "Tìm kiếm";
-            this.guna2TextBox1.SelectedText = "";
-            this.guna2TextBox1.Size = new System.Drawing.Size(256, 48);
-            this.guna2TextBox1.TabIndex = 2;
+            this.txtTimKiem.BorderRadius = 10;
+            this.txtTimKiem.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtTimKiem.DefaultText = "";
+            this.txtTimKiem.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtTimKiem.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtTimKiem.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtTimKiem.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtTimKiem.Dock = System.Windows.Forms.DockStyle.Top;
+            this.txtTimKiem.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtTimKiem.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtTimKiem.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
+            this.txtTimKiem.Location = new System.Drawing.Point(0, 0);
+            this.txtTimKiem.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtTimKiem.Name = "txtTimKiem";
+            this.txtTimKiem.PlaceholderText = "Tìm kiếm";
+            this.txtTimKiem.SelectedText = "";
+            this.txtTimKiem.Size = new System.Drawing.Size(256, 48);
+            this.txtTimKiem.TabIndex = 2;
             // 
             // pnlGiua
             // 
@@ -117,6 +117,22 @@
             this.guna2Panel1.Name = "guna2Panel1";
             this.guna2Panel1.Size = new System.Drawing.Size(588, 60);
             this.guna2Panel1.TabIndex = 0;
+            // 
+            // btnGui
+            // 
+            this.btnGui.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnGui.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnGui.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnGui.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnGui.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnGui.ForeColor = System.Drawing.Color.White;
+            this.btnGui.Location = new System.Drawing.Point(529, 5);
+            this.btnGui.Name = "btnGui";
+            this.btnGui.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.btnGui.Size = new System.Drawing.Size(56, 52);
+            this.btnGui.TabIndex = 1;
+            this.btnGui.Text = "Gửi";
+            this.btnGui.Click += new System.EventHandler(this.btnGui_Click);
             // 
             // txtNhapTinNhan
             // 
@@ -156,6 +172,25 @@
             this.pnlNguoiChat.Size = new System.Drawing.Size(588, 76);
             this.pnlNguoiChat.TabIndex = 0;
             // 
+            // lblTenDangNhapGiua
+            // 
+            this.lblTenDangNhapGiua.AutoSize = true;
+            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(92, 32);
+            this.lblTenDangNhapGiua.Name = "lblTenDangNhapGiua";
+            this.lblTenDangNhapGiua.Size = new System.Drawing.Size(102, 16);
+            this.lblTenDangNhapGiua.TabIndex = 1;
+            this.lblTenDangNhapGiua.Text = "Tên Đăng Nhập";
+            // 
+            // picAnhDaiDienGiua
+            // 
+            this.picAnhDaiDienGiua.ImageRotate = 0F;
+            this.picAnhDaiDienGiua.Location = new System.Drawing.Point(3, 3);
+            this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
+            this.picAnhDaiDienGiua.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picAnhDaiDienGiua.Size = new System.Drawing.Size(64, 64);
+            this.picAnhDaiDienGiua.TabIndex = 0;
+            this.picAnhDaiDienGiua.TabStop = false;
+            // 
             // pnlPhai
             // 
             this.pnlPhai.Controls.Add(this.lblTrangThai);
@@ -166,6 +201,29 @@
             this.pnlPhai.Name = "pnlPhai";
             this.pnlPhai.Size = new System.Drawing.Size(240, 629);
             this.pnlPhai.TabIndex = 0;
+            // 
+            // lblTrangThai
+            // 
+            this.lblTrangThai.AutoSize = true;
+            this.lblTrangThai.Location = new System.Drawing.Point(43, 161);
+            this.lblTrangThai.Name = "lblTrangThai";
+            this.lblTrangThai.Size = new System.Drawing.Size(147, 16);
+            this.lblTrangThai.TabIndex = 3;
+            this.lblTrangThai.Text = "Trạng Thái Người Dùng";
+            // 
+            // btnLichSuTroChuyen
+            // 
+            this.btnLichSuTroChuyen.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnLichSuTroChuyen.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnLichSuTroChuyen.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnLichSuTroChuyen.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnLichSuTroChuyen.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.btnLichSuTroChuyen.ForeColor = System.Drawing.Color.White;
+            this.btnLichSuTroChuyen.Location = new System.Drawing.Point(31, 217);
+            this.btnLichSuTroChuyen.Name = "btnLichSuTroChuyen";
+            this.btnLichSuTroChuyen.Size = new System.Drawing.Size(180, 45);
+            this.btnLichSuTroChuyen.TabIndex = 2;
+            this.btnLichSuTroChuyen.Text = "Lịch Sử Trò Chuyện";
             // 
             // lblTenDangNhapPhai
             // 
@@ -200,63 +258,6 @@
             this.pnlBackground.Size = new System.Drawing.Size(1182, 653);
             this.pnlBackground.TabIndex = 1;
             // 
-            // picAnhDaiDienGiua
-            // 
-            this.picAnhDaiDienGiua.ImageRotate = 0F;
-            this.picAnhDaiDienGiua.Location = new System.Drawing.Point(3, 3);
-            this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
-            this.picAnhDaiDienGiua.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAnhDaiDienGiua.Size = new System.Drawing.Size(64, 64);
-            this.picAnhDaiDienGiua.TabIndex = 0;
-            this.picAnhDaiDienGiua.TabStop = false;
-            // 
-            // lblTenDangNhapGiua
-            // 
-            this.lblTenDangNhapGiua.AutoSize = true;
-            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(92, 32);
-            this.lblTenDangNhapGiua.Name = "lblTenDangNhapGiua";
-            this.lblTenDangNhapGiua.Size = new System.Drawing.Size(102, 16);
-            this.lblTenDangNhapGiua.TabIndex = 1;
-            this.lblTenDangNhapGiua.Text = "Tên Đăng Nhập";
-            // 
-            // btnGui
-            // 
-            this.btnGui.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnGui.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnGui.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnGui.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnGui.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnGui.ForeColor = System.Drawing.Color.White;
-            this.btnGui.Location = new System.Drawing.Point(529, 5);
-            this.btnGui.Name = "btnGui";
-            this.btnGui.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.btnGui.Size = new System.Drawing.Size(56, 52);
-            this.btnGui.TabIndex = 1;
-            this.btnGui.Text = "guna2CircleButton1";
-            // 
-            // btnLichSuTroChuyen
-            // 
-            this.btnLichSuTroChuyen.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnLichSuTroChuyen.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnLichSuTroChuyen.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnLichSuTroChuyen.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnLichSuTroChuyen.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnLichSuTroChuyen.ForeColor = System.Drawing.Color.White;
-            this.btnLichSuTroChuyen.Location = new System.Drawing.Point(31, 217);
-            this.btnLichSuTroChuyen.Name = "btnLichSuTroChuyen";
-            this.btnLichSuTroChuyen.Size = new System.Drawing.Size(180, 45);
-            this.btnLichSuTroChuyen.TabIndex = 2;
-            this.btnLichSuTroChuyen.Text = "Lịch Sử Trò Chuyện";
-            // 
-            // lblTrangThai
-            // 
-            this.lblTrangThai.AutoSize = true;
-            this.lblTrangThai.Location = new System.Drawing.Point(43, 161);
-            this.lblTrangThai.Name = "lblTrangThai";
-            this.lblTrangThai.Size = new System.Drawing.Size(147, 16);
-            this.lblTrangThai.TabIndex = 3;
-            this.lblTrangThai.Text = "Trạng Thái Người Dùng";
-            // 
             // NhanTin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -266,16 +267,17 @@
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Chat";
+            this.Load += new System.EventHandler(this.NhanTin_Load);
             this.pnlTrai.ResumeLayout(false);
             this.pnlGiua.ResumeLayout(false);
             this.guna2Panel1.ResumeLayout(false);
             this.pnlNguoiChat.ResumeLayout(false);
             this.pnlNguoiChat.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).EndInit();
             this.pnlPhai.ResumeLayout(false);
             this.pnlPhai.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienPhai)).EndInit();
             this.pnlBackground.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -287,7 +289,7 @@
         private Guna.UI2.WinForms.Guna2Panel pnlPhai;
         private Guna.UI2.WinForms.Guna2GradientPanel pnlBackground;
         private System.Windows.Forms.FlowLayoutPanel flpDanhSachChat;
-        private Guna.UI2.WinForms.Guna2TextBox guna2TextBox1;
+        private Guna.UI2.WinForms.Guna2TextBox txtTimKiem;
         private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
         private System.Windows.Forms.FlowLayoutPanel flbKhungChat;
         private Guna.UI2.WinForms.Guna2Panel pnlNguoiChat;

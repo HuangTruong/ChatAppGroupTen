@@ -152,7 +152,7 @@
             this.txtTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtTaiKhoan.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtTaiKhoan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtTaiKhoan.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
+//            this.txtTaiKhoan.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
             this.txtTaiKhoan.Location = new System.Drawing.Point(65, 128);
             this.txtTaiKhoan.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtTaiKhoan.Name = "txtTaiKhoan";
@@ -176,8 +176,8 @@
             this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtMatKhau.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtMatKhau.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtMatKhau.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
-            this.txtMatKhau.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
+//            this.txtMatKhau.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+//            this.txtMatKhau.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtMatKhau.IconRightCursor = System.Windows.Forms.Cursors.Hand;
             this.txtMatKhau.Location = new System.Drawing.Point(65, 176);
             this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
