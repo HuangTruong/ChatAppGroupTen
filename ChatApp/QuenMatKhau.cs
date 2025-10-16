@@ -314,6 +314,11 @@ namespace ChatApp
         {
 
         }
+
+        private void guna2GradientPanel1_Paint_1(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 
     // Cấu trúc dữ liệu mã OTP trong Firebase

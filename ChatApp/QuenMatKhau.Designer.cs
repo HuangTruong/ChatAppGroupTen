@@ -37,15 +37,16 @@
             this.lblEmail = new System.Windows.Forms.Label();
             this.guna2GradientPanel1 = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlQuenMatKhau = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnXacNhan = new Guna.UI2.WinForms.Guna2Button();
             this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
             this.lblTaiKhoan = new Guna.UI2.WinForms.Guna2HtmlLabel();
-            this.btnXacNhan = new Guna.UI2.WinForms.Guna2Button();
             this.guna2GradientPanel1.SuspendLayout();
             this.pnlQuenMatKhau.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnQuayLaiDangNhap
             // 
+            this.btnQuayLaiDangNhap.BackColor = System.Drawing.Color.Transparent;
             this.btnQuayLaiDangNhap.BorderRadius = 10;
             this.btnQuayLaiDangNhap.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnQuayLaiDangNhap.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
@@ -68,6 +69,7 @@
             // 
             // btnGuiMaXacNhan
             // 
+            this.btnGuiMaXacNhan.BackColor = System.Drawing.Color.Transparent;
             this.btnGuiMaXacNhan.BorderRadius = 10;
             this.btnGuiMaXacNhan.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnGuiMaXacNhan.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
@@ -175,6 +177,7 @@
             this.guna2GradientPanel1.Name = "guna2GradientPanel1";
             this.guna2GradientPanel1.Size = new System.Drawing.Size(800, 450);
             this.guna2GradientPanel1.TabIndex = 1;
+            this.guna2GradientPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.guna2GradientPanel1_Paint_1);
             // 
             // pnlQuenMatKhau
             // 
@@ -200,6 +203,28 @@
             this.pnlQuenMatKhau.ShadowDecoration.Enabled = true;
             this.pnlQuenMatKhau.Size = new System.Drawing.Size(467, 426);
             this.pnlQuenMatKhau.TabIndex = 11;
+            // 
+            // btnXacNhan
+            // 
+            this.btnXacNhan.BackColor = System.Drawing.Color.Transparent;
+            this.btnXacNhan.BorderRadius = 10;
+            this.btnXacNhan.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnXacNhan.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnXacNhan.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnXacNhan.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnXacNhan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.btnXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnXacNhan.ForeColor = System.Drawing.Color.White;
+            this.btnXacNhan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
+            this.btnXacNhan.Location = new System.Drawing.Point(38, 340);
+            this.btnXacNhan.Name = "btnXacNhan";
+            this.btnXacNhan.ShadowDecoration.BorderRadius = 10;
+            this.btnXacNhan.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
+            this.btnXacNhan.ShadowDecoration.Depth = 10;
+            this.btnXacNhan.ShadowDecoration.Enabled = true;
+            this.btnXacNhan.Size = new System.Drawing.Size(193, 45);
+            this.btnXacNhan.TabIndex = 13;
+            this.btnXacNhan.Text = "Xác Nhận";
             // 
             // txtTaiKhoan
             // 
@@ -233,27 +258,6 @@
             this.lblTaiKhoan.Size = new System.Drawing.Size(133, 25);
             this.lblTaiKhoan.TabIndex = 11;
             this.lblTaiKhoan.Text = "Tên Đăng Nhập :";
-            // 
-            // btnXacNhan
-            // 
-            this.btnXacNhan.BorderRadius = 10;
-            this.btnXacNhan.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnXacNhan.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnXacNhan.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnXacNhan.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnXacNhan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.btnXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnXacNhan.ForeColor = System.Drawing.Color.White;
-            this.btnXacNhan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.btnXacNhan.Location = new System.Drawing.Point(38, 340);
-            this.btnXacNhan.Name = "btnXacNhan";
-            this.btnXacNhan.ShadowDecoration.BorderRadius = 10;
-            this.btnXacNhan.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
-            this.btnXacNhan.ShadowDecoration.Depth = 10;
-            this.btnXacNhan.ShadowDecoration.Enabled = true;
-            this.btnXacNhan.Size = new System.Drawing.Size(193, 45);
-            this.btnXacNhan.TabIndex = 13;
-            this.btnXacNhan.Text = "Xác Nhận";
             // 
             // QuenMatKhau
             // 

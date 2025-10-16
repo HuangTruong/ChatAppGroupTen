@@ -157,7 +157,7 @@ namespace ChatApp
                 }
                 else
                 {
-                    new TrangChu().Show();
+                    new TrangChu(user.Ten).Show();
                 }
             }
             catch (Exception ex)

@@ -252,7 +252,7 @@
             this.lblTenDangNhap.AutoSize = true;
             this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
-            this.lblTenDangNhap.Location = new System.Drawing.Point(965, 25);
+            this.lblTenDangNhap.Location = new System.Drawing.Point(990, 25);
             this.lblTenDangNhap.Name = "lblTenDangNhap";
             this.lblTenDangNhap.Size = new System.Drawing.Size(129, 23);
             this.lblTenDangNhap.TabIndex = 1;
