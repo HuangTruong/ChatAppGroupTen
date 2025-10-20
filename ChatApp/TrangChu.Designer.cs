@@ -126,6 +126,7 @@
             // picCaiDat
             // 
             this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picCaiDat.Image = global::ChatApp.Properties.Resources.CaiDat;
             this.picCaiDat.ImageRotate = 0F;
             this.picCaiDat.Location = new System.Drawing.Point(0, 0);
             this.picCaiDat.Name = "picCaiDat";
@@ -159,6 +160,7 @@
             // picNhanTin
             // 
             this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picNhanTin.Image = global::ChatApp.Properties.Resources.NhanTin;
             this.picNhanTin.ImageRotate = 0F;
             this.picNhanTin.Location = new System.Drawing.Point(0, 0);
             this.picNhanTin.Name = "picNhanTin";
@@ -203,6 +205,7 @@
             // picDangXuat
             // 
             this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picDangXuat.Image = global::ChatApp.Properties.Resources.DangXuat;
             this.picDangXuat.ImageRotate = 0F;
             this.picDangXuat.Location = new System.Drawing.Point(0, 0);
             this.picDangXuat.Name = "picDangXuat";
@@ -250,7 +253,7 @@
             this.lblTenDangNhap.AutoSize = true;
             this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
-            this.lblTenDangNhap.Location = new System.Drawing.Point(990, 25);
+            this.lblTenDangNhap.Location = new System.Drawing.Point(963, 25);
             this.lblTenDangNhap.Name = "lblTenDangNhap";
             this.lblTenDangNhap.Size = new System.Drawing.Size(129, 23);
             this.lblTenDangNhap.TabIndex = 1;
@@ -259,10 +262,10 @@
             // picAnhDaiDien
             // 
             this.picAnhDaiDien.ImageRotate = 0F;
-            this.picAnhDaiDien.Location = new System.Drawing.Point(1125, 13);
+            this.picAnhDaiDien.Location = new System.Drawing.Point(1107, 0);
             this.picAnhDaiDien.Name = "picAnhDaiDien";
             this.picAnhDaiDien.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAnhDaiDien.Size = new System.Drawing.Size(45, 45);
+            this.picAnhDaiDien.Size = new System.Drawing.Size(72, 69);
             this.picAnhDaiDien.TabIndex = 0;
             this.picAnhDaiDien.TabStop = false;
             // 

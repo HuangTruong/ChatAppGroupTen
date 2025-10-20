@@ -127,9 +127,11 @@
             this.cbbGioiTinh.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.cbbGioiTinh.ItemHeight = 30;
             this.cbbGioiTinh.Items.AddRange(new object[] {
+            "Giới Tính",
             "Nam",
             "Nữ",
             "Khác"});
+            this.cbbGioiTinh.StartIndex = 0;
             this.cbbGioiTinh.Location = new System.Drawing.Point(65, 269);
             this.cbbGioiTinh.Name = "cbbGioiTinh";
             this.cbbGioiTinh.Size = new System.Drawing.Size(270, 36);

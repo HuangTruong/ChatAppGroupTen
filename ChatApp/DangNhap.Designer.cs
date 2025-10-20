@@ -159,7 +159,7 @@
             this.txtTaiKhoan.PlaceholderText = "Tên Đăng Nhập";
             this.txtTaiKhoan.SelectedText = "";
             this.txtTaiKhoan.Size = new System.Drawing.Size(270, 40);
-            this.txtTaiKhoan.TabIndex = 5;
+            this.txtTaiKhoan.TabIndex = 0;
             // 
             // txtMatKhau
             // 

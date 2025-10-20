@@ -4,7 +4,6 @@ using FireSharp.Response;
 using System;
 using System.Windows.Forms;
 
-// [ADDED] chống re-entry & async hỗ trợ
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,7 +14,7 @@ namespace ChatApp
         // Biến để kết nối tới Firebase
         private IFirebaseClient firebaseClient;
 
-        // [ADDED] — chặn spam click (double/triple click)
+        // chặn spam click (double/triple click)
         private bool _isLoggingIn = false;
         private readonly SemaphoreSlim _loginGate = new SemaphoreSlim(1, 1);
 
@@ -43,7 +42,7 @@ namespace ChatApp
 
         private void DangNhap_Load(object sender, EventArgs e)
         {
-
+            txtTaiKhoan.Focus();
         }
 
         // Khi bấm nút “Đăng ký” thì mở form Đăng Ký
@@ -67,13 +66,13 @@ namespace ChatApp
         // Xử lý đăng nhập khi bấm nút “Đăng nhập”
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
-            // [ADDED] — nếu đang có phiên đăng nhập chạy, bỏ qua click mới
+            // ếu đang có phiên đăng nhập chạy, bỏ qua click mới
             if (_isLoggingIn) return;
 
-            // [ADDED] — set cờ ngay lập tức để chặn double-click trước khi await
+            // set cờ ngay lập tức để chặn double-click trước khi await
             _isLoggingIn = true;
 
-            // [ADDED] — vô hiệu hóa nút & Enter, hiển thị wait cursor
+            // vô hiệu hóa nút & Enter, hiển thị wait cursor
             var oldAccept = this.AcceptButton;
             this.AcceptButton = null;
             bool oldEnabled = btnDangNhap.Enabled;
@@ -82,7 +81,7 @@ namespace ChatApp
 
             try
             {
-                // [ADDED] — đảm bảo tuyệt đối chỉ 1 luồng đăng nhập chạy
+                // đảm bảo tuyệt đối chỉ 1 luồng đăng nhập chạy
                 await _loginGate.WaitAsync();
 
                 string taiKhoan = txtTaiKhoan.Text;
@@ -135,7 +134,6 @@ namespace ChatApp
                 txtMatKhau.Clear();
 
                 // Ẩn form đăng nhập và mở form Trang Chủ
-                // [ADDED] — không tạo nhiều TrangChu, nếu có rồi thì Activate
                 Form existed = null;
                 foreach (Form f in Application.OpenForms)
                 {
@@ -166,7 +164,7 @@ namespace ChatApp
             }
             finally
             {
-                // [ADDED] — nhả khóa và khôi phục UI
+                //  khóa và khôi phục UI
                 if (_loginGate.CurrentCount == 0)
                     _loginGate.Release();
 

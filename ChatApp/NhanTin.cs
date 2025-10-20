@@ -87,6 +87,7 @@ namespace ChatApp
                     {
                         tenDoiPhuong = (string)((Button)s).Tag;
                         lblTenDangNhapGiua.Text = tenDoiPhuong;
+                        lblTenDangNhapPhai.Text = tenDoiPhuong;
                         await TaiLichSuTinNhan();
                     };
 

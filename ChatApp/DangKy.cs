@@ -1,13 +1,13 @@
-﻿using System;
-using System.Text;
-using System.Windows.Forms;
-using FireSharp.Config;
+﻿using FireSharp.Config;
 using FireSharp.Interfaces;
 using FireSharp.Response;
-
+using System;
+using System.Drawing;
+using System.Text;
 // [ADDED] chống re-entry & async hỗ trợ
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ChatApp
 {
@@ -16,10 +16,11 @@ namespace ChatApp
         // Biến dùng để kết nối Firebase
         private IFirebaseClient firebaseClient;
 
-        // [ADDED] — chặn spam click (double/triple click)
+        // Chặn spam click 
         private bool _isRegistering = false;
         private readonly SemaphoreSlim _registerGate = new SemaphoreSlim(1, 1);
 
+           
         public DangKy()
         {
             InitializeComponent();
@@ -38,6 +39,7 @@ namespace ChatApp
             if (firebaseClient == null)
                 MessageBox.Show("Không kết nối được Firebase.");
         }
+        
 
         private void DangKy_Load(object sender, EventArgs e)
         {
@@ -53,7 +55,7 @@ namespace ChatApp
             if (DangNhapForm != null && !DangNhapForm.IsDisposed)
             {
                 DangNhapForm.Show();
-                DangNhapForm.Activate(); // [ADDED] tránh mở trùng
+                DangNhapForm.Activate(); // tránh mở trùng
                 this.Close();
             }
             else
@@ -68,13 +70,13 @@ namespace ChatApp
         // Xử lý khi nhấn nút “Đăng ký”
         private async void btnDangKy_Click(object sender, EventArgs e)
         {
-            // [ADDED] — nếu đang có phiên đăng ký chạy, bỏ qua click mới
+            // nếu đang có phiên đăng ký chạy, bỏ qua click mới
             if (_isRegistering) return;
 
-            // [ADDED] — set cờ ngay lập tức để chặn double-click trước khi await
+            // set cờ ngay lập tức để chặn double-click trước khi await
             _isRegistering = true;
 
-            // [ADDED] — vô hiệu hóa nút & Enter, hiển thị wait cursor
+            // vô hiệu hóa nút & Enter, hiển thị wait cursor
             var oldAccept = this.AcceptButton;
             this.AcceptButton = null;               // tắt Enter trong lúc xử lý
             bool oldEnabled = btnDangKy.Enabled;
@@ -83,7 +85,7 @@ namespace ChatApp
 
             try
             {
-                // [ADDED] — đảm bảo tuyệt đối chỉ 1 luồng đăng ký chạy
+                // đảm bảo tuyệt đối chỉ 1 luồng đăng ký chạy
                 await _registerGate.WaitAsync();
 
                 // Lấy dữ liệu người dùng nhập vào
@@ -91,7 +93,7 @@ namespace ChatApp
                 string matKhau = txtMatKhau.Text;
                 string xacNhanMatKhau = txtXacNhanMatKhau.Text;
                 string email = txtEmail.Text;
-                string encodedEmail = Convert.ToBase64String(Encoding.UTF8.GetBytes(email)); // Mã hóa email để lưu an toàn hơn
+                string encodedEmail = Convert.ToBase64String(Encoding.UTF8.GetBytes(email)); // Mã hóa email 
                 string ten = txtTen.Text;
                 string ngaySinh = dtpNgaySinh.Text;
                 string gioiTinh = cbbGioiTinh.Text;
@@ -117,9 +119,6 @@ namespace ChatApp
                         "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
-                // (tuỳ chọn) “hút” double-click siêu nhanh
-                // await Task.Delay(150);
 
                 try
                 {
@@ -188,7 +187,7 @@ namespace ChatApp
             }
             finally
             {
-                // [ADDED] — nhả khóa và khôi phục UI
+                // nhả khóa và khôi phục UI
                 if (_registerGate.CurrentCount == 0)
                     _registerGate.Release();
 
@@ -235,4 +234,5 @@ namespace ChatApp
         public string Ngaysinh { get; set; }  // Ngày sinh
         public string Gioitinh { get; set; }  // Giới tính
     }
+
 }
