@@ -44,8 +44,8 @@ namespace ChatApp
             // Cấu hình Firebase
             IFirebaseConfig cauHinh = new FirebaseConfig
             {
-                AuthSecret = "RBVYwGVpeA360cuFw7YcoiPKAf07ZpFHrZma2mx0",
-                BasePath = "https://fir-client-1d344-default-rtdb.firebaseio.com/"
+                AuthSecret = "j0kBCfIQBOBtgq5j0RaocJLgCuJO1AMn2GS5qXqH",
+                BasePath = "https://chatapp-ca701-default-rtdb.asia-southeast1.firebasedatabase.app/"
             };
 
             ketNoiFirebase = new FireSharp.FirebaseClient(cauHinh);
