@@ -164,8 +164,8 @@ namespace ChatApp
                         flbKhungChat.Controls.Clear();
 
                         string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
-                        if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(cid))
-                            dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
+                        
+                        dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
 
                         // nạp ngay lịch sử
                         await CapTinNhanMoi();
