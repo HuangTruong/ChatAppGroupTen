@@ -46,6 +46,9 @@ namespace ChatApp
 
         private bool dangTaiDanhSachNguoiDung = false; // tránh load trùng
 
+        private EventStreamResponse streamTrangThai;
+        private Dictionary<string, string> trangThaiNguoiDung = new Dictionary<string, string>();
+
         public NhanTin(string tenDangNhap)
         {
             InitializeComponent();
@@ -71,6 +74,9 @@ namespace ChatApp
         {
             lblTenDangNhapPhai.Text = tenHienTai;
 
+            await CapNhatTrangThai("online");
+            BatRealtimeTrangThai();
+
             // nạp trạng thái kết bạn + bật realtime kết bạn
             await NapTrangThaiKetBan();
             BatRealtimeKetBan();
@@ -89,6 +95,7 @@ namespace ChatApp
             try { streamFriendReq?.Dispose(); } catch { }
             try { streamFriends?.Dispose(); } catch { }
             try { timerTinNhanMoi?.Stop(); timerTinNhanMoi?.Dispose(); } catch { }
+            try { streamTrangThai?.Dispose(); } catch { }
             base.OnFormClosed(e);
         }
 
@@ -131,17 +138,32 @@ namespace ChatApp
                     if (string.Equals(user.Ten, tenHienTai, StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    string trangThai = "";
+                    string trangThai = ""; // mặc định không hiển thị trạng thái
+
+                    // Chỉ hiển thị trạng thái nếu là bạn bè
                     if (danhSachBanBe.ContainsKey(user.Ten))
-                        trangThai = " (Bạn bè)";
+                    {
+                        if (trangThaiNguoiDung.TryGetValue(user.Ten, out string trangThaiOnline) && trangThaiOnline == "online")
+                        {
+                            trangThai = "(online)";
+                        }
+                        else
+                        {
+                            trangThai = "(offline)";
+                        }
+                    }
+
+                    string ghiChuTrangThai = "";
+                    if (danhSachBanBe.ContainsKey(user.Ten))
+                        ghiChuTrangThai = " (Bạn bè)";
                     else if (danhSachDaGuiLoiMoi.Contains(user.Ten))
-                        trangThai = " (Đã mời)";
+                        ghiChuTrangThai = " (Đã mời)";
                     else if (danhSachLoiMoiNhanDuoc.Contains(user.Ten))
-                        trangThai = " (Mời bạn)";
+                        ghiChuTrangThai = " (Mời bạn)";
 
                     var btn = new Button
                     {
-                        Text = $"{user.Ten}{trangThai}",
+                        Text = $"{trangThai} {user.Ten}{ghiChuTrangThai}",
                         Tag = $"user:{user.Ten}",
                         Width = flpDanhSachChat.Width - 25,
                         Height = 40,
@@ -831,6 +853,46 @@ namespace ChatApp
             {
                 await TaiDanhSachNhom();
             }));
+        }
+
+        private async Task CapNhatTrangThai(string trangThai)
+        {
+            try
+            {
+                await firebase.SetAsync($"status/{tenHienTai}", trangThai);
+            }
+            catch { }
+        }
+
+        private void BatRealtimeTrangThai()
+        {
+            try { streamTrangThai?.Dispose(); } catch { }
+
+            firebase.OnAsync("status",
+                added: (s, a, c) => CapNhatTrangThaiUI(),
+                changed: (s, a, c) => CapNhatTrangThaiUI(),
+                removed: (s, a, c) => CapNhatTrangThaiUI()
+            ).ContinueWith(t =>
+            {
+                if (t.Status == TaskStatus.RanToCompletion)
+                    streamTrangThai = t.Result;
+            });
+        }
+
+        private void CapNhatTrangThaiUI()
+        {
+            if (!this.IsDisposed && this.IsHandleCreated)
+                BeginInvoke(new Action(async () =>
+                {
+                    try
+                    {
+                        var res = await firebase.GetAsync("status");
+                        var data = res.ResultAs<Dictionary<string, string>>();
+                        trangThaiNguoiDung = data ?? new Dictionary<string, string>();
+                        await TaiDanhSachNguoiDung();
+                    }
+                    catch { }
+                }));
         }
     }
 

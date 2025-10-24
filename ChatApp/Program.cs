@@ -16,7 +16,9 @@ namespace ChatApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DangNhap());
+            var mainForm = new DangNhap();
+            mainForm.FormClosed += (s, e) => Application.Exit(); // đảm bảo đóng app hoàn toàn
+            Application.Run(mainForm);
         }
     }
 }

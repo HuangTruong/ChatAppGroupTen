@@ -45,6 +45,11 @@ namespace ChatApp
             txtTaiKhoan.Focus();
         }
 
+        private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit(); // đóng toàn bộ chương trình
+        }
+
         // Khi bấm nút “Đăng ký” thì mở form Đăng Ký
         private void btnDangKy_Click(object sender, EventArgs e)
         {
@@ -145,16 +150,9 @@ namespace ChatApp
                 }
 
                 this.Hide();
-
-                if (existed != null)
-                {
-                    existed.Show();
-                    existed.Activate();
-                }
-                else
-                {
-                    new TrangChu(user.Ten).Show();
-                }
+                var home = new TrangChu(user.Ten);
+                home.FormClosed += (s, e2) => this.Close(); // Đóng luôn form login khi TrangChu đóng
+                home.Show();
             }
             catch (Exception ex)
             {

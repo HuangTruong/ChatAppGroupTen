@@ -303,6 +303,10 @@ namespace ChatApp
                 formMoi.Show();
                 this.Close();
             }
+
+            base.OnFormClosed((FormClosedEventArgs)e);
+            if (Application.OpenForms.Count == 0)
+                Application.Exit();
         }
 
         private void guna2GradientPanel1_Paint(object sender, PaintEventArgs e)

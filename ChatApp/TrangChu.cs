@@ -58,6 +58,7 @@ namespace ChatApp
                     _nhanTinForm.Show();       // đảm bảo visible
                     _nhanTinForm.Activate();   // focus
                     _nhanTinForm.BringToFront();
+                    this.Hide();
                     return;
                 }
 
@@ -68,11 +69,13 @@ namespace ChatApp
                 {
                     // [ADDED] khi đóng thì cho phép tạo lại
                     _nhanTinForm = null;
+                    this.Show();
                 };
 
                 // [ADDED] trong lúc show, tạm khóa click để khỏi spam
                 ToggleNhanTinTargets(false);
                 _nhanTinForm.Show(this);
+                this.Hide();
             }
             finally
             {
@@ -80,6 +83,13 @@ namespace ChatApp
                 _isOpeningNhanTin = false;
                 ToggleNhanTinTargets(true);
             }
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            CapNhatTrangThai("offline");
+            base.OnFormClosed(e);
+            Application.Exit(); // đóng toàn bộ chương trình
         }
 
         // [ADDED] tiện ích bật/tắt click trên 3 control
@@ -141,20 +151,34 @@ namespace ChatApp
 
         }
 
-        private void guna2GradientPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
         // Chuyển ký tự đặc biệt trong tài khoản thành dạng hợp lệ với Firebase
         private static string ChuyenKeyHopLe(string text)
         {
             return Regex.Replace(text, @"[.#$\[\]/]", "_");
         }
 
-        private void pnlBackground_Paint(object sender, PaintEventArgs e)
+        private void picDangXuat_Click(object sender, EventArgs e)
         {
+            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+            {
+                _nhanTinForm.Close(); // đóng form nếu còn tồn tại
+                _nhanTinForm = null;
+            }
 
+            CapNhatTrangThai("offline");
+            this.Hide(); // ẩn TrangChu
+            var loginForm = new DangNhap(); // form đăng nhập
+            loginForm.FormClosed += (s, args) => this.Close(); // đóng TrangChu khi loginForm đóng
+            loginForm.Show();
+        }
+
+        private async Task CapNhatTrangThai(string trangThai)
+        {
+            try
+            {
+                await firebaseClient.SetAsync($"status/{_ten}", trangThai);
+            }
+            catch { }
         }
     }
     public class UserTrangChu
