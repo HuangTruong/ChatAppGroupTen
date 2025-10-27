@@ -8,66 +8,109 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Net;
+using System.Globalization;
 
 namespace ChatApp
 {
     public partial class NhanTin : Form
     {
+        private readonly ConcurrentQueue<TinNhan> hangChoRender = new ConcurrentQueue<TinNhan>();
+        private System.Windows.Forms.Timer timerRender;
+
+        private readonly SemaphoreSlim khoaTaiTinNhan = new SemaphoreSlim(1, 1);
+
+        private System.Windows.Forms.Timer timerGomSuKienChat;
+        private DateTimeOffset lanCuoiTai1_1 = DateTimeOffset.MinValue;
+        private DateTimeOffset lanCuoiTaiNhom = DateTimeOffset.MinValue;
+
         private IFirebaseClient firebase;
 
-        // Người dùng hiện tại (tên hiển thị)
         private string tenHienTai;
-
-        // Người đang được chọn để chat (tên hiển thị) - dành cho 1-1
         private string tenDoiPhuong = "";
 
-        // Nếu đang chat nhóm thì id nhóm ở đây, và currentChatIsGroup = true
         private bool currentChatIsGroup = false;
         private string currentGroupId = "";
 
-        // Ghi nhớ id tin nhắn đã render theo từng cuộc chat (key có thể là cid cho 1-1 hoặc idNhom)
         private Dictionary<string, HashSet<string>> dsTinNhanDaCoTheoDoanChat = new Dictionary<string, HashSet<string>>();
+        private Dictionary<string, List<string>> thuTuTinNhanTheoDoanChat = new Dictionary<string, List<string>>();
 
-        // Timer dự phòng (poll)
-        private Timer timerTinNhanMoi;
+        private System.Windows.Forms.Timer timerTinNhanMoi;
 
-        // Realtime stream cho cuộc chat hiện tại
         private EventStreamResponse streamChatHienTai;
-
-        // Realtime stream cho kết bạn
         private EventStreamResponse streamFriendReq, streamFriends;
-
         private EventStreamResponse streamNhom;
 
-        // Trạng thái bạn bè / lời mời
+        private EventStreamResponse streamTyping;
+        private System.Windows.Forms.Timer timerDangNhap;
+        private long hetHanTyping = 0;
+
+        private Label lblTyping;
+
         private Dictionary<string, bool> danhSachBanBe = new Dictionary<string, bool>();
         private HashSet<string> danhSachDaGuiLoiMoi = new HashSet<string>();
         private HashSet<string> danhSachLoiMoiNhanDuoc = new HashSet<string>();
 
-        private bool dangTaiDanhSachNguoiDung = false; // tránh load trùng
+        private bool dangTaiDanhSachNguoiDung = false;
 
         private EventStreamResponse streamTrangThai;
         private Dictionary<string, string> trangThaiNguoiDung = new Dictionary<string, string>();
+
+        private System.Windows.Forms.Timer timerResize;
 
         public NhanTin(string tenDangNhap)
         {
             InitializeComponent();
 
+            ServicePointManager.DefaultConnectionLimit = Math.Max(100, ServicePointManager.DefaultConnectionLimit);
+
+            // Khung chat
+            flbKhungChat.FlowDirection = FlowDirection.TopDown;
+            flbKhungChat.WrapContents = false;
+            flbKhungChat.AutoScroll = true;
+            flbKhungChat.Padding = new Padding(0);
+
             tenHienTai = tenDangNhap;
 
-            // Cấu hình Firebase
             IFirebaseConfig config = new FirebaseConfig
             {
                 AuthSecret = "j0kBCfIQBOBtgq5j0RaocJLgCuJO1AMn2GS5qXqH",
                 BasePath = "https://chatapp-ca701-default-rtdb.asia-southeast1.firebasedatabase.app/"
             };
-
             firebase = new FireSharp.FirebaseClient(config);
+            if (firebase == null) MessageBox.Show("Không kết nối được Firebase!");
 
-            if (firebase == null)
+            // “Đang nhập…”
+            lblTyping = new Label
             {
-                MessageBox.Show("Không kết nối được Firebase!");
-            }
+                AutoSize = true,
+                ForeColor = Color.DimGray,
+                Text = "",
+                Visible = false
+            };
+            lblTyping.Location = new Point(lblTenDangNhapGiua.Left, lblTenDangNhapGiua.Bottom + 4);
+            this.Controls.Add(lblTyping);
+
+            // ======= ENTER để gửi tin (Shift+Enter xuống dòng) =======
+            this.KeyPreview = true;             // form bắt phím trước
+            this.AcceptButton = btnGui;         // ENTER = btnGui (fallback toàn form)
+            txtNhapTinNhan.KeyDown += TxtNhapTinNhan_KeyDown;
+            // =========================================================
+
+            // Debounce resize
+            timerResize = new System.Windows.Forms.Timer { Interval = 120 };
+            timerResize.Tick += (s, e) =>
+            {
+                timerResize.Stop();
+                RecomputeBubbleWidths(true);
+            };
+            flbKhungChat.Resize += (s, e) =>
+            {
+                timerResize.Stop();
+                timerResize.Start();
+            };
         }
 
         private async void NhanTin_Load(object sender, EventArgs e)
@@ -77,16 +120,294 @@ namespace ChatApp
             await CapNhatTrangThai("online");
             BatRealtimeTrangThai();
 
-            // nạp trạng thái kết bạn + bật realtime kết bạn
             await NapTrangThaiKetBan();
             BatRealtimeKetBan();
 
-            // tải danh sách user ban đầu
             await TaiDanhSachNguoiDung();
 
-            // tải danh sách nhóm
             await TaiDanhSachNhom();
             BatRealtimeNhom();
+
+            KhoiTaoTyping();
+            KhoiTaoRenderMem();
+
+            RecomputeBubbleWidths(true);
+        }
+
+        // ===== ENTER handler cho ô nhập =====
+        private void TxtNhapTinNhan_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Enter thường: gửi; Shift+Enter hoặc Ctrl+Enter: xuống dòng
+            if (e.KeyCode == Keys.Enter && !e.Shift && !e.Control)
+            {
+                e.SuppressKeyPress = true;   // không chèn newline, không beep
+                if (btnGui.Enabled) btnGui.PerformClick();
+            }
+        }
+
+        // ===== Render batch =====
+        private void KhoiTaoRenderMem()
+        {
+            var prop = typeof(Panel).GetProperty("DoubleBuffered",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (prop != null) prop.SetValue(flbKhungChat, true, null);
+
+            timerRender = new System.Windows.Forms.Timer();
+            timerRender.Interval = 80;
+            timerRender.Tick += (s, e) => FlushRender();
+            timerRender.Start();
+        }
+
+        const int MAX_BUBBLES = 300;
+
+        private int GetMaxBubbleWidth()
+        {
+            int scrollW = flbKhungChat.VerticalScroll.Visible ? SystemInformation.VerticalScrollBarWidth : 0;
+            return Math.Max(220, flbKhungChat.ClientSize.Width - (100 + scrollW));
+        }
+
+        private static DateTime ParseTime(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s))
+                return DateTime.UtcNow;
+
+            long ms;
+            if (long.TryParse(s, out ms) && ms > 946684800000L && ms < 4102444800000L)
+            {
+                try { return DateTimeOffset.FromUnixTimeMilliseconds(ms).UtcDateTime; }
+                catch { }
+            }
+
+            DateTimeOffset dtoExact;
+            if (DateTimeOffset.TryParseExact(
+                    s, "o", CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                    out dtoExact))
+                return dtoExact.UtcDateTime;
+
+            DateTimeOffset dto;
+            if (DateTimeOffset.TryParse(
+                    s, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                    out dto))
+                return dto.UtcDateTime;
+
+            DateTime dt;
+            if (DateTime.TryParse(
+                    s, CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                    out dt))
+                return dt;
+
+            return DateTime.UtcNow;
+        }
+
+        private void RecomputeBubbleWidths(bool realign)
+        {
+            if (!IsHandleCreated || IsDisposed) return;
+
+            int panelW = flbKhungChat.ClientSize.Width;
+            int textMax = GetMaxBubbleWidth();
+
+            flbKhungChat.SuspendLayout();
+            foreach (Control ctrl in flbKhungChat.Controls)
+            {
+                Panel row = ctrl as Panel;
+                if (row == null) continue;
+
+                if (row.Width != panelW)
+                    row.Width = panelW;
+
+                if (row.Controls.Count > 0)
+                {
+                    Panel bubble = row.Controls[0] as Panel;
+                    if (bubble != null)
+                    {
+                        var content = bubble.Controls.Count > 0 ? bubble.Controls[0] as FlowLayoutPanel : null;
+                        if (content != null)
+                        {
+                            foreach (Control c in content.Controls)
+                            {
+                                Label lbl = c as Label;
+                                if (lbl != null && lbl.Name == "lblMsg")
+                                {
+                                    int cap = Math.Max(50, textMax - bubble.Padding.Horizontal);
+                                    if (lbl.MaximumSize.Width != cap)
+                                        lbl.MaximumSize = new Size(cap, 0);
+                                }
+                            }
+                        }
+
+                        if (realign) AlignBubbleInRow(row);
+                    }
+                }
+            }
+            flbKhungChat.ResumeLayout(true);
+        }
+
+        private void FlushRender()
+        {
+            if (!this.IsHandleCreated || this.IsDisposed) return;
+            if (hangChoRender.IsEmpty) return;
+
+            List<TinNhan> gom = new List<TinNhan>(50);
+            TinNhan tnTmp;
+            while (gom.Count < 50 && hangChoRender.TryDequeue(out tnTmp))
+                gom.Add(tnTmp);
+            if (gom.Count == 0) return;
+
+            bool oCuoiKhungChat = false;
+            if (flbKhungChat.VerticalScroll.Visible)
+            {
+                int max = Math.Max(0, flbKhungChat.VerticalScroll.Maximum - flbKhungChat.VerticalScroll.LargeChange);
+                oCuoiKhungChat = flbKhungChat.VerticalScroll.Value >= max;
+            }
+            else
+            {
+                oCuoiKhungChat = true;
+            }
+
+            flbKhungChat.SuspendLayout();
+            bool oldAuto = flbKhungChat.AutoScroll;
+            flbKhungChat.AutoScroll = false;
+
+            foreach (TinNhan tn in gom)
+                TaoBubbleVaChen(tn);
+
+            int over = flbKhungChat.Controls.Count - MAX_BUBBLES;
+            if (over > 0)
+            {
+                for (int i = 0; i < over; i++)
+                    flbKhungChat.Controls[i].Dispose();
+                for (int i = 0; i < over; i++)
+                    flbKhungChat.Controls.RemoveAt(0);
+            }
+
+            flbKhungChat.AutoScroll = oldAuto;
+            flbKhungChat.ResumeLayout(true);
+
+            if (oCuoiKhungChat && flbKhungChat.Controls.Count > 0)
+            {
+                flbKhungChat.ScrollControlIntoView(flbKhungChat.Controls[flbKhungChat.Controls.Count - 1]);
+            }
+        }
+
+        // ===== Tạo bubble thủ công (không dùng TinNhanBubble) =====
+        private void TaoBubbleVaChen(TinNhan tn)
+        {
+            bool laNhom = currentChatIsGroup;
+            bool laCuaToi = string.Equals(tn.guiBoi, tenHienTai, StringComparison.OrdinalIgnoreCase);
+
+            Panel row = new Panel
+            {
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = laCuaToi ? new Padding(60, 2, 8, 8) : new Padding(8, 2, 60, 8),
+                Margin = new Padding(0, 2, 0, 2),
+                Width = flbKhungChat.ClientSize.Width,
+                Tag = laCuaToi
+            };
+
+            Panel bubble = new Panel
+            {
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(10, 6, 10, 6),
+                BackColor = laCuaToi ? Color.FromArgb(222, 242, 255) : Color.White,
+                BorderStyle = BorderStyle.None
+            };
+
+            FlowLayoutPanel stack = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Margin = Padding.Empty,
+                Padding = Padding.Empty
+            };
+
+            if (laNhom)
+            {
+                Label lblSender = new Label
+                {
+                    AutoSize = true,
+                    Text = tn.guiBoi ?? "",
+                    Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
+                    ForeColor = Color.DimGray,
+                    Margin = new Padding(0, 0, 0, 2),
+                    Name = "lblSender"
+                };
+                stack.Controls.Add(lblSender);
+            }
+
+            string text = tn.noiDung ?? "";
+            Label lblMsg = new Label
+            {
+                AutoSize = true,
+                MaximumSize = new Size(Math.Max(50, GetMaxBubbleWidth() - bubble.Padding.Horizontal), 0),
+                Text = text.Length == 0 ? " " : text,
+                Font = new Font("Segoe UI", 10f, FontStyle.Regular),
+                ForeColor = Color.Black,
+                Margin = new Padding(0, 0, 0, 4),
+                Name = "lblMsg",
+                UseMnemonic = false
+            };
+            lblMsg.AutoEllipsis = false;
+
+            Label lblTime = new Label
+            {
+                AutoSize = true,
+                Text = ParseTime(tn.thoiGian).ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
+                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
+                ForeColor = Color.DimGray,
+                Margin = new Padding(0, 0, 0, 0),
+                Name = "lblTime"
+            };
+
+            stack.Controls.Add(lblMsg);
+            stack.Controls.Add(lblTime);
+            bubble.Controls.Add(stack);
+
+            ContextMenuStrip menu = new ContextMenuStrip();
+            menu.Items.Add("Trả lời (trích dẫn)", null, (s, e) => { /* ChenTrichDan(tn); */ });
+            menu.Items.Add("Sao ⭐", null, async (s, e) => { /* await DanhDauSao(tn); */ });
+            menu.Items.Add("Ghim 📌", null, async (s, e) => { /* await GhimTinNhan(tn); */ });
+            menu.Items.Add("Sao chép", null, (s, e) => { try { Clipboard.SetText(tn.noiDung ?? ""); } catch { } });
+            if (laCuaToi)
+                menu.Items.Add("Xoá", null, async (s, e) => { /* await XoaTinNhan(tn); */ });
+            bubble.ContextMenuStrip = menu;
+
+            row.Controls.Add(bubble);
+
+            AlignBubbleInRow(row);
+            row.SizeChanged += (ss, ee) =>
+            {
+                if (row.Width != flbKhungChat.ClientSize.Width)
+                    row.Width = flbKhungChat.ClientSize.Width;
+                AlignBubbleInRow(row);
+            };
+            bubble.SizeChanged += (ss, ee) => AlignBubbleInRow(row);
+
+            flbKhungChat.Controls.Add(row);
+        }
+
+        private static void AlignBubbleInRow(Panel row)
+        {
+            if (row == null || row.Controls.Count == 0) return;
+            Control bubble = row.Controls[0];
+            bool laCuaToi = false;
+            if (row.Tag is bool) laCuaToi = (bool)row.Tag;
+
+            if (laCuaToi)
+            {
+                bubble.Left = Math.Max(row.Padding.Left,
+                    row.ClientSize.Width - row.Padding.Right - bubble.Width);
+            }
+            else
+            {
+                bubble.Left = row.Padding.Left;
+            }
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -94,34 +415,40 @@ namespace ChatApp
             try { streamChatHienTai?.Dispose(); } catch { }
             try { streamFriendReq?.Dispose(); } catch { }
             try { streamFriends?.Dispose(); } catch { }
-            try { timerTinNhanMoi?.Stop(); timerTinNhanMoi?.Dispose(); } catch { }
             try { streamTrangThai?.Dispose(); } catch { }
+            try { streamNhom?.Dispose(); } catch { }
+            try { streamTyping?.Dispose(); } catch { }
+
+            try { timerRender?.Stop(); timerRender?.Dispose(); } catch { }
+            try { timerGomSuKienChat?.Stop(); timerGomSuKienChat?.Dispose(); } catch { }
+            try { timerTinNhanMoi?.Stop(); timerTinNhanMoi?.Dispose(); } catch { }
+            try { timerDangNhap?.Stop(); timerDangNhap?.Dispose(); } catch { }
+            try { timerResize?.Stop(); timerResize?.Dispose(); } catch { }
+
+            CapNhatTrangThai("offline").ConfigureAwait(false);
             base.OnFormClosed(e);
         }
 
-        // ==================== TẢI DANH SÁCH NGƯỜI DÙNG ====================
+        private void ClearRenderQueue()
+        {
+            TinNhan _; while (hangChoRender.TryDequeue(out _)) { }
+        }
+
+        // ===== Danh sách người dùng =====
         private async Task TaiDanhSachNguoiDung()
         {
-            // tránh trùng lặp do realtime kích hoạt liên tục
             if (dangTaiDanhSachNguoiDung) return;
             dangTaiDanhSachNguoiDung = true;
 
             try
             {
-                var res = await firebase.GetAsync("users");
-                var data = res.ResultAs<Dictionary<string, UserFirebase>>();
+                FirebaseResponse res = await firebase.GetAsync("users");
+                Dictionary<string, UserFirebase> data = res.ResultAs<Dictionary<string, UserFirebase>>();
 
-                // Dọn UI an toàn trong luồng chính
-                if (InvokeRequired)
-                {
-                    Invoke(new Action(() => flpDanhSachChat.Controls.Clear()));
-                }
-                else
-                {
-                    flpDanhSachChat.Controls.Clear();
-                }
+                if (InvokeRequired) Invoke(new Action(() => flpDanhSachChat.Controls.Clear()));
+                else flpDanhSachChat.Controls.Clear();
 
-                if (data == null)
+                if (data == null || data.Count == 0)
                 {
                     Invoke(new Action(() =>
                     {
@@ -130,41 +457,31 @@ namespace ChatApp
                     return;
                 }
 
-                // Duyệt danh sách user
-                foreach (var item in data)
+                foreach (KeyValuePair<string, UserFirebase> item in data)
                 {
-                    var user = item.Value;
+                    UserFirebase user = item.Value;
                     if (user == null) continue;
-                    if (string.Equals(user.Ten, tenHienTai, StringComparison.OrdinalIgnoreCase))
-                        continue;
+                    if (string.Equals(user.Ten, tenHienTai, StringComparison.OrdinalIgnoreCase)) continue;
 
-                    string trangThai = ""; // mặc định không hiển thị trạng thái
-
-                    // Chỉ hiển thị trạng thái nếu là bạn bè
+                    string trangThai = "";
                     if (danhSachBanBe.ContainsKey(user.Ten))
                     {
-                        if (trangThaiNguoiDung.TryGetValue(user.Ten, out string trangThaiOnline) && trangThaiOnline == "online")
-                        {
+                        string trangThaiOnline;
+                        if (trangThaiNguoiDung.TryGetValue(user.Ten, out trangThaiOnline) && trangThaiOnline == "online")
                             trangThai = "(online)";
-                        }
                         else
-                        {
                             trangThai = "(offline)";
-                        }
                     }
 
                     string ghiChuTrangThai = "";
-                    if (danhSachBanBe.ContainsKey(user.Ten))
-                        ghiChuTrangThai = " (Bạn bè)";
-                    else if (danhSachDaGuiLoiMoi.Contains(user.Ten))
-                        ghiChuTrangThai = " (Đã mời)";
-                    else if (danhSachLoiMoiNhanDuoc.Contains(user.Ten))
-                        ghiChuTrangThai = " (Mời bạn)";
+                    if (danhSachBanBe.ContainsKey(user.Ten)) ghiChuTrangThai = " (Bạn bè)";
+                    else if (danhSachDaGuiLoiMoi.Contains(user.Ten)) ghiChuTrangThai = " (Đã mời)";
+                    else if (danhSachLoiMoiNhanDuoc.Contains(user.Ten)) ghiChuTrangThai = " (Mời bạn)";
 
-                    var btn = new Button
+                    Button btn = new Button
                     {
-                        Text = $"{trangThai} {user.Ten}{ghiChuTrangThai}",
-                        Tag = $"user:{user.Ten}",
+                        Text = string.Format("{0} {1}{2}", trangThai, user.Ten, ghiChuTrangThai),
+                        Tag = "user:" + user.Ten,
                         Width = flpDanhSachChat.Width - 25,
                         Height = 40,
                         TextAlign = ContentAlignment.MiddleLeft,
@@ -172,8 +489,7 @@ namespace ChatApp
                         FlatStyle = FlatStyle.Flat
                     };
 
-                    // Menu chuột phải: kết bạn / chấp nhận / huỷ
-                    var cm = new ContextMenuStrip();
+                    ContextMenuStrip cm = new ContextMenuStrip();
                     if (!danhSachBanBe.ContainsKey(user.Ten) &&
                         !danhSachDaGuiLoiMoi.Contains(user.Ten) &&
                         !danhSachLoiMoiNhanDuoc.Contains(user.Ten))
@@ -208,6 +524,8 @@ namespace ChatApp
                     // Mở chat 1-1
                     btn.Click += async (s, e) =>
                     {
+                        flbKhungChat.Controls.Clear();
+                        ClearRenderQueue();
                         tenDoiPhuong = user.Ten;
                         currentChatIsGroup = false;
                         currentGroupId = "";
@@ -216,20 +534,20 @@ namespace ChatApp
 
                         string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
                         dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
+                        thuTuTinNhanTheoDoanChat[cid] = new List<string>();
 
                         await CapTinNhanMoi();
                         BatRealtimeChatHienTai();
+                        BatRealtimeTyping();
                         BatTimerKiemTraTinNhanMoi();
+
+                        RecomputeBubbleWidths(true);
                     };
 
-                    // Thêm nút vào UI thread an toàn
-                    if (InvokeRequired)
-                        Invoke(new Action(() => flpDanhSachChat.Controls.Add(btn)));
-                    else
-                        flpDanhSachChat.Controls.Add(btn);
+                    if (InvokeRequired) Invoke(new Action(() => flpDanhSachChat.Controls.Add(btn)));
+                    else flpDanhSachChat.Controls.Add(btn);
                 }
 
-                // Sau khi load xong user mới load nhóm (đảm bảo không bị lặp)
                 await TaiDanhSachNhom();
             }
             catch (Exception ex)
@@ -242,63 +560,32 @@ namespace ChatApp
             }
         }
 
-
-        // ==================== TẠO NHÓM ====================
-        private async void btnTaoNhom_Click(object sender, EventArgs e)
-        {
-            string tenNhom = Microsoft.VisualBasic.Interaction.InputBox("Nhập tên nhóm:", "Tạo nhóm");
-            if (string.IsNullOrEmpty(tenNhom)) return;
-
-            // Chọn bạn bè thêm vào nhóm - đơn giản hiện dialog chọn từng người bằng MessageBox (có thể thay bằng form chọn)
-            var thanhVien = new Dictionary<string, bool> { { tenHienTai, true } };
-            // Tạo nhóm object
-            var nhom = new Nhom
-            {
-                id = Guid.NewGuid().ToString(),
-                tenNhom = tenNhom,
-                thanhVien = thanhVien,
-                taoBoi = tenHienTai
-            };
-
-            try
-            {
-                await firebase.SetAsync($"nhom/{nhom.id}", nhom);
-                MessageBox.Show($"Đã tạo nhóm: {tenNhom}");
-                await TaiDanhSachNhom();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi tạo nhóm: " + ex.Message);
-            }
-        }
-
-        // ==================== TẢI DANH SÁCH NHÓM ====================
+        // ===== Nhóm =====
         private async Task TaiDanhSachNhom()
         {
             try
             {
-                var res = await firebase.GetAsync("nhom");
-                var data = res.ResultAs<Dictionary<string, Nhom>>();
+                FirebaseResponse res = await firebase.GetAsync("nhom");
+                Dictionary<string, Nhom> data = res.ResultAs<Dictionary<string, Nhom>>();
 
-                // Xóa các button nhóm cũ trước khi thêm (tag bắt đầu bằng "group:")
-                var groupButtons = flpDanhSachChat.Controls.Cast<Control>()
+                List<Button> groupButtons = flpDanhSachChat.Controls.Cast<Control>()
                     .OfType<Button>()
-                    .Where(b => b.Tag is string t && t.StartsWith("group:"))
+                    .Where(b => b.Tag is string && ((string)b.Tag).StartsWith("group:"))
                     .ToList();
-                foreach (var b in groupButtons) flpDanhSachChat.Controls.Remove(b);
+                foreach (Button b in groupButtons) flpDanhSachChat.Controls.Remove(b);
 
                 if (data == null) return;
 
-                foreach (var item in data)
+                foreach (KeyValuePair<string, Nhom> item in data)
                 {
-                    var nhom = item.Value;
+                    Nhom nhom = item.Value;
                     if (nhom == null || nhom.thanhVien == null) continue;
-                    if (!nhom.thanhVien.ContainsKey(tenHienTai)) continue; // chỉ hiển thị nhóm mình là thành viên
+                    if (!nhom.thanhVien.ContainsKey(tenHienTai)) continue;
 
-                    var btn = new Button
+                    Button btn = new Button
                     {
-                        Text = $"[Nhóm] {nhom.tenNhom}",
-                        Tag = $"group:{nhom.id}",
+                        Text = "[Nhóm] " + nhom.tenNhom,
+                        Tag = "group:" + nhom.id,
                         Width = flpDanhSachChat.Width - 25,
                         Height = 40,
                         BackColor = Color.LightYellow,
@@ -306,38 +593,29 @@ namespace ChatApp
                         TextAlign = ContentAlignment.MiddleLeft
                     };
 
-                    // Menu chuột phải cho nhóm
-                    var cm = new ContextMenuStrip();
-                    cm.Items.Add("Thêm thành viên", null, async (s2, e2) =>
-                    {
-                        await ThemThanhVienVaoNhom(nhom.id);
-                    });
+                    ContextMenuStrip cm = new ContextMenuStrip();
+                    cm.Items.Add("Thêm thành viên", null, async (s2, e2) => { await ThemThanhVienVaoNhom(nhom.id); });
 
-                    // Nếu mình là người tạo nhóm thì thêm mục "Xóa nhóm"
                     if (nhom.taoBoi == tenHienTai)
                     {
                         cm.Items.Add("Xóa nhóm", null, async (s2, e2) =>
                         {
-                            var confirm = MessageBox.Show(
-                                $"Bạn có chắc muốn xóa nhóm \"{nhom.tenNhom}\" không?",
-                                "Xóa nhóm",
-                                MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Warning
-                            );
+                            DialogResult confirm = MessageBox.Show(
+                                string.Format("Bạn có chắc muốn xóa nhóm \"{0}\" không?", nhom.tenNhom),
+                                "Xóa nhóm", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                             if (confirm == DialogResult.Yes)
-                            {
                                 await XoaNhom(nhom.id);
-                            }
                         });
                     }
-
                     btn.ContextMenuStrip = cm;
 
                     btn.Click += async (s, e) =>
                     {
-                        var tag = (string)((Button)s).Tag;
-                        if (tag != null && tag.StartsWith("group:"))
+                        string tag = btn.Tag as string;
+                        if (!string.IsNullOrEmpty(tag) && tag.StartsWith("group:"))
                         {
+                            flbKhungChat.Controls.Clear();
+                            ClearRenderQueue();
                             currentChatIsGroup = true;
                             currentGroupId = tag.Substring("group:".Length);
                             tenDoiPhuong = "";
@@ -345,10 +623,14 @@ namespace ChatApp
                             flbKhungChat.Controls.Clear();
 
                             dsTinNhanDaCoTheoDoanChat[currentGroupId] = new HashSet<string>();
+                            thuTuTinNhanTheoDoanChat[currentGroupId] = new List<string>();
 
                             await CapTinNhanMoiNhom(currentGroupId);
                             BatRealtimeChatNhom(currentGroupId);
+                            BatRealtimeTyping();
                             BatTimerKiemTraTinNhanMoi();
+
+                            RecomputeBubbleWidths(true);
                         }
                     };
 
@@ -365,39 +647,34 @@ namespace ChatApp
         {
             try
             {
-                // Lấy nhóm hiện tại từ Firebase
-                var res = await firebase.GetAsync($"nhom/{idNhom}");
-                var nhom = res.ResultAs<Nhom>();
+                FirebaseResponse res = await firebase.GetAsync("nhom/" + idNhom);
+                Nhom nhom = res.ResultAs<Nhom>();
                 if (nhom == null)
                 {
                     MessageBox.Show("Không tìm thấy nhóm!");
                     return;
                 }
 
-                // Lọc ra danh sách bạn bè chưa có trong nhóm
-                var banChuaCo = danhSachBanBe.Keys
-                    .Where(b => !nhom.thanhVien.ContainsKey(b))
-                    .ToList();
+                List<string> banChuaCo = danhSachBanBe.Keys.Where(b => !nhom.thanhVien.ContainsKey(b)).ToList();
 
-                // Mở form chọn thành viên
                 using (var form = new ChonThanhVien(banChuaCo))
                 {
                     if (form.ShowDialog() == DialogResult.OK)
                     {
-                        var duocChon = form.ThanhVienDuocChon;
+                        List<string> duocChon = form.ThanhVienDuocChon;
                         if (duocChon.Count == 0)
                         {
                             MessageBox.Show("Chưa chọn ai để thêm!");
                             return;
                         }
 
-                        foreach (var ten in duocChon)
+                        foreach (string ten in duocChon)
                         {
                             nhom.thanhVien[ten] = true;
-                            await firebase.SetAsync($"nhom/{idNhom}/thanhVien/{ten}", true);
+                            await firebase.SetAsync("nhom/" + idNhom + "/thanhVien/" + ten, true);
                         }
 
-                        MessageBox.Show($"Đã thêm {duocChon.Count} thành viên vào nhóm!");
+                        MessageBox.Show(string.Format("Đã thêm {0} thành viên vào nhóm!", duocChon.Count));
                         await TaiDanhSachNhom();
                     }
                 }
@@ -412,11 +689,9 @@ namespace ChatApp
         {
             try
             {
-                // Xóa nhóm trong Firebase
-                await firebase.DeleteAsync($"nhom/{idNhom}");
-                await firebase.DeleteAsync($"cuocTroChuyenNhom/{idNhom}");
+                await firebase.DeleteAsync("nhom/" + idNhom);
+                await firebase.DeleteAsync("cuocTroChuyenNhom/" + idNhom);
 
-                // Cập nhật lại giao diện
                 MessageBox.Show("Đã xóa nhóm thành công!");
                 await TaiDanhSachNhom();
             }
@@ -426,7 +701,7 @@ namespace ChatApp
             }
         }
 
-        // ==================== GỬI TIN NHẮN ====================
+        // ===== Gửi tin =====
         private async void btnGui_Click(object sender, EventArgs e)
         {
             string noiDung = txtNhapTinNhan.Text.Trim();
@@ -436,7 +711,6 @@ namespace ChatApp
                 return;
             }
 
-            // Nếu đang chat nhóm
             if (currentChatIsGroup)
             {
                 if (string.IsNullOrEmpty(currentGroupId))
@@ -452,21 +726,30 @@ namespace ChatApp
                     TinNhan tn = new TinNhan
                     {
                         guiBoi = tenHienTai,
-                        nhanBoi = "", // không cần trường nhận cá nhân cho nhóm
+                        nhanBoi = "",
                         noiDung = noiDung,
                         thoiGian = DateTime.UtcNow.ToString("o")
                     };
 
-                    var push = await firebase.PushAsync($"cuocTroChuyenNhom/{currentGroupId}/", tn);
+                    PushResponse push = await firebase.PushAsync("cuocTroChuyenNhom/" + currentGroupId + "/", tn);
                     tn.id = push.Result.name;
-                    await firebase.SetAsync($"cuocTroChuyenNhom/{currentGroupId}/{tn.id}", tn);
+                    await firebase.SetAsync("cuocTroChuyenNhom/" + currentGroupId + "/" + tn.id, tn);
 
                     if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(currentGroupId))
                         dsTinNhanDaCoTheoDoanChat[currentGroupId] = new HashSet<string>();
                     if (dsTinNhanDaCoTheoDoanChat[currentGroupId].Add(tn.id))
-                        ThemTinNhanVaoKhung(tn);
+                    {
+                        if (tn.noiDung == null) tn.noiDung = "";
+                    }
+                    hangChoRender.Enqueue(tn);
+
+                    if (!thuTuTinNhanTheoDoanChat.ContainsKey(currentGroupId))
+                        thuTuTinNhanTheoDoanChat[currentGroupId] = new List<string>();
+                    thuTuTinNhanTheoDoanChat[currentGroupId].Add(tn.id);
 
                     txtNhapTinNhan.Clear();
+                    RefocusInput();
+                    await DanhDauDaXemCuoi();
                 }
                 catch (Exception ex)
                 {
@@ -476,11 +759,12 @@ namespace ChatApp
                 {
                     btnGui.Enabled = true;
                     Cursor.Current = Cursors.Default;
+                    RefocusInput();
                 }
                 return;
             }
 
-            // Nếu chat 1-1 (mặc định)
+            // 1-1
             if (string.IsNullOrEmpty(tenDoiPhuong))
             {
                 MessageBox.Show("Hãy chọn một người để trò chuyện!");
@@ -499,21 +783,28 @@ namespace ChatApp
                     guiBoi = tenHienTai,
                     nhanBoi = tenDoiPhuong,
                     noiDung = noiDung,
-                    // ISO 8601 UTC để sắp xếp an toàn (lexicographical OK)
                     thoiGian = DateTime.UtcNow.ToString("o")
                 };
 
-                var push = await firebase.PushAsync($"cuocTroChuyen/{cid}/", tn);
+                PushResponse push = await firebase.PushAsync("cuocTroChuyen/" + cid + "/", tn);
                 tn.id = push.Result.name;
-                await firebase.SetAsync($"cuocTroChuyen/{cid}/{tn.id}", tn);
+                await firebase.SetAsync("cuocTroChuyen/" + cid + "/" + tn.id, tn);
 
-                // đánh dấu để không render trùng khi poll/stream cùng lúc
                 if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(cid))
                     dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
                 if (dsTinNhanDaCoTheoDoanChat[cid].Add(tn.id))
-                    ThemTinNhanVaoKhung(tn);
+                {
+                    if (tn.noiDung == null) tn.noiDung = "";
+                }
+                hangChoRender.Enqueue(tn);
+
+                if (!thuTuTinNhanTheoDoanChat.ContainsKey(cid))
+                    thuTuTinNhanTheoDoanChat[cid] = new List<string>();
+                thuTuTinNhanTheoDoanChat[cid].Add(tn.id);
 
                 txtNhapTinNhan.Clear();
+                RefocusInput();
+                await DanhDauDaXemCuoi();
             }
             catch (Exception ex)
             {
@@ -523,88 +814,132 @@ namespace ChatApp
             {
                 btnGui.Enabled = true;
                 Cursor.Current = Cursors.Default;
+                RefocusInput();
             }
         }
 
-        // ==================== LOAD & THEO DÕI TIN NHẮN ====================
-        // Nạp phần còn thiếu (tin mới so với dsTinNhanDaCoTheoDoanChat) - cho 1-1
-        private async Task CapTinNhanMoi()
+        // ===== Load & theo dõi tin =====
+        private async Task CapTinNhanMoi() // 1-1
         {
             if (string.IsNullOrEmpty(tenDoiPhuong)) return;
 
-            string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
-            var res = await firebase.GetAsync($"cuocTroChuyen/{cid}");
-            var data = res.ResultAs<Dictionary<string, TinNhan>>();
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            if ((now - lanCuoiTai1_1).TotalMilliseconds < 600) return;
 
-            if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(cid))
-                dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
-            var dsDaCo = dsTinNhanDaCoTheoDoanChat[cid];
+            if (!await khoaTaiTinNhan.WaitAsync(0)) return;
 
-            if (data != null)
+            try
             {
-                foreach (var tn in data.Values.OrderBy(x => x.thoiGian))
+                string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
+                FirebaseResponse res = await firebase.GetAsync("cuocTroChuyen/" + cid);
+                Dictionary<string, TinNhan> data = res.ResultAs<Dictionary<string, TinNhan>>();
+
+                if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(cid))
+                    dsTinNhanDaCoTheoDoanChat[cid] = new HashSet<string>();
+                HashSet<string> dsDaCo = dsTinNhanDaCoTheoDoanChat[cid];
+
+                if (!thuTuTinNhanTheoDoanChat.ContainsKey(cid))
+                    thuTuTinNhanTheoDoanChat[cid] = new List<string>();
+
+                if (data != null && data.Count > 0)
                 {
-                    if (string.IsNullOrEmpty(tn.id)) continue; // phòng rủi ro
-                    if (dsDaCo.Add(tn.id))
-                        ThemTinNhanVaoKhung(tn);
+                    foreach (KeyValuePair<string, TinNhan> kv in data.OrderBy(k => ParseTime(k.Value != null ? k.Value.thoiGian : null)))
+                    {
+                        TinNhan tn = kv.Value ?? new TinNhan();
+                        if (string.IsNullOrEmpty(tn.id)) tn.id = kv.Key;
+                        if (string.IsNullOrEmpty(tn.id)) continue;
+
+                        if (dsDaCo.Add(tn.id))
+                        {
+                            if (tn.noiDung == null) tn.noiDung = "";
+                            thuTuTinNhanTheoDoanChat[cid].Add(tn.id);
+                            hangChoRender.Enqueue(tn);
+                        }
+                    }
                 }
+
+                lanCuoiTai1_1 = now;
+                await DanhDauDaXemCuoi();
+            }
+            catch { }
+            finally
+            {
+                try { khoaTaiTinNhan.Release(); } catch { }
             }
         }
 
-        // Nạp cho nhóm
         private async Task CapTinNhanMoiNhom(string idNhom)
         {
             if (string.IsNullOrEmpty(idNhom)) return;
 
-            var res = await firebase.GetAsync($"cuocTroChuyenNhom/{idNhom}");
-            var data = res.ResultAs<Dictionary<string, TinNhan>>();
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            if ((now - lanCuoiTaiNhom).TotalMilliseconds < 600) return;
 
-            if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(idNhom))
-                dsTinNhanDaCoTheoDoanChat[idNhom] = new HashSet<string>();
-            var dsDaCo = dsTinNhanDaCoTheoDoanChat[idNhom];
+            if (!await khoaTaiTinNhan.WaitAsync(0)) return;
 
-            if (data != null)
+            try
             {
-                foreach (var tn in data.Values.OrderBy(x => x.thoiGian))
+                FirebaseResponse res = await firebase.GetAsync("cuocTroChuyenNhom/" + idNhom);
+                Dictionary<string, TinNhan> data = res.ResultAs<Dictionary<string, TinNhan>>();
+
+                if (!dsTinNhanDaCoTheoDoanChat.ContainsKey(idNhom))
+                    dsTinNhanDaCoTheoDoanChat[idNhom] = new HashSet<string>();
+                HashSet<string> dsDaCo = dsTinNhanDaCoTheoDoanChat[idNhom];
+
+                if (!thuTuTinNhanTheoDoanChat.ContainsKey(idNhom))
+                    thuTuTinNhanTheoDoanChat[idNhom] = new List<string>();
+
+                if (data != null && data.Count > 0)
                 {
-                    if (string.IsNullOrEmpty(tn.id)) continue;
-                    if (dsDaCo.Add(tn.id))
-                        ThemTinNhanVaoKhung(tn);
+                    foreach (KeyValuePair<string, TinNhan> kv in data.OrderBy(k => ParseTime(k.Value != null ? k.Value.thoiGian : null)))
+                    {
+                        TinNhan tn = kv.Value ?? new TinNhan();
+                        if (string.IsNullOrEmpty(tn.id)) tn.id = kv.Key;
+                        if (string.IsNullOrEmpty(tn.id)) continue;
+
+                        if (dsDaCo.Add(tn.id))
+                        {
+                            if (tn.noiDung == null) tn.noiDung = "";
+                            thuTuTinNhanTheoDoanChat[idNhom].Add(tn.id);
+                            hangChoRender.Enqueue(tn);
+                        }
+                    }
                 }
+
+                lanCuoiTaiNhom = now;
+                await DanhDauDaXemCuoi();
+            }
+            catch { }
+            finally
+            {
+                try { khoaTaiTinNhan.Release(); } catch { }
             }
         }
 
-        // Bật timer kiểm tra tin nhắn mới (dự phòng)
         private void BatTimerKiemTraTinNhanMoi()
         {
-            try
-            {
-                if (timerTinNhanMoi != null)
-                {
-                    timerTinNhanMoi.Stop();
-                    timerTinNhanMoi.Dispose();
-                }
-            }
-            catch { }
+            try { timerTinNhanMoi?.Stop(); timerTinNhanMoi?.Dispose(); } catch { }
 
-            timerTinNhanMoi = new Timer();
-            timerTinNhanMoi.Interval = 2000;
+            timerTinNhanMoi = new System.Windows.Forms.Timer();
+            timerTinNhanMoi.Interval = 10000;
             timerTinNhanMoi.Tick += async (s, e) =>
             {
-                if (currentChatIsGroup)
+                if (streamChatHienTai == null)
                 {
-                    if (!string.IsNullOrEmpty(currentGroupId))
-                        await CapTinNhanMoiNhom(currentGroupId);
-                }
-                else
-                {
-                    await CapTinNhanMoi();
+                    if (currentChatIsGroup)
+                    {
+                        if (!string.IsNullOrEmpty(currentGroupId))
+                            await CapTinNhanMoiNhom(currentGroupId);
+                    }
+                    else
+                    {
+                        await CapTinNhanMoi();
+                    }
                 }
             };
             timerTinNhanMoi.Start();
         }
 
-        // Bật realtime cho cuộc chat hiện tại (1-1)
         private async void BatRealtimeChatHienTai()
         {
             try { streamChatHienTai?.Dispose(); } catch { }
@@ -613,21 +948,20 @@ namespace ChatApp
             string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
 
             streamChatHienTai = await firebase.OnAsync(
-                $"cuocTroChuyen/{cid}",
+                "cuocTroChuyen/" + cid,
                 added: async (s, a, c) => await UiCapNhatTinNhan(),
                 changed: async (s, a, c) => await UiCapNhatTinNhan(),
                 removed: async (s, a, c) => await UiCapNhatTinNhan()
             );
         }
 
-        // Bật realtime cho nhóm
         private async void BatRealtimeChatNhom(string idNhom)
         {
             try { streamChatHienTai?.Dispose(); } catch { }
             if (string.IsNullOrEmpty(idNhom)) return;
 
             streamChatHienTai = await firebase.OnAsync(
-                $"cuocTroChuyenNhom/{idNhom}",
+                "cuocTroChuyenNhom/" + idNhom,
                 added: async (s, a, c) => await UiCapNhatTinNhan(),
                 changed: async (s, a, c) => await UiCapNhatTinNhan(),
                 removed: async (s, a, c) => await UiCapNhatTinNhan()
@@ -636,130 +970,135 @@ namespace ChatApp
 
         private Task UiCapNhatTinNhan()
         {
-            if (!IsHandleCreated) return Task.CompletedTask;
-            BeginInvoke(new Action(async () =>
+            if (!IsHandleCreated || this.IsDisposed) return Task.CompletedTask;
+
+            if (timerGomSuKienChat == null)
             {
-                if (currentChatIsGroup)
+                timerGomSuKienChat = new System.Windows.Forms.Timer();
+                timerGomSuKienChat.Interval = 300;
+                timerGomSuKienChat.Tick += async (s, e) =>
                 {
-                    if (!string.IsNullOrEmpty(currentGroupId))
-                        await CapTinNhanMoiNhom(currentGroupId);
-                }
-                else
-                {
-                    await CapTinNhanMoi();
-                }
-            }));
+                    timerGomSuKienChat.Stop();
+                    try
+                    {
+                        if (currentChatIsGroup)
+                        {
+                            if (!string.IsNullOrEmpty(currentGroupId))
+                                await CapTinNhanMoiNhom(currentGroupId);
+                        }
+                        else
+                        {
+                            await CapTinNhanMoi();
+                        }
+                    }
+                    catch { }
+                };
+            }
+
+            timerGomSuKienChat.Stop();
+            timerGomSuKienChat.Start();
             return Task.CompletedTask;
         }
 
-        // ==================== HIỂN THỊ TIN NHẮN ====================
-        private void ThemTinNhanVaoKhung(TinNhan tn)
+        // ===== Phụ =====
+        private string TaoIdCuocTroChuyen(string u1, string u2)
         {
-            Label lbl = new Label();
-            lbl.AutoSize = true;
-            lbl.MaximumSize = new Size(400, 0);
-
-            // Nếu là nhóm, hiển thị tên người gửi trước nội dung
-            string hienThiNoiDung;
-            if (currentChatIsGroup)
-            {
-                // Hiển thị: "Người gửi: Nội dung"
-                hienThiNoiDung = $"{tn.guiBoi}: {tn.noiDung}\n({tn.thoiGian})";
-            }
-            else
-            {
-                hienThiNoiDung = $"{tn.noiDung}\n({tn.thoiGian})";
-            }
-
-            lbl.Text = hienThiNoiDung;
-            lbl.Padding = new Padding(10);
-            lbl.Margin = new Padding(5);
-
-            if (tn.guiBoi == tenHienTai)
-            {
-                lbl.BackColor = Color.LightSkyBlue;
-                lbl.TextAlign = ContentAlignment.MiddleRight;
-                lbl.Anchor = AnchorStyles.Right;
-            }
-            else
-            {
-                lbl.BackColor = Color.LightGray;
-                lbl.TextAlign = ContentAlignment.MiddleLeft;
-                lbl.Anchor = AnchorStyles.Left;
-            }
-
-            flbKhungChat.Controls.Add(lbl);
-            flbKhungChat.ScrollControlIntoView(lbl);
+            return string.CompareOrdinal(u1, u2) < 0 ? (u1 + "__" + u2) : (u2 + "__" + u1);
         }
 
-        // ==================== HÀM PHỤ ====================
-        private string TaoIdCuocTroChuyen(string a, string b)
+        private async Task DanhDauSao(TinNhan tn)
         {
-            // Ghép theo thứ tự chữ cái để 2 bên cùng trỏ 1 node
-            return string.CompareOrdinal(a, b) < 0 ? $"{a}_{b}" : $"{b}_{a}";
+            try
+            {
+                string key = currentChatIsGroup ? currentGroupId : TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
+                await firebase.SetAsync("stars/" + tenHienTai + "/" + key + "/" + tn.id, true);
+                MessageBox.Show("Đã đánh dấu sao ⭐");
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi đánh dấu sao: " + ex.Message); }
         }
 
-        // ==================== KẾT BẠN ====================
+        private async Task GhimTinNhan(TinNhan tn)
+        {
+            try
+            {
+                string key = currentChatIsGroup ? currentGroupId : TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
+                await firebase.SetAsync("pins/" + key + "/" + tn.id, true);
+                MessageBox.Show("Đã ghim 📌");
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi ghim: " + ex.Message); }
+        }
+
+        private async Task XoaTinNhan(TinNhan tn)
+        {
+            try
+            {
+                if (currentChatIsGroup)
+                    await firebase.DeleteAsync("cuocTroChuyenNhom/" + currentGroupId + "/" + tn.id);
+                else
+                {
+                    string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
+                    await firebase.DeleteAsync("cuocTroChuyen/" + cid + "/" + tn.id);
+                }
+            }
+            catch (Exception ex) { MessageBox.Show("Lỗi xoá tin: " + ex.Message); }
+        }
+
+        // ===== Kết bạn / Trạng thái =====
         private async Task NapTrangThaiKetBan()
         {
             danhSachBanBe.Clear();
             danhSachDaGuiLoiMoi.Clear();
             danhSachLoiMoiNhanDuoc.Clear();
 
-            // Lấy danh sách bạn bè
-            var f1 = await firebase.GetAsync($"friends/{tenHienTai}");
-            var duLieuBanBe = f1.ResultAs<Dictionary<string, bool>>();
-            if (duLieuBanBe != null)
-                danhSachBanBe = duLieuBanBe;
+            FirebaseResponse f1 = await firebase.GetAsync("friends/" + tenHienTai);
+            Dictionary<string, bool> duLieuBanBe = f1.ResultAs<Dictionary<string, bool>>();
+            if (duLieuBanBe != null) danhSachBanBe = duLieuBanBe;
 
-            // Lấy danh sách mình mời người khác
-            var tatCaLoiMoi = await firebase.GetAsync("friendRequests/pending");
-            var duLieuLoiMoiCho = tatCaLoiMoi.ResultAs<Dictionary<string, Dictionary<string, bool>>>();
+            FirebaseResponse tatCaLoiMoi = await firebase.GetAsync("friendRequests/pending");
+            Dictionary<string, Dictionary<string, bool>> duLieuLoiMoiCho = tatCaLoiMoi.ResultAs<Dictionary<string, Dictionary<string, bool>>>();
             if (duLieuLoiMoiCho != null)
             {
-                foreach (var loiMoiDenNguoiNhan in duLieuLoiMoiCho)
+                foreach (KeyValuePair<string, Dictionary<string, bool>> loiMoiDenNguoiNhan in duLieuLoiMoiCho)
                 {
                     string nguoiNhan = loiMoiDenNguoiNhan.Key;
-                    foreach (var loiMoiTuNguoiGui in loiMoiDenNguoiNhan.Value)
+                    foreach (KeyValuePair<string, bool> loiMoiTuNguoiGui in loiMoiDenNguoiNhan.Value)
                     {
                         string nguoiGui = loiMoiTuNguoiGui.Key;
-                        if (nguoiGui == tenHienTai)
-                            danhSachDaGuiLoiMoi.Add(nguoiNhan);
+                        if (nguoiGui == tenHienTai) danhSachDaGuiLoiMoi.Add(nguoiNhan);
                     }
                 }
             }
 
-            // Lấy danh sách người khác mời mình
-            var f2 = await firebase.GetAsync($"friendRequests/pending/{tenHienTai}");
-            var danhSachNguoiGuiLoiMoi = f2.ResultAs<Dictionary<string, bool>>();
+            FirebaseResponse f2 = await firebase.GetAsync("friendRequests/pending/" + tenHienTai);
+            Dictionary<string, bool> danhSachNguoiGuiLoiMoi = f2.ResultAs<Dictionary<string, bool>>();
             if (danhSachNguoiGuiLoiMoi != null)
-                danhSachLoiMoiNhanDuoc = danhSachNguoiGuiLoiMoi.Keys.ToHashSet();
+                danhSachLoiMoiNhanDuoc = new HashSet<string>(danhSachNguoiGuiLoiMoi.Keys);
         }
 
         private async Task GuiLoiMoiKetBan(string ten)
         {
-            await firebase.SetAsync($"friendRequests/pending/{ten}/{tenHienTai}", true);
-            MessageBox.Show($"Đã gửi lời mời kết bạn đến {ten}!");
+            await firebase.SetAsync("friendRequests/pending/" + ten + "/" + tenHienTai, true);
+            MessageBox.Show("Đã gửi lời mời kết bạn đến " + ten + "!");
             danhSachDaGuiLoiMoi.Add(ten);
         }
 
         private async Task ChapNhanKetBan(string ten)
         {
-            await firebase.SetAsync($"friends/{tenHienTai}/{ten}", true);
-            await firebase.SetAsync($"friends/{ten}/{tenHienTai}", true);
-            await firebase.DeleteAsync($"friendRequests/pending/{tenHienTai}/{ten}");
+            await firebase.SetAsync("friends/" + tenHienTai + "/" + ten, true);
+            await firebase.SetAsync("friends/" + ten + "/" + tenHienTai, true);
+            await firebase.DeleteAsync("friendRequests/pending/" + tenHienTai + "/" + ten);
 
-            MessageBox.Show($"Bạn và {ten} đã trở thành bạn bè!");
+            MessageBox.Show("Bạn và " + ten + " đã trở thành bạn bè!");
             danhSachBanBe[ten] = true;
             danhSachLoiMoiNhanDuoc.Remove(ten);
         }
 
         private async Task HuyKetBan(string ten)
         {
-            await firebase.DeleteAsync($"friends/{tenHienTai}/{ten}");
-            await firebase.DeleteAsync($"friends/{ten}/{tenHienTai}");
+            await firebase.DeleteAsync("friends/" + tenHienTai + "/" + ten);
+            await firebase.DeleteAsync("friends/" + ten + "/" + tenHienTai);
             danhSachBanBe.Remove(ten);
-            MessageBox.Show($"Đã hủy kết bạn với {ten}.");
+            MessageBox.Show("Đã hủy kết bạn với " + ten + ".");
         }
 
         private void BatRealtimeKetBan()
@@ -767,40 +1106,31 @@ namespace ChatApp
             try { streamFriends?.Dispose(); } catch { }
             try { streamFriendReq?.Dispose(); } catch { }
 
-            // Realtime bạn bè (khi đã là bạn)
-            firebase.OnAsync($"friends/{tenHienTai}",
+            firebase.OnAsync("friends/" + tenHienTai,
                 added: async (s, a, c) => await RefreshBanBe(),
                 changed: async (s, a, c) => await RefreshBanBe(),
                 removed: async (s, a, c) => await RefreshBanBe()
             ).ContinueWith(t =>
             {
-                if (t.Status == TaskStatus.RanToCompletion)
-                    streamFriends = t.Result;
+                if (t.Status == TaskStatus.RanToCompletion) streamFriends = t.Result;
             });
 
-            // Realtime lời mời kết bạn đến mình
-            firebase.OnAsync($"friendRequests/pending/{tenHienTai}",
+            firebase.OnAsync("friendRequests/pending/" + tenHienTai,
                 added: (s, a, c) =>
                 {
-                    // dùng Invoke để cập nhật UI an toàn
                     BeginInvoke(new Action(async () =>
                     {
                         await NapTrangThaiKetBan();
-
-                        string nguoiGui = a.Path?.TrimStart('/');
+                        string nguoiGui = a.Path != null ? a.Path.TrimStart('/') : "";
                         if (!string.IsNullOrEmpty(nguoiGui))
                         {
-                            // hiện popup thông báo nhẹ
-                            MessageBox.Show($"📩 Bạn có lời mời kết bạn mới từ {nguoiGui}!", "Kết bạn mới");
+                            MessageBox.Show("📩 Bạn có lời mời kết bạn mới từ " + nguoiGui + "!", "Kết bạn mới");
                         }
-
-                        // chỉ cập nhật nhãn/trạng thái, không reload toàn bộ danh sách
                         await TaiDanhSachNguoiDung();
                     }));
                 },
                 removed: (s, a, c) =>
                 {
-                    // khi lời mời bị huỷ hoặc chấp nhận thì chỉ cập nhật trạng thái
                     BeginInvoke(new Action(async () =>
                     {
                         await NapTrangThaiKetBan();
@@ -809,8 +1139,7 @@ namespace ChatApp
                 }
             ).ContinueWith(t =>
             {
-                if (t.Status == TaskStatus.RanToCompletion)
-                    streamFriendReq = t.Result;
+                if (t.Status == TaskStatus.RanToCompletion) streamFriendReq = t.Result;
             });
         }
 
@@ -819,11 +1148,8 @@ namespace ChatApp
             try
             {
                 await NapTrangThaiKetBan();
-                // đảm bảo gọi lại UI trong thread chính
-                if (InvokeRequired)
-                    BeginInvoke(new Action(async () => await TaiDanhSachNguoiDung()));
-                else
-                    await TaiDanhSachNguoiDung();
+                if (InvokeRequired) BeginInvoke(new Action(async () => await TaiDanhSachNguoiDung()));
+                else await TaiDanhSachNguoiDung();
             }
             catch (Exception ex)
             {
@@ -841,25 +1167,23 @@ namespace ChatApp
                 removed: (s, a, c) => XuLyCapNhatNhom()
             ).ContinueWith(t =>
             {
-                if (t.Status == TaskStatus.RanToCompletion)
-                    streamNhom = t.Result;
+                if (t.Status == TaskStatus.RanToCompletion) streamNhom = t.Result;
             });
         }
 
         private void XuLyCapNhatNhom()
         {
-            // Dùng BeginInvoke để tránh cross-thread
-            BeginInvoke(new Action(async () =>
-            {
-                await TaiDanhSachNhom();
-            }));
+            BeginInvoke(new Action(async () => { await TaiDanhSachNhom(); }));
         }
 
+        // Trạng thái online/offline
         private async Task CapNhatTrangThai(string trangThai)
         {
+            if (firebase == null || string.IsNullOrEmpty(tenHienTai)) return;
             try
             {
-                await firebase.SetAsync($"status/{tenHienTai}", trangThai);
+                string key = tenHienTai.Replace(".", "_").Replace("$", "_");
+                await firebase.SetAsync("status/" + key, trangThai);
             }
             catch { }
         }
@@ -874,8 +1198,7 @@ namespace ChatApp
                 removed: (s, a, c) => CapNhatTrangThaiUI()
             ).ContinueWith(t =>
             {
-                if (t.Status == TaskStatus.RanToCompletion)
-                    streamTrangThai = t.Result;
+                if (t.Status == TaskStatus.RanToCompletion) streamTrangThai = t.Result;
             });
         }
 
@@ -886,22 +1209,162 @@ namespace ChatApp
                 {
                     try
                     {
-                        var res = await firebase.GetAsync("status");
-                        var data = res.ResultAs<Dictionary<string, string>>();
-                        trangThaiNguoiDung = data ?? new Dictionary<string, string>();
+                        FirebaseResponse res = await firebase.GetAsync("status");
+                        Dictionary<string, string> data = res.ResultAs<Dictionary<string, string>>();
+                        trangThaiNguoiDung = (data != null) ? data : new Dictionary<string, string>();
                         await TaiDanhSachNguoiDung();
                     }
                     catch { }
                 }));
         }
+
+        // ===== Typing =====
+        private void KhoiTaoTyping()
+        {
+            if (timerDangNhap != null) return;
+
+            timerDangNhap = new System.Windows.Forms.Timer { Interval = 700 };
+            timerDangNhap.Tick += async (s, e) =>
+            {
+                timerDangNhap.Stop();
+                if (string.IsNullOrWhiteSpace(txtNhapTinNhan.Text)) return;
+                await GuiTrangThaiDangNhap();
+            };
+
+            txtNhapTinNhan.TextChanged += (s, e2) =>
+            {
+                timerDangNhap.Stop();
+                timerDangNhap.Start();
+            };
+        }
+
+        private async Task GuiTrangThaiDangNhap()
+        {
+            string key = currentChatIsGroup ? currentGroupId
+                : (!string.IsNullOrEmpty(tenDoiPhuong) ? TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong) : "");
+            if (string.IsNullOrEmpty(key)) return;
+
+            hetHanTyping = DateTimeOffset.UtcNow.AddSeconds(4).ToUnixTimeMilliseconds();
+            await firebase.SetAsync("typing/" + key + "/" + tenHienTai, new { until = hetHanTyping });
+        }
+
+        private void BatRealtimeTyping()
+        {
+            try { streamTyping?.Dispose(); } catch { }
+
+            string key = currentChatIsGroup ? currentGroupId
+                : (!string.IsNullOrEmpty(tenDoiPhuong) ? TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong) : "");
+            if (string.IsNullOrEmpty(key)) return;
+
+            firebase.OnAsync("typing/" + key,
+                added: (s, a, c) => CapNhatTypingUI(),
+                changed: (s, a, c) => CapNhatTypingUI(),
+                removed: (s, a, c) => CapNhatTypingUI()
+            ).ContinueWith(t =>
+            {
+                if (t.Status == TaskStatus.RanToCompletion) streamTyping = t.Result;
+            });
+        }
+
+        private async void CapNhatTypingUI()
+        {
+            try
+            {
+                string key = currentChatIsGroup ? currentGroupId
+                    : (!string.IsNullOrEmpty(tenDoiPhuong) ? TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong) : "");
+                if (string.IsNullOrEmpty(key)) return;
+
+                FirebaseResponse res = await firebase.GetAsync("typing/" + key);
+                Dictionary<string, Dictionary<string, long>> data = res.ResultAs<Dictionary<string, Dictionary<string, long>>>();
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                bool coNguoiDangNhap = false;
+                string tenNguoi = "";
+                if (data != null)
+                {
+                    foreach (KeyValuePair<string, Dictionary<string, long>> kv in data)
+                    {
+                        string ten = kv.Key;
+                        if (string.Equals(ten, tenHienTai, StringComparison.OrdinalIgnoreCase)) continue;
+
+                        long until;
+                        if (kv.Value != null && kv.Value.TryGetValue("until", out until) && until > now)
+                        {
+                            coNguoiDangNhap = true;
+                            tenNguoi = ten;
+                            break;
+                        }
+                    }
+                }
+
+                if (!this.IsDisposed && this.IsHandleCreated)
+                {
+                    BeginInvoke(new Action(() =>
+                    {
+                        lblTyping.Visible = coNguoiDangNhap;
+                        lblTyping.Text = coNguoiDangNhap
+                            ? (currentChatIsGroup ? (tenNguoi + " đang nhập...") : "Đang nhập...")
+                            : "";
+                    }));
+                }
+            }
+            catch { }
+        }
+
+        // ===== Read receipts =====
+        private async Task DanhDauDaXemCuoi()
+        {
+            try
+            {
+                string key = currentChatIsGroup ? currentGroupId
+                    : (!string.IsNullOrEmpty(tenDoiPhuong) ? TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong) : "");
+                if (string.IsNullOrEmpty(key)) return;
+
+                List<string> list;
+                if (!thuTuTinNhanTheoDoanChat.TryGetValue(key, out list) || list.Count == 0) return;
+
+                string msgIdCuoi = list[list.Count - 1];
+                long nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+                if (currentChatIsGroup)
+                    await firebase.SetAsync("cuocTroChuyenNhom/" + key + "/" + msgIdCuoi + "/reads/" + tenHienTai, nowMs);
+                else
+                {
+                    string cid = TaoIdCuocTroChuyen(tenHienTai, tenDoiPhuong);
+                    await firebase.SetAsync("cuocTroChuyen/" + cid + "/" + msgIdCuoi + "/reads/" + tenHienTai, nowMs);
+                }
+            }
+            catch { }
+        }
+        private void RefocusInput()
+        {
+            if (this.IsDisposed || !this.IsHandleCreated) return;
+            try
+            {
+                // Đảm bảo gọi trên UI thread
+                BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        txtNhapTinNhan.Focus();
+                        // Đặt caret về cuối (sau khi Clear là 0)
+                        txtNhapTinNhan.SelectionStart = txtNhapTinNhan.TextLength;
+                        txtNhapTinNhan.SelectionLength = 0;
+                    }
+                    catch { /* an toàn */ }
+                }));
+            }
+            catch { /* an toàn */ }
+        }
+
     }
 
-    // ==================== MÔ HÌNH DỮ LIỆU ====================
+    // ===== Models =====
     public class TinNhan
     {
         public string id { get; set; }
         public string guiBoi { get; set; }
-        public string nhanBoi { get; set; } 
+        public string nhanBoi { get; set; }
         public string noiDung { get; set; }
         public string thoiGian { get; set; }
     }

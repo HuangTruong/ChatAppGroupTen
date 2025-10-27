@@ -4,7 +4,6 @@ using FireSharp.Response;
 using System;
 using System.Drawing;
 using System.Text;
-// [ADDED] chống re-entry & async hỗ trợ
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,10 +19,23 @@ namespace ChatApp
         private bool _isRegistering = false;
         private readonly SemaphoreSlim _registerGate = new SemaphoreSlim(1, 1);
 
-           
         public DangKy()
         {
             InitializeComponent();
+
+            // ENTER trên form sẽ kích hoạt btnDangKy
+            this.KeyPreview = true;                 // form bắt phím trước
+            this.AcceptButton = btnDangKy;         // ENTER = btnDangKy
+            this.KeyDown += DangKy_KeyDown;        // dự phòng nếu control nào chặn AcceptButton
+
+            // Gắn Enter cho các ô nhập phổ biến
+            txtTaiKhoan.KeyDown += TextBox_EnterToSubmit;
+            txtMatKhau.KeyDown += TextBox_EnterToSubmit;
+            txtXacNhanMatKhau.KeyDown += TextBox_EnterToSubmit;
+            txtEmail.KeyDown += TextBox_EnterToSubmit;
+            txtTen.KeyDown += TextBox_EnterToSubmit;
+            cbbGioiTinh.KeyDown += TextBox_EnterToSubmit;
+            dtpNgaySinh.KeyDown += TextBox_EnterToSubmit;
 
             // Cấu hình Firebase (gồm khóa bảo mật và đường dẫn database)
             IFirebaseConfig MinhHoangDaCodeCaiNay = new FirebaseConfig
@@ -39,12 +51,34 @@ namespace ChatApp
             if (firebaseClient == null)
                 MessageBox.Show("Không kết nối được Firebase.");
         }
-        
 
         private void DangKy_Load(object sender, EventArgs e)
         {
             // Gán sự kiện ẩn hiện mật khẩu cho cả Xác Nhận Mật Khẩu để mở đồng thời cả hai
             txtXacNhanMatKhau.IconRightClick += txtMatKhau_IconRightClick;
+
+            // đảm bảo AcceptButton vẫn là btnDangKy (phòng Designer ghi đè)
+            this.AcceptButton = btnDangKy;
+        }
+
+        // ENTER toàn form (dự phòng)
+        private void DangKy_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled && !_isRegistering)
+            {
+                e.SuppressKeyPress = true;   // chặn beep
+                btnDangKy.PerformClick();
+            }
+        }
+
+        // ENTER trong các textbox/combobox/datetimepicker
+        private void TextBox_EnterToSubmit(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled && !_isRegistering)
+            {
+                e.SuppressKeyPress = true;
+                btnDangKy.PerformClick();
+            }
         }
 
         // Nút “Quay lại đăng nhập”
@@ -193,7 +227,7 @@ namespace ChatApp
 
                 _isRegistering = false;
                 btnDangKy.Enabled = oldEnabled;
-                this.AcceptButton = oldAccept;
+                this.AcceptButton = oldAccept ?? btnDangKy;   // bật lại Enter
                 this.UseWaitCursor = false;
             }
         }
@@ -218,9 +252,9 @@ namespace ChatApp
                 isMatKhau = true;
             }
         }
+
         private void pnlBackground_Paint(object sender, PaintEventArgs e)
         {
-
         }
     }
 

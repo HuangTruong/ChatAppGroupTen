@@ -142,6 +142,9 @@
     <Compile Include="QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControl\TinNhanBubble.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <EmbeddedResource Include="NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>

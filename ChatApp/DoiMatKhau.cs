@@ -3,6 +3,7 @@ using FireSharp.Interfaces;
 using FireSharp.Response;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,10 +14,21 @@ namespace ChatApp
         private readonly string _taiKhoan;     // Tài khoản cần đổi mật khẩu
         private IFirebaseClient _firebase;     // Đối tượng kết nối Firebase
 
+        // Chặn enter lặp khi đang xử lý
+        private bool _isSubmitting = false;
+        private readonly SemaphoreSlim _gate = new SemaphoreSlim(1, 1);
+
         public DoiMatKhau(string taiKhoan)
         {
             InitializeComponent();
             _taiKhoan = taiKhoan;
+
+            // ENTER trên form sẽ kích hoạt btnDoiMatKhau
+            this.KeyPreview = true;
+            this.AcceptButton = btnDoiMatKhau;
+            this.KeyDown += DoiMatKhau_KeyDown;           // dự phòng
+            txtMatKhau.KeyDown += TextBox_EnterToSubmit;  // enter trong textbox
+            txtXacNhan.KeyDown += TextBox_EnterToSubmit;
 
             // Thiết lập cấu hình kết nối Firebase
             var MinhHoangDaLamCaiNay = new FirebaseConfig
@@ -39,38 +51,71 @@ namespace ChatApp
             return Regex.Replace(s, @"[.#$\[\]/]", "_");
         }
 
+        // ENTER toàn form (trường hợp control nào đó chặn AcceptButton)
+        private void DoiMatKhau_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && btnDoiMatKhau.Enabled && !_isSubmitting)
+            {
+                e.SuppressKeyPress = true;
+                btnDoiMatKhau.PerformClick();
+            }
+        }
+
+        // ENTER trong textbox
+        private void TextBox_EnterToSubmit(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && btnDoiMatKhau.Enabled && !_isSubmitting)
+            {
+                e.SuppressKeyPress = true;
+                btnDoiMatKhau.PerformClick();
+            }
+        }
+
         // Xử lý khi người dùng nhấn nút "Đổi mật khẩu"
         private async void btnDoiMatKhau_Click(object sender, EventArgs e)
         {
-            string mkMoi = txtMatKhau.Text.Trim();     // Mật khẩu mới
-            string mkXn = txtXacNhan.Text.Trim();      // Mật khẩu xác nhận
+            if (_isSubmitting) return;
+            _isSubmitting = true;
 
-            // Kiểm tra các trường nhập
-            if (string.IsNullOrWhiteSpace(mkMoi) || string.IsNullOrWhiteSpace(mkXn))
-            {
-                MessageBox.Show("Vui lòng nhập đầy đủ mật khẩu!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            // tắt tạm AcceptButton để tránh Enter lặp khi đang await
+            var oldAccept = this.AcceptButton;
+            this.AcceptButton = null;
 
-            // So sánh mật khẩu xác nhận
-            if (mkMoi != mkXn)
-            {
-                MessageBox.Show("Mật khẩu xác nhận không khớp!", "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // Kiểm tra độ dài mật khẩu
-            if (mkMoi.Length < 6)
-            {
-                MessageBox.Show("Mật khẩu phải có ít nhất 6 ký tự.", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            bool oldEnabled = btnDoiMatKhau.Enabled;
+            btnDoiMatKhau.Enabled = false;
+            this.UseWaitCursor = true;
 
             try
             {
+                await _gate.WaitAsync();
+
+                string mkMoi = txtMatKhau.Text.Trim();     // Mật khẩu mới
+                string mkXn = txtXacNhan.Text.Trim();      // Mật khẩu xác nhận
+
+                // Kiểm tra các trường nhập
+                if (string.IsNullOrWhiteSpace(mkMoi) || string.IsNullOrWhiteSpace(mkXn))
+                {
+                    MessageBox.Show("Vui lòng nhập đầy đủ mật khẩu!", "Thông báo",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // So sánh mật khẩu xác nhận
+                if (mkMoi != mkXn)
+                {
+                    MessageBox.Show("Mật khẩu xác nhận không khớp!", "Lỗi",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Kiểm tra độ dài mật khẩu
+                if (mkMoi.Length < 6)
+                {
+                    MessageBox.Show("Mật khẩu phải có ít nhất 6 ký tự.", "Thông báo",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 // Kiểm tra kết nối Firebase
                 if (_firebase == null)
                 {
@@ -102,6 +147,15 @@ namespace ChatApp
             {
                 MessageBox.Show("Có lỗi khi cập nhật mật khẩu: " + ex.Message, "Lỗi",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (_gate.CurrentCount == 0) _gate.Release();
+
+                _isSubmitting = false;
+                btnDoiMatKhau.Enabled = oldEnabled;
+                this.AcceptButton = oldAccept ?? btnDoiMatKhau; // bật lại Enter
+                this.UseWaitCursor = false;
             }
         }
 
