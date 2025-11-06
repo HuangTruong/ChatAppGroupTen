@@ -2,124 +2,110 @@
 using FireSharp.Interfaces;
 using FireSharp.Response;
 using System;
-using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
+// Các thư viện tự tạo
+using ChatApp.Services.Auth; 
 
 namespace ChatApp
 {
     public partial class DangNhap : Form
     {
-        // Kết nối Firebase
-        private IFirebaseClient firebaseClient;
-
-        // chặn spam click (double/triple click)
-        private bool _isLoggingIn = false;
-        private readonly SemaphoreSlim _loginGate = new SemaphoreSlim(1, 1);
+        // Dịch vụ xử lý đăng nhập, đăng ký, truy xuất người dùng từ Firebase
+        private readonly AuthService _authService = new AuthService();
 
         public DangNhap()
         {
             InitializeComponent();
 
-            // Enter trên form sẽ kích hoạt btnDangNhap
-            this.KeyPreview = true;                // form bắt phím trước
-            this.AcceptButton = btnDangNhap;       // ENTER = btnDangNhap
-            this.KeyDown += DangNhap_KeyDown;      // dự phòng
+            // Cho phép form bắt phím ENTER
+            this.KeyPreview = true;          // Form nhận sự kiện phím trước control con
+            this.AcceptButton = btnDangNhap; // ENTER sẽ tự động nhấn nút Đăng nhập
+            this.KeyDown += DangNhap_KeyDown; // Dự phòng nếu control chặn AcceptButton
 
-            // gắn Enter trực tiếp cho các textbox (kể cả control bên thứ 3)
+            // Gắn phím Enter cho 2 ô nhập tài khoản và mật khẩu
             txtTaiKhoan.KeyDown += TextBox_EnterToLogin;
             txtMatKhau.KeyDown += TextBox_EnterToLogin;
 
-            // Cấu hình Firebase
-            IFirebaseConfig MinhHoangDaVietCaiNay = new FirebaseConfig
-            {
-                AuthSecret = "j0kBCfIQBOBtgq5j0RaocJLgCuJO1AMn2GS5qXqH",
-                BasePath = "https://chatapp-ca701-default-rtdb.asia-southeast1.firebasedatabase.app/"
-            };
-            firebaseClient = new FireSharp.FirebaseClient(MinhHoangDaVietCaiNay);
-
-            if (firebaseClient == null)
-            {
-                MessageBox.Show("Không kết nối được Firebase.");
-            }
+            // TODO: Có thể thêm phần kiểm tra Firebase Config hoặc load trước ở đây
         }
 
         private void DangNhap_Load(object sender, EventArgs e)
         {
+            // Khi form mở, focus vào ô tài khoản
             txtTaiKhoan.Focus();
-            // đảm bảo AcceptButton đã được set (nếu Designer ghi đè)
+
+            // Đảm bảo lại AcceptButton (đôi khi Designer ghi đè)
             this.AcceptButton = btnDangNhap;
         }
-
         private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
         {
+            // Đóng ứng dụng hoàn toàn nếu form đăng nhập bị đóng
             Application.Exit();
         }
 
         private void btnDangKy_Click(object sender, EventArgs e)
         {
+            // Mở form Đăng ký
             var DangKyForm = new DangKy();
-            DangKyForm.Tag = this;
+            DangKyForm.Tag = this;  // Gửi tham chiếu form hiện tại sang form mới
             DangKyForm.Show();
-            this.Hide();
+            this.Hide();            // Ẩn form đăng nhập
         }
 
         private void lnkQuenMatKhau_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            // Mở form Quên mật khẩu
             var QuenMKForm = new QuenMatKhau();
             QuenMKForm.Tag = this;
             QuenMKForm.Show();
             this.Hide();
         }
 
-        // ENTER trên form (dự phòng nếu control nào đó chặn AcceptButton)
+        // Dự phòng: nếu control nào đó ngăn AcceptButton hoạt động
         private void DangNhap_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter && btnDangNhap.Enabled && !_isLoggingIn)
+            // Nếu nhấn Enter và nút đang được phép nhấn
+            if (e.KeyCode == Keys.Enter && btnDangNhap.Enabled)
             {
-                e.SuppressKeyPress = true;
-                btnDangNhap.PerformClick();
+                e.SuppressKeyPress = true;    // Chặn "ding" âm thanh của Windows
+                btnDangNhap.PerformClick();   // Giả lập nhấn nút Đăng nhập
             }
         }
 
-        // ENTER trong các textbox
+        // Cho phép Enter trong các textbox thực hiện đăng nhập
         private void TextBox_EnterToLogin(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter && btnDangNhap.Enabled && !_isLoggingIn)
+            if (e.KeyCode == Keys.Enter && btnDangNhap.Enabled)
             {
                 e.SuppressKeyPress = true;
                 btnDangNhap.PerformClick();
             }
         }
 
-        // Xử lý đăng nhập
+        // Nút đăng nhập
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
-            if (_isLoggingIn) return;
-            _isLoggingIn = true;
+            // Chặn spam click liên tiếp
+            if (!btnDangNhap.Enabled) return;
 
-            // vô hiệu hóa AcceptButton tạm thời để tránh Enter lặp khi đang đợi
-            var oldAccept = this.AcceptButton;
-            this.AcceptButton = null;
-
-            bool oldEnabled = btnDangNhap.Enabled;
-            btnDangNhap.Enabled = false;
-            this.UseWaitCursor = true;
+            btnDangNhap.Enabled = false;  // Tạm thời vô hiệu hoá nút
+            this.UseWaitCursor = true;    // Hiển thị con trỏ chờ
 
             try
             {
-                await _loginGate.WaitAsync();
-
                 string taiKhoan = txtTaiKhoan.Text;
                 string matKhau = txtMatKhau.Text;
 
+                // Kiểm tra rỗng
                 if (string.IsNullOrWhiteSpace(taiKhoan))
                 {
                     MessageBox.Show("Vui lòng nhập tên đăng nhập!", "Thông báo",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
                 if (string.IsNullOrWhiteSpace(matKhau))
                 {
                     MessageBox.Show("Vui lòng nhập mật khẩu!", "Thông báo",
@@ -127,78 +113,71 @@ namespace ChatApp
                     return;
                 }
 
-                FirebaseResponse userResponse = await firebaseClient.GetAsync($"users/{taiKhoan}");
+                //----------------------------------------------------------
+                // Lấy thông tin người dùng từ Firebase
+                var user = await _authService.GetUserAsync(taiKhoan);
 
-                if (userResponse.Body == "null")
+                if (user == null)
                 {
                     MessageBox.Show("Tài khoản không tồn tại!", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                var user = userResponse.ResultAs<UserDto>();
-
-                if (user == null || user.MatKhau != matKhau)
+                // So sánh mật khẩu
+                if (user.MatKhau != matKhau)
                 {
                     MessageBox.Show("Mật khẩu không đúng!", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
+                // Nếu hợp lệ => thông báo và chuyển sang form chính
                 MessageBox.Show("Đăng nhập thành công!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                // Xoá nội dung ô nhập
                 txtTaiKhoan.Clear();
                 txtMatKhau.Clear();
 
+                // Ẩn form đăng nhập, mở form Trang chủ
                 this.Hide();
                 var home = new TrangChu(user.Ten);
-                home.FormClosed += (s, e2) => this.Close();
+                home.FormClosed += (s, e2) => this.Close();  // Khi home đóng -> đóng luôn login
                 home.Show();
             }
             catch (Exception ex)
             {
+                // Nếu có lỗi (Firebase hoặc hệ thống)
                 MessageBox.Show("Lỗi đăng nhập: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                if (_loginGate.CurrentCount == 0) _loginGate.Release();
-
-                _isLoggingIn = false;
-                btnDangNhap.Enabled = oldEnabled;
-                this.AcceptButton = oldAccept ?? btnDangNhap;   // bật lại Enter
+                // Luôn bật lại nút và tắt con trỏ chờ
+                btnDangNhap.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
 
-        bool isMatKhau = true;  // Ban đầu đang ẩn
+        // Biến dùng để lưu trạng thái ẩn/hiện mật khẩu
+        bool isMatKhau = true;  // Mặc định: đang ẩn
+
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {
+            // Khi nhấn vào icon bên phải ô mật khẩu
             if (isMatKhau)
             {
-                txtMatKhau.PasswordChar = '\0';
+                txtMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
                 txtMatKhau.IconRight = Properties.Resources.HienMatKhau;
                 isMatKhau = false;
             }
             else
             {
-                txtMatKhau.PasswordChar = '●';
+                txtMatKhau.PasswordChar = '●'; // Ẩn lại
                 txtMatKhau.IconRight = Properties.Resources.AnMatKhau;
                 isMatKhau = true;
             }
         }
     }
-
-    // Model người dùng
-    public class UserDto
-    {
-        public string TaiKhoan { get; set; }
-        public string MatKhau { get; set; }
-        public string Email { get; set; }
-        public string Ten { get; set; }
-        public string Ngaysinh { get; set; }
-        public string Gioitinh { get; set; }
-    }
 }
-

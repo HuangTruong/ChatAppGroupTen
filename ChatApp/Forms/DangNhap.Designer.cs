@@ -213,6 +213,7 @@
             this.Name = "DangNhap";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DangNhap";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DangNhap_FormClosed);
             this.Load += new System.EventHandler(this.DangNhap_Load);
             this.pnlLogin.ResumeLayout(false);
             this.pnlLogin.PerformLayout();
