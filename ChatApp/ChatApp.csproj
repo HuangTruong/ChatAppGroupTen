@@ -81,10 +81,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChonThanhVien.cs">
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Forms\ChonThanhVien.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ChonThanhVien.Designer.cs">
+    <Compile Include="Forms\ChonThanhVien.Designer.cs">
       <DependentUpon>ChonThanhVien.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\KeySanitizer.cs" />
@@ -102,10 +103,10 @@
     <Compile Include="Forms\NhanTin.Designer.cs">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </Compile>
-    <Compile Include="CuocTroChuyen.cs">
+    <Compile Include="UserControl\CuocTroChuyen.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="CuocTroChuyen.Designer.cs">
+    <Compile Include="UserControl\CuocTroChuyen.Designer.cs">
       <DependentUpon>CuocTroChuyen.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DangKy.cs">
@@ -120,10 +121,10 @@
     <Compile Include="Forms\DangNhap.Designer.cs">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </Compile>
-    <Compile Include="DoiMatKhau.cs">
+    <Compile Include="Forms\DoiMatKhau.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DoiMatKhau.Designer.cs">
+    <Compile Include="Forms\DoiMatKhau.Designer.cs">
       <DependentUpon>DoiMatKhau.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Users\UserFirebase.cs" />
@@ -135,16 +136,16 @@
     <Compile Include="Services\Chat\ChatService.cs" />
     <Compile Include="Services\Chat\GroupService.cs" />
     <Compile Include="Services\Firebase\FirebaseClientFactory.cs" />
-    <Compile Include="TinNhanCuaBan.cs">
+    <Compile Include="UserControl\TinNhanCuaBan.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TinNhanCuaBan.Designer.cs">
+    <Compile Include="UserControl\TinNhanCuaBan.Designer.cs">
       <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
     </Compile>
-    <Compile Include="TinNhanCuaToi.cs">
+    <Compile Include="UserControl\TinNhanCuaToi.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="TinNhanCuaToi.Designer.cs">
+    <Compile Include="UserControl\TinNhanCuaToi.Designer.cs">
       <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TrangChu.cs">
@@ -165,7 +166,7 @@
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CuocTroChuyen.resx">
+    <EmbeddedResource Include="UserControl\CuocTroChuyen.resx">
       <DependentUpon>CuocTroChuyen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DangKy.resx">
@@ -174,7 +175,7 @@
     <EmbeddedResource Include="Forms\DangNhap.resx">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DoiMatKhau.resx">
+    <EmbeddedResource Include="Forms\DoiMatKhau.resx">
       <DependentUpon>DoiMatKhau.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -187,10 +188,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="TinNhanCuaBan.resx">
+    <EmbeddedResource Include="UserControl\TinNhanCuaBan.resx">
       <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TinNhanCuaToi.resx">
+    <EmbeddedResource Include="UserControl\TinNhanCuaToi.resx">
       <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TrangChu.resx">

@@ -4,31 +4,29 @@ using FireSharp.Response;
 using System;
 using System.Drawing;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using ChatApp.Services.Auth;
+using ChatApp.Models.Users;
 
 namespace ChatApp
 {
     public partial class DangKy : Form
     {
-        // Biến dùng để kết nối Firebase
-        private IFirebaseClient firebaseClient;
-
-        // Chặn spam click 
-        private bool _isRegistering = false;
-        private readonly SemaphoreSlim _registerGate = new SemaphoreSlim(1, 1);
+        // Dịch vụ xử lý xác thực người dùng (đăng ký, kiểm tra trùng, lưu Firebase,...)
+        private readonly AuthService _authService = new AuthService();
 
         public DangKy()
         {
             InitializeComponent();
 
-            // ENTER trên form sẽ kích hoạt btnDangKy
-            this.KeyPreview = true;                 // form bắt phím trước
-            this.AcceptButton = btnDangKy;         // ENTER = btnDangKy
-            this.KeyDown += DangKy_KeyDown;        // dự phòng nếu control nào chặn AcceptButton
+            // Cho phép nhấn ENTER để kích hoạt nút “Đăng ký”
+            this.KeyPreview = true;        // Form bắt sự kiện phím trước các control con
+            this.AcceptButton = btnDangKy; // ENTER = click btnDangKy
+            this.KeyDown += DangKy_KeyDown;
 
-            // Gắn Enter cho các ô nhập phổ biến
+            // Gán sự kiện ENTER cho từng ô nhập để tiện người dùng thao tác
             txtTaiKhoan.KeyDown += TextBox_EnterToSubmit;
             txtMatKhau.KeyDown += TextBox_EnterToSubmit;
             txtXacNhanMatKhau.KeyDown += TextBox_EnterToSubmit;
@@ -36,45 +34,31 @@ namespace ChatApp
             txtTen.KeyDown += TextBox_EnterToSubmit;
             cbbGioiTinh.KeyDown += TextBox_EnterToSubmit;
             dtpNgaySinh.KeyDown += TextBox_EnterToSubmit;
-
-            // Cấu hình Firebase (gồm khóa bảo mật và đường dẫn database)
-            IFirebaseConfig MinhHoangDaCodeCaiNay = new FirebaseConfig
-            {
-                AuthSecret = "j0kBCfIQBOBtgq5j0RaocJLgCuJO1AMn2GS5qXqH",
-                BasePath = "https://chatapp-ca701-default-rtdb.asia-southeast1.firebasedatabase.app/"
-            };
-
-            // Tạo đối tượng FirebaseClient để giao tiếp với Firebase
-            firebaseClient = new FireSharp.FirebaseClient(MinhHoangDaCodeCaiNay);
-
-            // Nếu kết nối thất bại thì báo lỗi
-            if (firebaseClient == null)
-                MessageBox.Show("Không kết nối được Firebase.");
         }
 
         private void DangKy_Load(object sender, EventArgs e)
         {
-            // Gán sự kiện ẩn hiện mật khẩu cho cả Xác Nhận Mật Khẩu để mở đồng thời cả hai
+            // Gán sự kiện ẩn/hiện mật khẩu cho ô Xác nhận mật khẩu (dùng chung biểu tượng mắt)
             txtXacNhanMatKhau.IconRightClick += txtMatKhau_IconRightClick;
 
-            // đảm bảo AcceptButton vẫn là btnDangKy (phòng Designer ghi đè)
+            // Đảm bảo nút ENTER luôn gắn với nút Đăng ký
             this.AcceptButton = btnDangKy;
         }
 
-        // ENTER toàn form (dự phòng)
+        // Sự kiện nhấn ENTER toàn form (nếu không focus ở control cụ thể)
         private void DangKy_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled && !_isRegistering)
+            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled)
             {
-                e.SuppressKeyPress = true;   // chặn beep
-                btnDangKy.PerformClick();
+                e.SuppressKeyPress = true;  // Ngăn tiếng “bíp” của phím Enter
+                btnDangKy.PerformClick();   // Kích hoạt hành động đăng ký
             }
         }
 
-        // ENTER trong các textbox/combobox/datetimepicker
+        // ENTER trong các TextBox/ComboBox cũng sẽ kích hoạt Đăng ký
         private void TextBox_EnterToSubmit(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled && !_isRegistering)
+            if (e.KeyCode == Keys.Enter && btnDangKy.Enabled)
             {
                 e.SuppressKeyPress = true;
                 btnDangKy.PerformClick();
@@ -84,55 +68,45 @@ namespace ChatApp
         // Nút “Quay lại đăng nhập”
         private void btnQuayLaiDangNhap_Click(object sender, EventArgs e)
         {
-            // Nếu form đăng nhập trước đó còn tồn tại thì quay lại form đó
+            // Nếu form đăng nhập đang ẩn thì mở lại
             Form DangNhapForm = this.Tag as Form;
             if (DangNhapForm != null && !DangNhapForm.IsDisposed)
             {
                 DangNhapForm.Show();
-                DangNhapForm.Activate(); // tránh mở trùng
+                DangNhapForm.Activate();
                 this.Close();
             }
             else
             {
-                // Nếu form đăng nhập trước đó đã bị đóng → mở form mới
+                // Nếu không có form cũ -> tạo form mới
                 var newLogin = new ChatApp.DangNhap();
                 newLogin.Show();
                 this.Close();
             }
         }
 
-        // Xử lý khi nhấn nút “Đăng ký”
+        // Nút “Đăng ký” được nhấn
         private async void btnDangKy_Click(object sender, EventArgs e)
         {
-            // nếu đang có phiên đăng ký chạy, bỏ qua click mới
-            if (_isRegistering) return;
+            // Nếu nút đang bị disable (đang xử lý) thì thoát —> chống spam click
+            if (!btnDangKy.Enabled) return;
 
-            // set cờ ngay lập tức để chặn double-click trước khi await
-            _isRegistering = true;
-
-            // vô hiệu hóa nút & Enter, hiển thị wait cursor
-            var oldAccept = this.AcceptButton;
-            this.AcceptButton = null;               // tắt Enter trong lúc xử lý
-            bool oldEnabled = btnDangKy.Enabled;
+            // Vô hiệu nút trong lúc xử lý để tránh người dùng bấm liên tục
             btnDangKy.Enabled = false;
-            this.UseWaitCursor = true;
+            this.UseWaitCursor = true; // Hiển thị con trỏ chờ (đồng hồ cát)
 
             try
             {
-                // đảm bảo tuyệt đối chỉ 1 luồng đăng ký chạy
-                await _registerGate.WaitAsync();
-
                 // Lấy dữ liệu người dùng nhập vào
-                string taiKhoan = txtTaiKhoan.Text;
-                string matKhau = txtMatKhau.Text;
-                string xacNhanMatKhau = txtXacNhanMatKhau.Text;
-                string email = txtEmail.Text;
-                string encodedEmail = Convert.ToBase64String(Encoding.UTF8.GetBytes(email)); // Mã hóa email 
-                string ten = txtTen.Text;
+                string taiKhoan = txtTaiKhoan.Text.Trim();
+                string matKhau = txtMatKhau.Text.Trim();
+                string xacNhanMatKhau = txtXacNhanMatKhau.Text.Trim();
+                string email = txtEmail.Text.Trim();
+                string ten = txtTen.Text.Trim();
                 string ngaySinh = dtpNgaySinh.Text;
                 string gioiTinh = cbbGioiTinh.Text;
 
-                // Kiểm tra xem người dùng có bỏ trống thông tin nào không
+                // ✅ Kiểm tra nhập đủ thông tin
                 if (string.IsNullOrWhiteSpace(taiKhoan) ||
                     string.IsNullOrWhiteSpace(matKhau) ||
                     string.IsNullOrWhiteSpace(xacNhanMatKhau) ||
@@ -146,7 +120,7 @@ namespace ChatApp
                     return;
                 }
 
-                // Kiểm tra xem mật khẩu nhập lại có khớp không
+                // ✅ Kiểm tra xác nhận mật khẩu
                 if (matKhau != xacNhanMatKhau)
                 {
                     MessageBox.Show("Mật khẩu và xác nhận mật khẩu không khớp!",
@@ -154,119 +128,102 @@ namespace ChatApp
                     return;
                 }
 
-                try
+                // ✅ Kiểm tra tài khoản trùng (theo username Firebase)
+                if (await _authService.GetUserAsync(taiKhoan) != null)
                 {
-                    // Kiểm tra xem tài khoản đã tồn tại trong database chưa
-                    var userExistsResponse = await firebaseClient.GetAsync($"users/{taiKhoan}");
-                    if (userExistsResponse.Body != "null")
-                    {
-                        MessageBox.Show("Tên tài khoản đã tồn tại!", "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Kiểm tra email (đã được mã hóa Base64)
-                    var emailExistsResponse = await firebaseClient.GetAsync($"emails/{encodedEmail}");
-                    if (emailExistsResponse.Body != "null")
-                    {
-                        MessageBox.Show("Email đã tồn tại!", "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Kiểm tra xem tên hiển thị (nickname) đã có ai dùng chưa
-                    var usernameExistsResponse = await firebaseClient.GetAsync($"Username/{ten}");
-                    if (usernameExistsResponse.Body != "null")
-                    {
-                        MessageBox.Show("Tên hiển thị đã tồn tại!", "Lỗi",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // Nếu mọi thứ hợp lệ thì tạo đối tượng người dùng mới
-                    var newUser = new UserDK
-                    {
-                        TaiKhoan = taiKhoan,
-                        MatKhau = matKhau,
-                        Email = email,
-                        Ten = ten,
-                        Ngaysinh = ngaySinh,
-                        Gioitinh = gioiTinh
-                    };
-
-                    // Gửi dữ liệu người dùng lên Firebase (tạo mới)
-                    await firebaseClient.SetAsync($"users/{taiKhoan}", newUser);
-
-                    // Lưu email đã dùng vào danh sách emails (để tránh trùng)
-                    await firebaseClient.SetAsync($"emails/{encodedEmail}", true);
-
-                    MessageBox.Show("Đăng ký thành công!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // Xóa toàn bộ thông tin vừa nhập (reset form)
-                    txtTen.Clear();
-                    txtTaiKhoan.Clear();
-                    txtMatKhau.Clear();
-                    txtXacNhanMatKhau.Clear();
-                    txtEmail.Clear();
-                    dtpNgaySinh.Value = DateTime.Today;
-                    cbbGioiTinh.SelectedIndex = -1;
-                }
-                catch (Exception ex)
-                {
-                    // Nếu có lỗi trong quá trình xử lý (ví dụ lỗi mạng, Firebase lỗi)
-                    MessageBox.Show("Đã xảy ra lỗi: " + ex.Message, "Lỗi",
+                    MessageBox.Show("Tên tài khoản đã tồn tại!", "Lỗi",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+
+                // ✅ Kiểm tra email trùng
+                if (await _authService.EmailExistsAsync(email))
+                {
+                    MessageBox.Show("Email đã tồn tại!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // ✅ Kiểm tra tên hiển thị trùng
+                if (await _authService.UsernameExistsAsync(ten))
+                {
+                    MessageBox.Show("Tên hiển thị đã tồn tại!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // ✅ Tạo đối tượng người dùng mới
+                var newUser = new UserDK
+                {
+                    TaiKhoan = taiKhoan,
+                    MatKhau = matKhau,
+                    Email = email,
+                    Ten = ten,
+                    Ngaysinh = ngaySinh,
+                    Gioitinh = gioiTinh
+                };
+
+                // ✅ Gửi yêu cầu đăng ký lên Firebase
+                await _authService.RegisterAsync(newUser);
+
+                // ✅ Thông báo thành công
+                MessageBox.Show("Đăng ký thành công!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // ✅ Reset form sau khi đăng ký
+                txtTen.Clear();
+                txtTaiKhoan.Clear();
+                txtMatKhau.Clear();
+                txtXacNhanMatKhau.Clear();
+                txtEmail.Clear();
+                dtpNgaySinh.Value = DateTime.Today;
+                cbbGioiTinh.SelectedIndex = -1;
+            }
+            catch (Exception ex)
+            {
+                // Nếu có lỗi bất ngờ (Firebase, kết nối, logic, v.v.)
+                MessageBox.Show("Đã xảy ra lỗi: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                // nhả khóa và khôi phục UI
-                if (_registerGate.CurrentCount == 0)
-                    _registerGate.Release();
-
-                _isRegistering = false;
-                btnDangKy.Enabled = oldEnabled;
-                this.AcceptButton = oldAccept ?? btnDangKy;   // bật lại Enter
+                // Dù thành công hay thất bại vẫn bật lại nút và tắt con trỏ chờ
+                btnDangKy.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
 
-        bool isMatKhau = true;  // Ban đầu đang ẩn
+        // ==========================
+        // ẨN / HIỆN MẬT KHẨU
+        // ==========================
+
+        bool isMatKhau = true;  // Biến đánh dấu trạng thái đang ẩn hay đang hiện
+
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {
             if (isMatKhau)
             {
-                txtMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
-                txtMatKhau.IconRight = Properties.Resources.HienMatKhau; // đổi icon sang mắt mở
-                txtXacNhanMatKhau.PasswordChar = '\0'; // Hiện mật khẩu
-                txtXacNhanMatKhau.IconRight = Properties.Resources.HienMatKhau; // đổi icon sang mắt mở
+                // Hiện mật khẩu
+                txtMatKhau.PasswordChar = '\0'; // '\0' = không che ký tự
+                txtMatKhau.IconRight = Properties.Resources.HienMatKhau;
+
+                // Đồng bộ với ô Xác nhận mật khẩu
+                txtXacNhanMatKhau.PasswordChar = '\0';
+                txtXacNhanMatKhau.IconRight = Properties.Resources.HienMatKhau;
+
                 isMatKhau = false;
             }
             else
             {
-                txtMatKhau.PasswordChar = '●'; // Ẩn mật khẩu
-                txtMatKhau.IconRight = Properties.Resources.AnMatKhau; // đổi lại icon mắt đóng
-                txtXacNhanMatKhau.PasswordChar = '●'; // Ẩn mật khẩu
-                txtXacNhanMatKhau.IconRight = Properties.Resources.AnMatKhau; // đổi lại icon mắt đóng
+                // Ẩn mật khẩu
+                txtMatKhau.PasswordChar = '●';
+                txtMatKhau.IconRight = Properties.Resources.AnMatKhau;
+
+                txtXacNhanMatKhau.PasswordChar = '●';
+                txtXacNhanMatKhau.IconRight = Properties.Resources.AnMatKhau;
+
                 isMatKhau = true;
             }
         }
-
-        private void pnlBackground_Paint(object sender, PaintEventArgs e)
-        {
-        }
     }
-
-    // Class mô tả cấu trúc dữ liệu người dùng lưu trong Firebase
-    public class UserDK
-    {
-        public string TaiKhoan { get; set; }  // Tên đăng nhập
-        public string MatKhau { get; set; }   // Mật khẩu
-        public string Email { get; set; }     // Email
-        public string Ten { get; set; }       // Họ tên đầy đủ
-        public string Ngaysinh { get; set; }  // Ngày sinh
-        public string Gioitinh { get; set; }  // Giới tính
-    }
-
 }
