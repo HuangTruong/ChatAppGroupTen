@@ -10,7 +10,20 @@ namespace ChatApp.Helpers
     // Làm sạch (sanitize) chuỗi trước khi dùng làm khóa (key) trong Firebase Realtime Database.
     public static class KeySanitizer
     {
-        private static readonly Regex _bad = new Regex(@"[.#$\[\]/]", RegexOptions.Compiled);
-        public static string SafeKey(string s) => string.IsNullOrEmpty(s) ? s : _bad.Replace(s, "_");
+        // Làm sạch chuỗi để dùng làm key trên Firebase
+        public static string SafeKey(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
+
+            string key = raw.Trim();
+            char[] invalid = { '.', '#', '$', '[', ']', '/', ' ' };
+
+            foreach (char c in invalid)
+            {
+                key = key.Replace(c, '_');
+            }
+
+            return key;
+        }
     }
 }

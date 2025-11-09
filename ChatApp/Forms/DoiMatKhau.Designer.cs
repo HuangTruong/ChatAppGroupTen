@@ -181,7 +181,6 @@
             this.Name = "DoiMatKhau";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Đổi mật khẩu";
-            this.Load += new System.EventHandler(this.DoiMatKhau_Load);
             this.pnlBackground.ResumeLayout(false);
             this.pnlDoiMatKhau.ResumeLayout(false);
             this.pnlDoiMatKhau.PerformLayout();

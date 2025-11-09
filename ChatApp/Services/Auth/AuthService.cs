@@ -1,58 +1,75 @@
-﻿using System;
+﻿using FireSharp.Interfaces;
+using System;
 using System.Text;
 using System.Threading.Tasks;
-using FireSharp.Response;
 
 using ChatApp.Helpers;
 using ChatApp.Models.Users;
-using ChatApp.Services.Firebase;
-
-
 
 namespace ChatApp.Services.Auth
 {
     public class AuthService
     {
-        // Lấy thông tin của một người dùng từ Firebase theo tài khoản (taiKhoan).
-        public async Task<UserDto> GetUserAsync(string taiKhoan)
+        private readonly IFirebaseClient _firebase;
+
+        // ✅ Constructor: nếu không truyền vào thì tự tạo bằng FirebaseClientFactory
+        public AuthService(IFirebaseClient firebase = null)
         {
-            var client = FirebaseClientFactory.Create();
-            var res = await client.GetAsync($"users/{KeySanitizer.SafeKey(taiKhoan)}");
-            return res.Body == "null" ? null : res.ResultAs<UserDto>();
+            _firebase = firebase ?? throw new ArgumentNullException(nameof(firebase));
         }
 
-        //Kiểm tra xem tên hiển thị(username) đã tồn tại chưa.
+        // ✅ Lấy thông tin người dùng theo tài khoản
+        public async Task<User> GetUserAsync(string taiKhoan)
+        {
+            var res = await _firebase.GetAsync($"users/{KeySanitizer.SafeKey(taiKhoan)}");
+            return res.Body == "null" ? null : res.ResultAs<User>();
+        }
+
+        // ✅ Kiểm tra username đã tồn tại chưa
         public async Task<bool> UsernameExistsAsync(string ten)
         {
-            var client = FirebaseClientFactory.Create();
-            var res = await client.GetAsync($"Username/{ten}");
+            var res = await _firebase.GetAsync($"Username/{ten}");
             return res.Body != "null";
         }
 
-        // Kiểm tra xem email đã được đăng ký chưa.
+        // ✅ Kiểm tra email đã được đăng ký chưa
         public async Task<bool> EmailExistsAsync(string email)
         {
             var enc = Convert.ToBase64String(Encoding.UTF8.GetBytes(email));
-            var client = FirebaseClientFactory.Create();
-            var res = await client.GetAsync($"emails/{enc}");
+            var res = await _firebase.GetAsync($"emails/{enc}");
             return res.Body != "null";
         }
 
-        // Đăng ký một tài khoản mới.
-        public async Task RegisterAsync(UserDK user)
+        // ✅ Kiểm tra tài khoản có khớp email không
+        public async Task<bool> IsAccountEmailAsync(string taiKhoan, string email)
         {
-            var client = FirebaseClientFactory.Create();
-            await client.SetAsync($"users/{KeySanitizer.SafeKey(user.TaiKhoan)}", user);
-            var enc = Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Email));
-            await client.SetAsync($"emails/{enc}", true);
-            await client.SetAsync($"Username/{user.Ten}", true);
+            var user = await GetUserAsync(taiKhoan);
+            if (user == null) return false;
+            return string.Equals(user.Email?.Trim(), email?.Trim(), StringComparison.OrdinalIgnoreCase);
         }
 
-        // Đổi mật khẩu cho tài khoản.
+        // ✅ Đăng ký tài khoản mới
+        public async Task RegisterAsync(User user)
+        {
+            string safeKey = KeySanitizer.SafeKey(user.TaiKhoan);
+            string encEmail = Convert.ToBase64String(Encoding.UTF8.GetBytes(user.Email));
+
+            await _firebase.SetAsync($"users/{safeKey}", user);
+            await _firebase.SetAsync($"emails/{encEmail}", true);
+            await _firebase.SetAsync($"Username/{user.Ten}", true);
+        }
+
+        // ✅ Đổi mật khẩu
         public async Task UpdatePasswordAsync(string taiKhoan, string mkMoi)
         {
-            var client = FirebaseClientFactory.Create();
-            await client.UpdateAsync($"users/{KeySanitizer.SafeKey(taiKhoan)}", new { MatKhau = mkMoi });
+            await _firebase.UpdateAsync($"users/{KeySanitizer.SafeKey(taiKhoan)}", new { MatKhau = mkMoi });
+        }
+
+        // ✅ Cập nhật trạng thái người dùng (Online, Offline, Typing...)
+        public async Task UpdateStatusAsync(string taiKhoan, string trangThai)
+        {
+            string key = KeySanitizer.SafeKey(taiKhoan);
+            await _firebase.SetAsync($"status/{key}", trangThai);
         }
     }
 }

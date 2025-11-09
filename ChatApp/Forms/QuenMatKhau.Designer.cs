@@ -177,7 +177,6 @@
             this.guna2GradientPanel1.Name = "guna2GradientPanel1";
             this.guna2GradientPanel1.Size = new System.Drawing.Size(800, 450);
             this.guna2GradientPanel1.TabIndex = 1;
-            this.guna2GradientPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.guna2GradientPanel1_Paint_1);
             // 
             // pnlQuenMatKhau
             // 

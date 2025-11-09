@@ -1,6 +1,6 @@
 ﻿namespace ChatApp.Models.Users
 {
-    public class UserDK   // dùng khi DangKy tạo tài khoản mới
+    public class User
     {
         public string TaiKhoan { get; set; }
         public string MatKhau { get; set; }

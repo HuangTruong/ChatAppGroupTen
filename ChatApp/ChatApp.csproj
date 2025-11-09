@@ -81,28 +81,39 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ChangePasswordController.cs" />
+    <Compile Include="Controllers\ForgotPasswordController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\NhanTinController.cs" />
+    <Compile Include="Controllers\RegisterCotroller.cs" />
+    <Compile Include="Controllers\TrangChuController.cs" />
     <Compile Include="Forms\ChonThanhVien.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ChonThanhVien.Designer.cs">
       <DependentUpon>ChonThanhVien.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ChatInputHandler.cs" />
     <Compile Include="Helpers\KeySanitizer.cs" />
     <Compile Include="Helpers\TimeParser.cs" />
+    <Compile Include="Helpers\Ui\ChatBubbleFactory.cs" />
     <Compile Include="Helpers\Ui\ControlExtensions.cs" />
     <Compile Include="Helpers\Ui\FocusExtensions.cs" />
+    <Compile Include="Helpers\Ui\MessageRenderQueue.cs" />
     <Compile Include="Models\Chat\Nhom.cs" />
     <Compile Include="Models\Chat\TinNhan.cs" />
+    <Compile Include="Models\Chat\UserListItem.cs" />
     <Compile Include="Models\Otp\ThongTinMaFirebase.cs" />
-    <Compile Include="Models\Users\UserDK.cs" />
-    <Compile Include="Models\Users\UserDto.cs" />
+    <Compile Include="Models\Users\User.cs" />
     <Compile Include="Forms\NhanTin.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\NhanTin.Designer.cs">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </Compile>
+    <Compile Include="Services\Chat\FriendService.cs" />
+    <Compile Include="Services\Chat\StatusService.cs" />
+    <Compile Include="Services\Chat\TypingService.cs" />
     <Compile Include="UserControl\CuocTroChuyen.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -127,8 +138,6 @@
     <Compile Include="Forms\DoiMatKhau.Designer.cs">
       <DependentUpon>DoiMatKhau.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\Users\UserFirebase.cs" />
-    <Compile Include="Models\Users\UserTrangChu.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\Auth\AuthService.cs" />

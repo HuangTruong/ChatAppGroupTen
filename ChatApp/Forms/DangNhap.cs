@@ -15,20 +15,11 @@ namespace ChatApp
         {
             InitializeComponent();
 
-            // Khi form mở, con trỏ nằm sẵn ở ô tài khoản
-            txtTaiKhoan.Focus();
-
-            // Cho phép nhấn ENTER để kích hoạt nút Đăng nhập
-            this.AcceptButton = btnDangNhap;
+            txtTaiKhoan.Focus(); // Khi form mở, con trỏ nằm sẵn ở ô tài khoản
+            this.AcceptButton = btnDangNhap; // Cho phép nhấn ENTER để kích hoạt nút Đăng nhập
         }
 
-        // Đóng toàn bộ ứng dụng khi form đăng nhập bị tắt
-        private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-
-        // Mở form Đăng ký
+        #region Sư kiện nút Đăng ký ,mở form Đăng ký
         private void btnDangKy_Click(object sender, EventArgs e)
         {
             var DangKyForm = new DangKy();
@@ -36,8 +27,9 @@ namespace ChatApp
             DangKyForm.Show();
             this.Hide();
         }
+        #endregion
 
-        // Mở form Quên mật khẩu
+        #region Sự kiện link Quên mật khẩu , mở form Quên mật khẩu
         private void lnkQuenMatKhau_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             var QuenMKForm = new QuenMatKhau();
@@ -45,8 +37,9 @@ namespace ChatApp
             QuenMKForm.Show();
             this.Hide();
         }
+        #endregion
 
-        // Nút Đăng nhập
+        #region Sự kiện nút Đăng nhập
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
             // Chặn spam click
@@ -58,23 +51,24 @@ namespace ChatApp
             try
             {
                 // Gọi controller để xử lý đăng nhập (Firebase hoặc logic riêng)
-                var user = await _loginController.DangNhapAsync(
-                    txtTaiKhoan.Text, txtMatKhau.Text);
+                var user = await _loginController.DangNhapAsync(txtTaiKhoan.Text, txtMatKhau.Text);
 
-                MessageBox.Show("Đăng nhập thành công!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Đăng nhập thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Mở form Trang chủ và ẩn form hiện tại
                 this.Hide();
                 var home = new TrangChu(user.Ten);
-                home.FormClosed += (s, e2) => this.Close();  // Khi đóng home -> thoát luôn
+                home.FormClosed += (s, e2) => this.Show();
                 home.Show();
+
+                txtTaiKhoan.Clear();   
+                txtMatKhau.Clear();    
+                txtTaiKhoan.Focus();
             }
             catch (Exception ex)
             {
                 // Báo lỗi đăng nhập (lỗi hệ thống hoặc Firebase)
-                MessageBox.Show("Lỗi đăng nhập: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi đăng nhập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -83,8 +77,9 @@ namespace ChatApp
                 this.UseWaitCursor = false;
             }
         }
+        #endregion
 
-        // Sự kiện click vào icon con mắt để ẩn/hiện mật khẩu
+        #region Sự kiện click vào icon con mắt để ẩn/hiện mật khẩu
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {
             isMatKhau = !isMatKhau;
@@ -93,5 +88,13 @@ namespace ChatApp
                 ? Properties.Resources.AnMatKhau
                 : Properties.Resources.HienMatKhau;
         }
+        #endregion
+
+        #region Sự kiện form closed. Đóng toàn bộ ứng dụng khi form đăng nhập bị tắt
+        private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+        #endregion
     }
 }

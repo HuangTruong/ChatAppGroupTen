@@ -1,17 +1,25 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using ChatApp.Services.Auth;
+
 using ChatApp.Models.Users;
+using ChatApp.Services.Auth;
+using ChatApp.Services.Firebase;
 
 namespace ChatApp.Controllers
 {
     public class LoginController
     {
-        private readonly AuthService _authService = new AuthService();
+        private readonly AuthService _authService;
+
+        // ✅ Khởi tạo AuthService với client lấy từ Factory
+        public LoginController()
+        {
+            var client = FirebaseClientFactory.Create();
+            _authService = new AuthService(client);
+        }
 
         // Hàm xử lý logic đăng nhập
-        public async Task<UserDto> DangNhapAsync(string taiKhoan, string matKhau)
+        public async Task<User> DangNhapAsync(string taiKhoan, string matKhau)
         {
             if (string.IsNullOrWhiteSpace(taiKhoan))
                 throw new ArgumentException("Vui lòng nhập tên đăng nhập!");

@@ -7,10 +7,11 @@ namespace ChatApp.Services.Firebase
 {
     public static class FirebaseClientFactory
     {
-        // TODO: => đọc từ App.config / user-secrets / env var
+        // Đọc cấu hình từ App.config
         private static readonly string _basePath = ConfigurationManager.AppSettings["FirebaseBasePath"];
         private static readonly string _authSecret = ConfigurationManager.AppSettings["FirebaseAuthSecret"];
 
+        // tạo ra đối tượng IFirebaseClient với các cấu hình (BasePath, AuthSecret) được đọc tự động từ file App.config.
         public static IFirebaseClient Create()
         {
             var cfg = new FirebaseConfig { 

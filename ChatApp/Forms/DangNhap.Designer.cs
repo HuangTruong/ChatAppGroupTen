@@ -46,7 +46,7 @@
             this.lnkQuenMatKhau.AutoSize = true;
             this.lnkQuenMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lnkQuenMatKhau.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(13)))), ((int)(((byte)(71)))), ((int)(((byte)(161)))));
-            this.lnkQuenMatKhau.Location = new System.Drawing.Point(147, 356);
+            this.lnkQuenMatKhau.Location = new System.Drawing.Point(136, 227);
             this.lnkQuenMatKhau.Name = "lnkQuenMatKhau";
             this.lnkQuenMatKhau.Size = new System.Drawing.Size(125, 23);
             this.lnkQuenMatKhau.TabIndex = 8;
