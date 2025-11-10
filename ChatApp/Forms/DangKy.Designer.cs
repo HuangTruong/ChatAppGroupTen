@@ -34,12 +34,12 @@
             this.cbbGioiTinh = new Guna.UI2.WinForms.Guna2ComboBox();
             this.lblTieuDe = new System.Windows.Forms.Label();
             this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
+            this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.txtTen = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtXacNhanMatKhau = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtMatKhau = new Guna.UI2.WinForms.Guna2TextBox();
-            this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.guna2Panel1.SuspendLayout();
             this.pnlBackground.SuspendLayout();
             this.SuspendLayout();
@@ -131,10 +131,10 @@
             "Nam",
             "Nữ",
             "Khác"});
-            this.cbbGioiTinh.StartIndex = 0;
             this.cbbGioiTinh.Location = new System.Drawing.Point(65, 269);
             this.cbbGioiTinh.Name = "cbbGioiTinh";
             this.cbbGioiTinh.Size = new System.Drawing.Size(270, 36);
+            this.cbbGioiTinh.StartIndex = 0;
             this.cbbGioiTinh.TabIndex = 17;
             // 
             // lblTieuDe
@@ -173,6 +173,18 @@
             this.guna2Panel1.ShadowDecoration.Enabled = true;
             this.guna2Panel1.Size = new System.Drawing.Size(400, 420);
             this.guna2Panel1.TabIndex = 21;
+            // 
+            // pnlBackground
+            // 
+            this.pnlBackground.Controls.Add(this.guna2Panel1);
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
+            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
+            this.pnlBackground.Name = "pnlBackground";
+            this.pnlBackground.Size = new System.Drawing.Size(782, 453);
+            this.pnlBackground.TabIndex = 22;
             // 
             // txtTen
             // 
@@ -300,18 +312,6 @@
             this.txtMatKhau.TabIndex = 11;
             this.txtMatKhau.IconRightClick += new System.EventHandler(this.txtMatKhau_IconRightClick);
             // 
-            // pnlBackground
-            // 
-            this.pnlBackground.Controls.Add(this.guna2Panel1);
-            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
-            this.pnlBackground.Name = "pnlBackground";
-            this.pnlBackground.Size = new System.Drawing.Size(782, 453);
-            this.pnlBackground.TabIndex = 22;
-            // 
             // DangKy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -322,7 +322,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "DangKy";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DangKy";
+            this.Text = "Đăng Ký";
             this.Load += new System.EventHandler(this.DangKy_Load);
             this.guna2Panel1.ResumeLayout(false);
             this.guna2Panel1.PerformLayout();

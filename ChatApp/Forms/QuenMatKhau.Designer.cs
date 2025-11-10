@@ -79,7 +79,7 @@
             this.btnGuiMaXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuiMaXacNhan.ForeColor = System.Drawing.Color.White;
             this.btnGuiMaXacNhan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.btnGuiMaXacNhan.Location = new System.Drawing.Point(160, 199);
+            this.btnGuiMaXacNhan.Location = new System.Drawing.Point(183, 206);
             this.btnGuiMaXacNhan.Name = "btnGuiMaXacNhan";
             this.btnGuiMaXacNhan.ShadowDecoration.BorderRadius = 10;
             this.btnGuiMaXacNhan.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
@@ -252,7 +252,7 @@
             this.lblTaiKhoan.BackColor = System.Drawing.Color.Transparent;
             this.lblTaiKhoan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTaiKhoan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblTaiKhoan.Location = new System.Drawing.Point(38, 106);
+            this.lblTaiKhoan.Location = new System.Drawing.Point(34, 106);
             this.lblTaiKhoan.Name = "lblTaiKhoan";
             this.lblTaiKhoan.Size = new System.Drawing.Size(133, 25);
             this.lblTaiKhoan.TabIndex = 11;
@@ -267,6 +267,7 @@
             this.Controls.Add(this.guna2GradientPanel1);
             this.Name = "QuenMatKhau";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Quên Mật Khẩu";
             this.guna2GradientPanel1.ResumeLayout(false);
             this.pnlQuenMatKhau.ResumeLayout(false);
             this.pnlQuenMatKhau.PerformLayout();

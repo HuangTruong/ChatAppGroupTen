@@ -42,41 +42,46 @@ namespace ChatApp
         #region Sự kiện nút Đăng nhập
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
-            // Chặn spam click
             if (!btnDangNhap.Enabled) return;
 
             btnDangNhap.Enabled = false;
-            this.UseWaitCursor = true;  // Hiện con trỏ chờ trong lúc xử lý
+            this.UseWaitCursor = true;
 
             try
             {
-                // Gọi controller để xử lý đăng nhập (Firebase hoặc logic riêng)
                 var user = await _loginController.DangNhapAsync(txtTaiKhoan.Text, txtMatKhau.Text);
 
-                MessageBox.Show("Đăng nhập thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Đăng nhập thành công!", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Mở form Trang chủ và ẩn form hiện tại
                 this.Hide();
                 var home = new TrangChu(user.Ten);
                 home.FormClosed += (s, e2) => this.Show();
                 home.Show();
 
-                txtTaiKhoan.Clear();   
-                txtMatKhau.Clear();    
+                txtTaiKhoan.Clear();
+                txtMatKhau.Clear();
                 txtTaiKhoan.Focus();
             }
             catch (Exception ex)
             {
-                // Báo lỗi đăng nhập (lỗi hệ thống hoặc Firebase)
-                MessageBox.Show("Lỗi đăng nhập: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi đăng nhập: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Nếu sai mật khẩu -> xóa mật khẩu, giữ nguyên tài khoản
+                if (ex.Message.Contains("Mật khẩu không đúng"))
+                {
+                    txtMatKhau.Clear();
+                    txtMatKhau.Focus();
+                }
             }
             finally
             {
-                // Luôn khôi phục trạng thái UI
                 btnDangNhap.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
+
         #endregion
 
         #region Sự kiện click vào icon con mắt để ẩn/hiện mật khẩu

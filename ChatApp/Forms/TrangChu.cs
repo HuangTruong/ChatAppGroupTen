@@ -70,6 +70,7 @@ namespace ChatApp
             string display = string.IsNullOrWhiteSpace(tenHienThi) ? _ten : tenHienThi;
             lblChaoMung.Text = $"Chào mừng '{display}'";
             _tipTen.SetToolTip(lblChaoMung, display);
+            lblTenDangNhap.Text = "";
             CanhGiuaChaoMung();
         }
 
@@ -203,5 +204,7 @@ namespace ChatApp
         }
 
         #endregion
+
+        
     }
 }
