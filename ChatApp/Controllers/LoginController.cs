@@ -31,7 +31,11 @@ namespace ChatApp.Controllers
             if (user == null)
                 throw new InvalidOperationException("Tài khoản không tồn tại!");
             if (user.MatKhau != matKhau)
+            {
                 throw new InvalidOperationException("Mật khẩu không đúng!");
+                
+            }
+                
 
             return user;
         }

@@ -131,10 +131,10 @@
             "Nam",
             "Nữ",
             "Khác"});
-            this.cbbGioiTinh.StartIndex = 0;
             this.cbbGioiTinh.Location = new System.Drawing.Point(65, 269);
             this.cbbGioiTinh.Name = "cbbGioiTinh";
             this.cbbGioiTinh.Size = new System.Drawing.Size(270, 36);
+            this.cbbGioiTinh.StartIndex = 0;
             this.cbbGioiTinh.TabIndex = 17;
             // 
             // lblTieuDe
@@ -322,7 +322,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "DangKy";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "DangKy";
+            this.Text = "Đăng Ký";
             this.Load += new System.EventHandler(this.DangKy_Load);
             this.guna2Panel1.ResumeLayout(false);
             this.guna2Panel1.PerformLayout();

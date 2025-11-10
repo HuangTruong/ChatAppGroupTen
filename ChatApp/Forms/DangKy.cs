@@ -4,6 +4,8 @@ using System.Windows.Forms;
 // Thư viện tự tạo
 using ChatApp.Controllers;
 using ChatApp.Models.Users;
+using ChatApp.Services.Email;
+using ChatApp.Services.Auth;
 
 namespace ChatApp
 {
@@ -11,7 +13,12 @@ namespace ChatApp
     {
         // Controller xử lý logic đăng ký người dùng
         private readonly RegisterController _registerController = new RegisterController();
-        private bool isMatKhau = true;   // Biến theo dõi trạng thái ẩn/hiện mật khẩu
+
+        // Service gửi email xác nhận
+        private readonly IEmailSender _emailSender = new SmtpEmailSender();
+
+        // Biến theo dõi trạng thái ẩn/hiện mật khẩu
+        private bool isMatKhau = true;
 
         public DangKy()
         {
@@ -26,23 +33,23 @@ namespace ChatApp
             {
                 if (e.KeyCode == Keys.Enter && btnDangKy.Enabled)
                 {
-                    e.SuppressKeyPress = true;   // Ngăn tiếng “bíp”
-                    btnDangKy.PerformClick();    // Gọi sự kiện click nút “Đăng ký”
+                    e.SuppressKeyPress = true;   // Chặn tiếng "bíp"
+                    btnDangKy.PerformClick();    // Gọi sự kiện click nút Đăng ký
                 }
             };
         }
 
         private void DangKy_Load(object sender, EventArgs e)
         {
-            // Khi click vào icon “mắt” của ô xác nhận mật khẩu
-            // sẽ gọi cùng sự kiện với ô mật khẩu chính
+            // Khi click icon "mắt" ở ô xác nhận mật khẩu
+            // -> dùng chung handler với ô mật khẩu chính
             txtXacNhanMatKhau.IconRightClick += txtMatKhau_IconRightClick;
         }
 
         // Nút “Quay lại đăng nhập”
         private void btnQuayLaiDangNhap_Click(object sender, EventArgs e)
         {
-            // Nếu form đăng nhập đang bị ẩn -> mở lại
+            // Nếu form đăng nhập cũ còn tồn tại thì bật lại
             Form DangNhapForm = this.Tag as Form;
             if (DangNhapForm != null && !DangNhapForm.IsDisposed)
             {
@@ -52,7 +59,7 @@ namespace ChatApp
             }
             else
             {
-                // Nếu không có form đăng nhập trước đó -> tạo mới
+                // Nếu không có -> tạo form đăng nhập mới
                 var newLogin = new DangNhap();
                 newLogin.Show();
                 this.Close();
@@ -62,20 +69,58 @@ namespace ChatApp
         // Nút “Đăng ký”
         private async void btnDangKy_Click(object sender, EventArgs e)
         {
-            // Chống spam click
             if (!btnDangKy.Enabled) return;
 
+            // Kiểm tra thông tin bắt buộc
+            if (string.IsNullOrWhiteSpace(txtTaiKhoan.Text) ||
+                string.IsNullOrWhiteSpace(txtMatKhau.Text) ||
+                string.IsNullOrWhiteSpace(txtXacNhanMatKhau.Text) ||
+                string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                MessageBox.Show("Vui lòng nhập đầy đủ Tên đăng nhập, Mật khẩu, Xác nhận mật khẩu và Email.",
+                    "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var email = txtEmail.Text.Trim();
+
             btnDangKy.Enabled = false;
-            this.UseWaitCursor = true; // Hiển thị con trỏ chờ
+            this.UseWaitCursor = true;
 
             try
             {
-                // Lấy thông tin người dùng nhập
+                // Kiểm tra email đã tồn tại chưa (trước khi gửi mã)
+                bool emailTonTai = await _registerController.KiemTraEmailTonTaiAsync(email);
+                if (emailTonTai)
+                {
+                    MessageBox.Show("Email này đã được sử dụng. Vui lòng dùng email khác.",
+                        "Email đã tồn tại", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return; // Dừng, không gửi OTP, không đăng ký
+                }
+
+                // Gửi mã xác nhận tới email
+                await EmailVerificationService.SendNewCodeAsync(email, _emailSender);
+
+                // Mở form phụ để người dùng nhập mã OTP
+                using (var dlg = new XacNhanEmail(email, _emailSender))
+                {
+                    var result = dlg.ShowDialog(this);
+
+                    // Nếu người dùng bấm Hủy hoặc đóng form -> không đăng ký
+                    if (result != DialogResult.OK)
+                    {
+                        MessageBox.Show("Bạn đã hủy xác nhận email. Đăng ký chưa được thực hiện.",
+                            "Đã hủy", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
+                    }
+                }
+
+                // Mã đúng -> tạo đối tượng User và gọi RegisterController
                 var newUser = new User
                 {
                     TaiKhoan = txtTaiKhoan.Text.Trim(),
                     MatKhau = txtMatKhau.Text.Trim(),
-                    Email = txtEmail.Text.Trim(),
+                    Email = email,
                     Ten = txtTen.Text.Trim(),
                     Ngaysinh = dtpNgaySinh.Text,
                     Gioitinh = cbbGioiTinh.Text
@@ -83,13 +128,12 @@ namespace ChatApp
 
                 var confirmPass = txtXacNhanMatKhau.Text.Trim();
 
-                // Gọi controller để xử lý đăng ký (kiểm tra, lưu Firebase,...)
                 await _registerController.DangKyAsync(newUser, confirmPass);
 
                 MessageBox.Show("Đăng ký thành công!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Xóa dữ liệu nhập sau khi đăng ký thành công
+                // Xóa dữ liệu sau khi đăng ký thành công
                 txtTen.Clear();
                 txtTaiKhoan.Clear();
                 txtMatKhau.Clear();
@@ -100,34 +144,38 @@ namespace ChatApp
             }
             catch (Exception ex)
             {
-                // Thông báo lỗi (Firebase, logic hoặc kết nối)
+                // Lỗi từ AuthService, Firebase hoặc OTP -> đều báo ra
                 MessageBox.Show("Lỗi: " + ex.Message, "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                // Luôn khôi phục lại trạng thái ban đầu
+                // Luôn khôi phục trạng thái nút / con trỏ
                 btnDangKy.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
 
-        // Sự kiện click vào icon “mắt” để ẩn/hiện mật khẩu
+        // Sự kiện click icon “mắt” để ẩn/hiện mật khẩu
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {
-            isMatKhau = !isMatKhau; // Đảo trạng thái
+            isMatKhau = !isMatKhau;
 
-            // Nếu đang ẩn → hiển thị, ngược lại thì che
+            // Đang ẩn -> hiện, đang hiện -> ẩn
             char c = isMatKhau ? '●' : '\0';
             var icon = isMatKhau
                 ? Properties.Resources.AnMatKhau
                 : Properties.Resources.HienMatKhau;
 
-            // Cập nhật cho cả 2 ô
+            // Áp dụng cho cả 2 ô mật khẩu
             txtMatKhau.PasswordChar = c;
             txtMatKhau.IconRight = icon;
             txtXacNhanMatKhau.PasswordChar = c;
             txtXacNhanMatKhau.IconRight = icon;
+        }
+        private void DangKy_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

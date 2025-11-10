@@ -291,7 +291,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Chat";
+            this.Text = "Nhắn Tin";
             this.Load += new System.EventHandler(this.NhanTin_Load);
             this.pnlTrai.ResumeLayout(false);
             this.pnlGiua.ResumeLayout(false);

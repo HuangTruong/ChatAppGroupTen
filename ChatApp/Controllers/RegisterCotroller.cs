@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-
+﻿using ChatApp.Models.Users;
+using ChatApp.Services;
 using ChatApp.Services.Auth;
-using ChatApp.Models.Users;
+using System;
+using System.Threading.Tasks;
 
 namespace ChatApp.Controllers
 {
@@ -43,6 +43,16 @@ namespace ChatApp.Controllers
 
             // Đăng ký tài khoản lên Firebase
             await _authService.RegisterAsync(user);
+        }
+
+        // Hàm hỗ trợ: dùng cho DangKy để CHECK email trước khi gửi OTP
+        public async Task<bool> KiemTraEmailTonTaiAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            email = email.Trim();
+            return await _authService.EmailExistsAsync(email);
         }
     }
 }
