@@ -1,10 +1,10 @@
-﻿using FireSharp.Interfaces;
+﻿using ChatApp.Helpers;
+using ChatApp.Models.Users;
+using ChatApp.Services.Firebase;
+using FireSharp.Interfaces;
 using System;
 using System.Text;
 using System.Threading.Tasks;
-
-using ChatApp.Helpers;
-using ChatApp.Models.Users;
 
 namespace ChatApp.Services.Auth
 {
@@ -15,7 +15,7 @@ namespace ChatApp.Services.Auth
         // ✅ Constructor: nếu không truyền vào thì tự tạo bằng FirebaseClientFactory
         public AuthService(IFirebaseClient firebase = null)
         {
-            _firebase = firebase ?? throw new ArgumentNullException(nameof(firebase));
+            _firebase = firebase ?? FirebaseClientFactory.Create();
         }
 
         // ✅ Lấy thông tin người dùng theo tài khoản
