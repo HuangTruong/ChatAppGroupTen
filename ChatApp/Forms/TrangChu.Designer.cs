@@ -276,6 +276,7 @@ namespace ChatApp
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(1181, 654);
             this.Controls.Add(this.pnlBackground);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TrangChu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.TrangChu_Load);
