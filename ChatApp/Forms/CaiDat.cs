@@ -9,7 +9,7 @@ namespace ChatApp
         private readonly string _taiKhoan;
         private readonly string _email;
 
-        // Truyền tài khoản + email từ form gọi (VD: TrangChu)
+
         public CatDat(string taiKhoan, string email)
         {
             InitializeComponent();
@@ -28,7 +28,7 @@ namespace ChatApp
         {
         }
 
-        // 👉 Đổi mật khẩu: mở form DoiMatKhau với đúng tài khoản
+        // Đổi mật khẩu: mở form DoiMatKhau với đúng tài khoản
         private void btnDoiMatKhau_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(_taiKhoan))
@@ -47,7 +47,7 @@ namespace ChatApp
             frm.ShowDialog(this);
         }
 
-        // 👉 Đổi email: tạm để TODO, sau này bạn gắn flow xác thực email
+        //  Đổi email (bổ sung sau)
         private void btnDoiEmail_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Chức năng đổi Email sẽ được bổ sung sau.",

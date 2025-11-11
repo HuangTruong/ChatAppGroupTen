@@ -1,0 +1,185 @@
+[33mcommit 1aa76b45df07144dac5356dcfc960f20ecb2cf54[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Tue Nov 11 01:20:50 2025 +0700
+
+    cap nhat
+
+[33mcommit 8f04038e37b067ae595b9a75a80f1596c96e9370[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Sun Nov 9 21:11:45 2025 +0700
+
+    To chuc lai file va thu muc
+
+[33mcommit 201ee4c6f1085e8ff4197c7e67865e1048bdb4ca[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Fri Nov 7 14:59:52 2025 +0700
+
+    Chinh sua code form dang nhap
+
+[33mcommit adee93e0d52ecb22ae90d0f250ebeddcd980d53d[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Thu Nov 6 18:21:19 2025 +0700
+
+    To chuc lai cac thu muc va file
+
+[33mcommit 51c563aee41cd28be84fb3560cd3e77bae65ba40[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Mon Oct 27 19:03:01 2025 +0700
+
+    cap nhat tinh nang nhan tin
+
+[33mcommit b5425f26d763c4bcab780adcb6d1a3627316def0[m
+Author: Trần Phước Hoàng <hoangtranhtk567@gmail.com>
+Date:   Fri Oct 24 18:37:12 2025 +0700
+
+    - Sửa lỗi đóng mở chương trình.
+    - Hiển thị trạng thái online/offline bạn bè.
+
+[33mcommit 898b96378b007f1bda972c0bdcd950090961f7d8[m
+Author: Trần Phước Hoàng <hoangtranhtk567@gmail.com>
+Date:   Fri Oct 24 16:54:48 2025 +0700
+
+    Tạo group, thêm bạn bè, xóa bạn bè khỏi nhóm, nhắn tin group.
+
+[33mcommit d57f92fb0349a6fb6d8c3870cf535d52dc69835e[m
+Author: Trần Phước Hoàng <hoangtranhtk567@gmail.com>
+Date:   Tue Oct 21 12:57:11 2025 +0700
+
+    Update
+
+[33mcommit 050f47df79375270b3dcca40de13e3b85adf6fbf[m
+Author: Trần Phước Hoàng <hoangtranhtk567@gmail.com>
+Date:   Tue Oct 21 12:30:44 2025 +0700
+
+    Add friends
+
+[33mcommit cc0050efacaf91fbdf7c53625fb72bd3dad11cb1[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Mon Oct 20 15:50:48 2025 +0700
+
+    Sua cac loi hien thi
+
+[33mcommit 2cc595dcd0405fc24f26dac295168d60f649e396[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Mon Oct 20 14:21:05 2025 +0700
+
+    Cap nhat link firebase moi:
+
+[33mcommit f785401cb95517c9f6de7d6772464e26da9b1164[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Mon Oct 20 12:37:04 2025 +0700
+
+    Sua loi an icon Dang nhap
+
+[33mcommit ed78cee0b9de65454af9f9ecc17ea3cac7b6bf73[m[33m ([m[1;31morigin/hoangtran[m[33m)[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Thu Oct 16 20:03:38 2025 +0700
+
+    Tinh nang nhan tin 1-1
+
+[33mcommit 75ab2b748615556127dc238a95c3a404714c3f63[m
+Author: HoangLe1701uit <hnhom17@gmail.com>
+Date:   Thu Oct 16 15:17:17 2025 +0700
+
+    Cap nhat ten user o trang chu
+
+[33mcommit 3f6846ea1740848a0c954053aaa02b72389d1580[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Wed Oct 15 06:58:35 2025 +0700
+
+    Them mot so hinh anh vao giao dien
+
+[33mcommit 233d343d91932565815cc5f0410bed8b6121734a[m
+Merge: ceed1f3 21febcc
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Tue Oct 14 21:53:48 2025 +0700
+
+    Sưa Giao Dien
+
+[33mcommit ceed1f3180c16fd484900dd991466e9f9cd53ed9[m
+Merge: c914ce9 3cfdb5d
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Tue Oct 14 21:19:09 2025 +0700
+
+    Xu Ly Xung Dot Thu Cong
+
+[33mcommit 21febcc8250ce6e0d377df58ab66567a96054f94[m
+Merge: c914ce9 16699f3
+Author: HuangTruong <hoangviettruong0109@gmail.com>
+Date:   Tue Oct 14 19:38:17 2025 +0700
+
+    Merge pull request #6 from HuangTruong/khanh-hung-update
+    
+    Khanh hung update
+
+[33mcommit 3cfdb5dd231e5a75183065fcebcdfec77a7846be[m[33m ([m[1;31morigin/VietHoang[m[33m)[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Tue Oct 14 19:34:18 2025 +0700
+
+    Them Hien Thi Mat Khau Va Sua Form Dang Nhap, Dang Ký
+
+[33mcommit 16699f3fc0b987d76209a09e123f239122dd552f[m[33m ([m[1;31morigin/khanh-hung-update[m[33m)[m
+Author: senicon <trannguyetkhanhvn2019@gmail.com>
+Date:   Tue Oct 14 16:45:28 2025 +0700
+
+    Sửa lỗi spam click, fix loi firebase k nhan, fix viec nut k nhan
+
+[33mcommit 025c73915e1008a497a660130e702e5b1f39a1e0[m
+Author: senicon <trannguyetkhanhvn2019@gmail.com>
+Date:   Tue Oct 14 16:44:47 2025 +0700
+
+    Sửa lỗi spam click, them chong spam gui otp / xac nhan, them time cooldown khi gui ma la 60s, chi mo 1 form doi mat khau (vo hieu hoa khi co form bat len), khoa UI khi xu ly (tranh loi khac nhau / k thich thi xoa dong nay k anh huong)
+
+[33mcommit 774ce7cfa54c30a5c63ab8e113f1a85234d6fdb3[m
+Author: senicon <trannguyetkhanhvn2019@gmail.com>
+Date:   Tue Oct 14 16:10:51 2025 +0700
+
+    Sửa lỗi spam click trong form Trang Chu
+
+[33mcommit eccfaec4d905693a47077ebba72b60804c34e71a[m
+Author: senicon <trannguyetkhanhvn2019@gmail.com>
+Date:   Tue Oct 14 16:04:06 2025 +0700
+
+    Sửa lỗi spam click trong form Đăng Ký
+
+[33mcommit 69a3ca996dbab36b998df89bf34a6a480a96706b[m
+Author: senicon <trannguyetkhanhvn2019@gmail.com>
+Date:   Tue Oct 14 16:03:54 2025 +0700
+
+    Sửa lỗi spam click trong form Đăng Ký
+
+[33mcommit c914ce95b0a43ad5c59fda6cfcae4f6d7e86eada[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Mon Oct 13 09:00:40 2025 +0700
+
+    Thay Doi Giao Dien
+
+[33mcommit fe246bd7526fe6df537dc575acb8558b0bdb3283[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Mon Oct 13 08:40:39 2025 +0700
+
+    Bo sung giao dien
+
+[33mcommit ff29df5550ed5eefa2945438b4802cd66fd5be5b[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Mon Oct 13 08:15:56 2025 +0700
+
+    Push thu de xu ly loi
+
+[33mcommit 84922ce95f7688ea44a3883ceaede29c9d38622c[m[33m ([m[1;31morigin/Form-DangNhap-DangKy-QuenMatKhau[m[33m)[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Thu Oct 9 15:03:09 2025 +0700
+
+    Giao dien dang nhap, dang ky, quen mat khau
+
+[33mcommit 5cca20f922a2ba86a727a4acb05850df260460e4[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Thu Oct 9 14:46:57 2025 +0700
+
+    Them giao dien dang nhap, dang ky, quen mat khau
+
+[33mcommit f77c992c37ecb78ec5b5271393909715c1112225[m
+Author: Trương Viet Hoang <hoangviettruong0109@gmail.com>
+Date:   Thu Oct 9 12:48:52 2025 +0700
+
+    Chat App
