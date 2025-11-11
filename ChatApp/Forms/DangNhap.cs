@@ -55,7 +55,7 @@ namespace ChatApp
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 this.Hide();
-                var home = new TrangChu(user.Ten);
+                var home = new TrangChu(user.Ten, user.TaiKhoan);
                 home.FormClosed += (s, e2) => this.Show();
                 home.Show();
 
