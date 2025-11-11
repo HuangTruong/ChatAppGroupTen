@@ -110,7 +110,7 @@
             this.txtMaXacNhan.PlaceholderText = "Mã Xác Nhận";
             this.txtMaXacNhan.SelectedText = "";
             this.txtMaXacNhan.Size = new System.Drawing.Size(229, 37);
-            this.txtMaXacNhan.TabIndex = 5;
+            this.txtMaXacNhan.TabIndex = 3;
             // 
             // txtEmail
             // 
@@ -132,7 +132,7 @@
             this.txtEmail.PlaceholderText = "Email";
             this.txtEmail.SelectedText = "";
             this.txtEmail.Size = new System.Drawing.Size(229, 37);
-            this.txtEmail.TabIndex = 4;
+            this.txtEmail.TabIndex = 2;
             // 
             // lblTieuDe
             // 
@@ -256,7 +256,7 @@
             this.txtTaiKhoan.PlaceholderText = "Tên Đăng Nhập";
             this.txtTaiKhoan.SelectedText = "";
             this.txtTaiKhoan.Size = new System.Drawing.Size(229, 37);
-            this.txtTaiKhoan.TabIndex = 12;
+            this.txtTaiKhoan.TabIndex = 1;
             // 
             // QuenMatKhau
             // 
