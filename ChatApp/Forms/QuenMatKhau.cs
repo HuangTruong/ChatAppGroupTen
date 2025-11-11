@@ -193,5 +193,10 @@ namespace ChatApp
         }
 
         #endregion
+
+        private void QuenMatKhau_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }

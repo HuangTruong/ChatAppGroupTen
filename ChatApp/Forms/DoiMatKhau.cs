@@ -83,5 +83,7 @@ namespace ChatApp
                 this.UseWaitCursor = false;
             }
         }
+
+
     }
 }
