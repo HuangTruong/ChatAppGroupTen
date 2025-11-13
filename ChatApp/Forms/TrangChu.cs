@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ChatApp.Models.Users;
+using ChatApp.Services.Auth;
+using ChatApp.Services.Firebase;
+using FireSharp.Interfaces;
+using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using FireSharp.Interfaces;
-using ChatApp.Models.Users;
-using ChatApp.Services.Firebase;
 
 namespace ChatApp
 {
@@ -12,6 +13,8 @@ namespace ChatApp
     {
         private readonly string _ten;          // Tên hiển thị (từ form login)
         private readonly string _taiKhoan;     // Khóa để query Firebase
+        private readonly AuthService _authService;
+
 
         private readonly IFirebaseClient _fbClient;
 
@@ -30,6 +33,8 @@ namespace ChatApp
             _ten = ten;
             _taiKhoan = taiKhoan;
             _fbClient = FirebaseClientFactory.Create();
+            _authService = new AuthService(_fbClient);
+
 
             TaoLabelChaoMung();
             LayHeaderContainer().Resize += (s, e) => CanhGiuaChaoMung();
@@ -148,7 +153,7 @@ namespace ChatApp
                     return;
                 }
 
-                _nhanTinForm = new NhanTin(_taiKhoan) // truyền taiKhoan nếu form chat cần
+                _nhanTinForm = new NhanTin(_taiKhoan, _ten) // truyền taiKhoan nếu form chat cần
                 {
                     StartPosition = FormStartPosition.CenterParent
                 };
@@ -214,6 +219,35 @@ namespace ChatApp
 
             this.Close();
         }
+        protected override async void OnFormClosing(FormClosingEventArgs e)
+        {
+            // Nếu đang có form Nhắn tin thì đóng lại để nó tự dọn Firebase stream + timer
+            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+            {
+                try
+                {
+                    _nhanTinForm.Close();
+                    _nhanTinForm = null;
+                }
+                catch
+                {
+                    // Bỏ qua lỗi nếu có
+                }
+            }
+
+            // Cập nhật trạng thái OFFLINE lên Firebase
+            try
+            {
+                await _authService.UpdateStatusAsync(_ten, "offline");
+            }
+            catch
+            {
+                // Không làm crash app nếu lỗi mạng/Firebase
+            }
+
+            base.OnFormClosing(e);
+        }
+
 
         #endregion
     }
