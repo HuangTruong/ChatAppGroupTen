@@ -125,6 +125,7 @@ namespace ChatApp
             this.picCaiDat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picCaiDat.TabIndex = 0;
             this.picCaiDat.TabStop = false;
+            this.picCaiDat.Click += new System.EventHandler(this.picCaiDat_Click);
             // 
             // pnlNhanTin
             // 

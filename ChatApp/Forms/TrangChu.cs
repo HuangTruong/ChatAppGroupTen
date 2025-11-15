@@ -1,6 +1,6 @@
 ﻿using ChatApp.Models.Users;
-using ChatApp.Services.Firebase;
 using ChatApp.Services.Auth;
+using ChatApp.Services.Firebase;
 using FireSharp.Interfaces;
 using System;
 using System.Drawing;
@@ -31,9 +31,9 @@ namespace ChatApp
 
             _ten = ten;
             _taiKhoan = taiKhoan;
-
             _fbClient = FirebaseClientFactory.Create();
             _authService = new AuthService(_fbClient);
+
 
             TaoLabelChaoMung();
             LayHeaderContainer().Resize += (s, e) => CanhGiuaChaoMung();
@@ -117,6 +117,7 @@ namespace ChatApp
         {
             try
             {
+                // chỉnh path cho đúng cấu trúc DB của bạn
                 var res = await _fbClient.GetAsync($"users/{_taiKhoan}");
                 _currentUser = res.ResultAs<User>();
 
@@ -151,7 +152,7 @@ namespace ChatApp
                     return;
                 }
 
-                _nhanTinForm = new NhanTin(_taiKhoan)
+                _nhanTinForm = new NhanTin(_taiKhoan, _ten) // truyền taiKhoan nếu form chat cần
                 {
                     StartPosition = FormStartPosition.CenterParent
                 };
@@ -207,24 +208,45 @@ namespace ChatApp
 
         #region Đăng xuất
 
-        private async void picDangXuat_Click(object sender, EventArgs e)
+        private void picDangXuat_Click(object sender, EventArgs e)
         {
-            // Nếu đang mở form NhắnTin thì đóng
-            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+            if (_currentUser == null)
             {
-                _nhanTinForm.Close();
-                _nhanTinForm = null;
+                MessageBox.Show("Không lấy được thông tin tài khoản từ Firebase.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            // Cập nhật trạng thái offline lên Firebase
+            this.Close();
+        }
+        protected override async void OnFormClosing(FormClosingEventArgs e)
+        {
+            // Nếu đang có form Nhắn tin thì đóng lại để nó tự dọn Firebase stream + timer
+            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+            {
+                try
+                {
+                    _nhanTinForm.Close();
+                    _nhanTinForm = null;
+                }
+                catch
+                {
+                    // Bỏ qua lỗi nếu có
+                }
+            }
+
+            // Cập nhật trạng thái OFFLINE lên Firebase
             try
             {
                 await _authService.UpdateStatusAsync(_ten, "offline");
             }
             catch
             {
-                // không crash nếu lỗi mạng / firebase
+                // Không làm crash app nếu lỗi mạng/Firebase
             }
+
+            base.OnFormClosing(e);
+        }
 
             // Đóng TrangChu (quay về đăng nhập theo logic bên ngoài)
             this.Close();

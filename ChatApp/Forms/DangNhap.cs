@@ -99,6 +99,7 @@ namespace ChatApp
         private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
+            Environment.Exit(0);
         }
         #endregion
     }

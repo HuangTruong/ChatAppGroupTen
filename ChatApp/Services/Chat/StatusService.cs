@@ -10,6 +10,7 @@ namespace ChatApp.Services.Status
     {
         private readonly IFirebaseClient _firebase; // Kết nối Firebase
 
+
         public StatusService(IFirebaseClient firebase)
         {
             _firebase = firebase ?? throw new ArgumentNullException(nameof(firebase));
