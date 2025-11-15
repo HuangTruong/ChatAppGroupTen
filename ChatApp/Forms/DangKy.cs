@@ -42,7 +42,6 @@ namespace ChatApp
         private void DangKy_Load(object sender, EventArgs e)
         {
             // Khi click icon "mắt" ở ô xác nhận mật khẩu
-            // -> dùng chung handler với ô mật khẩu chính
             txtXacNhanMatKhau.IconRightClick += txtMatKhau_IconRightClick;
         }
 
@@ -71,42 +70,79 @@ namespace ChatApp
         {
             if (!btnDangKy.Enabled) return;
 
-            // Kiểm tra thông tin bắt buộc
-            if (string.IsNullOrWhiteSpace(txtTaiKhoan.Text) ||
-                string.IsNullOrWhiteSpace(txtMatKhau.Text) ||
-                string.IsNullOrWhiteSpace(txtXacNhanMatKhau.Text) ||
-                string.IsNullOrWhiteSpace(txtEmail.Text))
+            // Lấy dữ liệu từ form
+            var taiKhoan = txtTaiKhoan.Text.Trim();
+            var matKhau = txtMatKhau.Text.Trim();
+            var xacNhanMk = txtXacNhanMatKhau.Text.Trim();
+            var email = txtEmail.Text.Trim();
+            var ten = txtTen.Text.Trim();
+            var ngaySinh = dtpNgaySinh.Value;
+            var gioiTinh = cbbGioiTinh.Text.Trim();
+
+
+            if (string.IsNullOrWhiteSpace(taiKhoan) ||
+                string.IsNullOrWhiteSpace(matKhau) ||
+                string.IsNullOrWhiteSpace(xacNhanMk) ||
+                string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(ten) ||
+                string.IsNullOrWhiteSpace(gioiTinh))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ Tên đăng nhập, Mật khẩu, Xác nhận mật khẩu và Email.",
+                MessageBox.Show("Vui lòng nhập đầy đủ Tên, Tên đăng nhập, Mật khẩu, Xác nhận mật khẩu, Email và Giới tính.",
                     "Thiếu thông tin", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var email = txtEmail.Text.Trim();
+
+            // Xác nhận mật khẩu
+            if (!string.Equals(matKhau, xacNhanMk, StringComparison.Ordinal))
+            {
+                MessageBox.Show("Mật khẩu xác nhận không khớp.",
+                    "Sai xác nhận mật khẩu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Validate email format
+            try
+            {
+                var mailAddr = new System.Net.Mail.MailAddress(email);
+                if (mailAddr.Address != email)
+                    throw new Exception();
+            }
+            catch
+            {
+                MessageBox.Show("Định dạng email không hợp lệ.",
+                    "Email không hợp lệ", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             btnDangKy.Enabled = false;
             this.UseWaitCursor = true;
 
             try
             {
-                // Kiểm tra email đã tồn tại chưa (trước khi gửi mã)
-                bool emailTonTai = await _registerController.KiemTraEmailTonTaiAsync(email);
-                if (emailTonTai)
+                // Trùng tài khoản
+                if (await _registerController.KiemTraTaiKhoanTonTaiAsync(taiKhoan))
+                {
+                    MessageBox.Show("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.",
+                        "Trùng tên đăng nhập", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Trùng email
+                if (await _registerController.KiemTraEmailTonTaiAsync(email))
                 {
                     MessageBox.Show("Email này đã được sử dụng. Vui lòng dùng email khác.",
                         "Email đã tồn tại", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return; // Dừng, không gửi OTP, không đăng ký
+                    return;
                 }
 
-                // Gửi mã xác nhận tới email
+                // Gửi xác nhận mail
+
                 await EmailVerificationService.SendNewCodeAsync(email, _emailSender);
 
-                // Mở form phụ để người dùng nhập mã OTP
                 using (var dlg = new XacNhanEmail(email, _emailSender))
                 {
                     var result = dlg.ShowDialog(this);
-
-                    // Nếu người dùng bấm Hủy hoặc đóng form -> không đăng ký
                     if (result != DialogResult.OK)
                     {
                         MessageBox.Show("Bạn đã hủy xác nhận email. Đăng ký chưa được thực hiện.",
@@ -115,25 +151,23 @@ namespace ChatApp
                     }
                 }
 
-                // Mã đúng -> tạo đối tượng User và gọi RegisterController
                 var newUser = new User
                 {
-                    TaiKhoan = txtTaiKhoan.Text.Trim(),
-                    MatKhau = txtMatKhau.Text.Trim(),
+                    TaiKhoan = taiKhoan,
+                    MatKhau = matKhau,
                     Email = email,
-                    Ten = txtTen.Text.Trim(),
-                    Ngaysinh = dtpNgaySinh.Text,
-                    Gioitinh = cbbGioiTinh.Text
+                    Ten = ten,
+                    Ngaysinh = ngaySinh.ToString("yyyy-MM-dd"),
+                    Gioitinh = gioiTinh
                 };
 
-                var confirmPass = txtXacNhanMatKhau.Text.Trim();
-
-                await _registerController.DangKyAsync(newUser, confirmPass);
+                await _registerController.DangKyAsync(newUser, xacNhanMk);
 
                 MessageBox.Show("Đăng ký thành công!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Xóa dữ liệu sau khi đăng ký thành công
+                // CLEAR 
+
                 txtTen.Clear();
                 txtTaiKhoan.Clear();
                 txtMatKhau.Clear();
@@ -144,17 +178,17 @@ namespace ChatApp
             }
             catch (Exception ex)
             {
-                // Lỗi từ AuthService, Firebase hoặc OTP -> đều báo ra
                 MessageBox.Show("Lỗi: " + ex.Message, "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
-                // Luôn khôi phục trạng thái nút / con trỏ
                 btnDangKy.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
+
+
 
         // Sự kiện click icon “mắt” để ẩn/hiện mật khẩu
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)

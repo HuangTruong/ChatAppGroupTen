@@ -13,10 +13,9 @@ namespace ChatApp
     {
         private readonly string _ten;          // Tên hiển thị (từ form login)
         private readonly string _taiKhoan;     // Khóa để query Firebase
-        private readonly AuthService _authService;
-
 
         private readonly IFirebaseClient _fbClient;
+        private readonly AuthService _authService; // dùng để cập nhật status
 
         private NhanTin _nhanTinForm;
         private bool _isOpeningNhanTin = false;
@@ -211,10 +210,11 @@ namespace ChatApp
 
         private void picDangXuat_Click(object sender, EventArgs e)
         {
-            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
+            if (_currentUser == null)
             {
-                _nhanTinForm.Close();
-                _nhanTinForm = null;
+                MessageBox.Show("Không lấy được thông tin tài khoản từ Firebase.",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             this.Close();
@@ -248,6 +248,9 @@ namespace ChatApp
             base.OnFormClosing(e);
         }
 
+            // Đóng TrangChu (quay về đăng nhập theo logic bên ngoài)
+            this.Close();
+        }
 
         #endregion
     }

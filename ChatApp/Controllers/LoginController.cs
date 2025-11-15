@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using ChatApp.Models.Users;
 using ChatApp.Services.Auth;
 using ChatApp.Services.Firebase;
@@ -11,14 +10,12 @@ namespace ChatApp.Controllers
     {
         private readonly AuthService _authService;
 
-        // ✅ Khởi tạo AuthService với client lấy từ Factory
         public LoginController()
         {
             var client = FirebaseClientFactory.Create();
             _authService = new AuthService(client);
         }
 
-        // Hàm xử lý logic đăng nhập
         public async Task<User> DangNhapAsync(string taiKhoan, string matKhau)
         {
             if (string.IsNullOrWhiteSpace(taiKhoan))
@@ -30,12 +27,12 @@ namespace ChatApp.Controllers
 
             if (user == null)
                 throw new InvalidOperationException("Tài khoản không tồn tại!");
+
             if (user.MatKhau != matKhau)
-            {
                 throw new InvalidOperationException("Mật khẩu không đúng!");
-                
-            }
-                
+
+            // Đăng nhập thành công -> cập nhật trạng thái ONLINE
+            await _authService.UpdateStatusAsync(user.Ten, "online");
 
             return user;
         }
