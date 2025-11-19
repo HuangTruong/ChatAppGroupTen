@@ -1,22 +1,41 @@
-﻿using FireSharp.Interfaces;
-using System;
-using System.Net;
-using System.Net.Mail;
+﻿using System;
 using System.Threading.Tasks;
+using FireSharp.Interfaces;
 
 using ChatApp.Helpers;
 using ChatApp.Models.Otp;
 using ChatApp.Services.Firebase;
+using ChatApp.Services.Email;
 
 namespace ChatApp.Services.Auth
-
 {
     public class OtpService
     {
-        private readonly IFirebaseClient _client = FirebaseClientFactory.Create();
+        private readonly IFirebaseClient _client;
+        private readonly IEmailSender _emailSender;
+
+        // Dùng mặc định: tự tạo FirebaseClient + SmtpEmailSender
+        public OtpService()
+            : this(FirebaseClientFactory.Create(), new SmtpEmailSender())
+        {
+        }
+
+        // Cho phép truyền từ ngoài vào (nếu sau này muốn DI / test)
+        public OtpService(IFirebaseClient client, IEmailSender emailSender)
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
+        }
+
         // Lưu thông tin mã OTP của một tài khoản lên Firebase.
         public async Task SaveOtpAsync(string taiKhoan, ThongTinMaFirebase otp)
         {
+            if (string.IsNullOrWhiteSpace(taiKhoan))
+                throw new ArgumentException("Tài khoản không hợp lệ.", nameof(taiKhoan));
+
+            if (otp == null)
+                throw new ArgumentNullException(nameof(otp));
+
             string key = KeySanitizer.SafeKey(taiKhoan);
             await _client.SetAsync($"otp/{key}", otp);
         }
@@ -24,6 +43,9 @@ namespace ChatApp.Services.Auth
         // Lấy mã OTP và thời gian hết hạn của một tài khoản từ Firebase.
         public async Task<ThongTinMaFirebase> GetOtpAsync(string taiKhoan)
         {
+            if (string.IsNullOrWhiteSpace(taiKhoan))
+                return null;
+
             string key = KeySanitizer.SafeKey(taiKhoan);
             var res = await _client.GetAsync($"otp/{key}");
             return res.Body == "null" ? null : res.ResultAs<ThongTinMaFirebase>();
@@ -32,31 +54,48 @@ namespace ChatApp.Services.Auth
         // Xoá mã OTP của một tài khoản khỏi Firebase sau khi OTP đã được dùng hoặc hết hạn.
         public async Task DeleteOtpAsync(string taiKhoan)
         {
+            if (string.IsNullOrWhiteSpace(taiKhoan))
+                return;
+
             string key = KeySanitizer.SafeKey(taiKhoan);
             await _client.DeleteAsync($"otp/{key}");
         }
 
-        // Gửi mã OTP qua email
+        // Gửi mã OTP qua email (dùng chung hạ tầng IEmailSender)
+        // Giữ nguyên kiểu gọi sync để không phải sửa Controller/Form
         public void GuiEmailOtp(string emailNhan, string ma)
         {
+            if (string.IsNullOrWhiteSpace(emailNhan))
+                throw new ArgumentException("Email nhận không hợp lệ.", nameof(emailNhan));
+
+            if (string.IsNullOrWhiteSpace(ma))
+                throw new ArgumentException("Mã OTP không hợp lệ.", nameof(ma));
+
             try
             {
-                string emailGui = "hnhom17@gmail.com";
-                string matKhauUngDung = "gcgq xzja ivub klbo"; // app password
-                string tieuDe = "Mã xác nhận đổi mật khẩu";
-                string noiDung = $"Xin chào,\n\nMã xác nhận của bạn là: {ma}\nMã có hiệu lực trong 5 phút.\n\nTrân trọng!";
+                string subject = "Mã xác nhận đổi mật khẩu ChatApp";
 
-                using (MailMessage mail = new MailMessage(emailGui, emailNhan, tieuDe, noiDung))
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-                {
-                    smtp.EnableSsl = true;
-                    smtp.Credentials = new NetworkCredential(emailGui, matKhauUngDung);
-                    smtp.Send(mail);
-                }
+                // Body HTML, style na ná EmailVerificationService cho đồng bộ
+                string body = $@"
+<div style='font-family:Segoe UI,Arial,sans-serif'>
+    <h2>Mã xác nhận đổi mật khẩu ChatApp</h2>
+    <p>Bạn (hoặc ai đó) vừa yêu cầu đặt lại mật khẩu cho tài khoản ChatApp của bạn.</p>
+    <p>Mã OTP của bạn là:</p>
+    <div style='font-size:26px;font-weight:bold;letter-spacing:3px'>{ma}</div>
+    <p>Mã có hiệu lực trong 5 phút.</p>
+    <p>Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email này.</p>
+</div>";
+
+                // Gọi async nhưng block lại cho đơn giản (Form đang dùng void)
+                _emailSender
+                    .SendEmailAsync(emailNhan, subject, body)
+                    .GetAwaiter()
+                    .GetResult();
             }
             catch (Exception ex)
             {
-                throw new Exception("Gửi email thất bại: " + ex.Message);
+                // Ném lỗi rõ ràng hơn, giúp debug
+                throw new Exception("Gửi email OTP thất bại: " + ex.Message, ex);
             }
         }
     }

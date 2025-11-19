@@ -13,5 +13,7 @@ namespace ChatApp.Models.Chat
         public string nhanBoi { get; set; }   // rỗng nếu nhóm
         public string noiDung { get; set; }
         public string thoiGian { get; set; }  // ISO-8601 "o" hoặc Unix ms
+        public bool laNhom { get; set; }
+    
     }
 }

@@ -81,11 +81,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\ChangePasswordController.cs" />
-    <Compile Include="Controllers\ForgotPasswordController.cs" />
-    <Compile Include="Controllers\LoginController.cs" />
-    <Compile Include="Controllers\NhanTinController.cs" />
-    <Compile Include="Controllers\RegisterCotroller.cs" />
+    <Compile Include="Controllers\CaiDatController.cs" />
+    <Compile Include="Controllers\DangKyController.cs" />
+    <Compile Include="Controllers\DangNhapController.cs" />
+    <Compile Include="Controllers\DoiMatKhauController.cs" />
+    <Compile Include="Controllers\NhanTinController\NhanTinController.Chat.cs" />
+    <Compile Include="Controllers\NhanTinController\NhanTinController.Core.cs" />
+    <Compile Include="Controllers\NhanTinController\NhanTinController.FriendsAndSearch.cs" />
+    <Compile Include="Controllers\NhanTinController\NhanTinController.Groups.cs" />
+    <Compile Include="Controllers\QuanLyThanhVienNhom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controllers\QuanLyThanhVienNhom.Designer.cs">
+      <DependentUpon>QuanLyThanhVienNhom.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controllers\QuenMatKhauController.cs" />
     <Compile Include="Controllers\TrangChuController.cs" />
     <Compile Include="Forms\CaiDat.cs">
       <SubType>Form</SubType>
@@ -105,9 +115,10 @@
     <Compile Include="Forms\XacNhanEmail.Designer.cs">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\ChatInputHandler.cs" />
-    <Compile Include="Helpers\KeySanitizer.cs" />
-    <Compile Include="Helpers\TimeParser.cs" />
+    <Compile Include="Helpers\Common\ChatInputHandler.cs" />
+    <Compile Include="Helpers\Common\KeySanitizer.cs" />
+    <Compile Include="Helpers\Common\TimeParser.cs" />
+    <Compile Include="Helpers\Ui\CaiDatLayoutHelper.cs" />
     <Compile Include="Helpers\Ui\ChatBubbleFactory.cs" />
     <Compile Include="Helpers\Ui\ControlExtensions.cs" />
     <Compile Include="Helpers\Ui\FocusExtensions.cs" />
@@ -192,6 +203,12 @@
     <Compile Include="UserControl\TinNhanBubble.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <EmbeddedResource Include="Controllers\QuanLyThanhVienNhom.resx">
+      <DependentUpon>QuanLyThanhVienNhom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CaiDat.resx">
+      <DependentUpon>CaiDat.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>

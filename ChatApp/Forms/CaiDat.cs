@@ -2,61 +2,81 @@
 using System.Windows.Forms;
 using Guna.UI2.WinForms;
 
+using ChatApp.Controllers;
+
 namespace ChatApp
 {
-    public partial class CatDat : Form
+    public partial class CatDat : Form, ICaiDatView
     {
-        private readonly string _taiKhoan;
-        private readonly string _email;
-
+        private readonly CaiDatController _controller;
 
         public CatDat(string taiKhoan, string email)
         {
             InitializeComponent();
 
-            _taiKhoan = taiKhoan;
-            _email = email;
-
-            txtTenDangNhap.Text = _taiKhoan;
-            txtEmail.Text = _email;
-
-            txtTenDangNhap.ReadOnly = true;
-            txtEmail.ReadOnly = true;
+            // Tạo controller, truyền view + data ban đầu
+            _controller = new CaiDatController(this, taiKhoan, email);
         }
 
-        private void CatDat_Load(object sender, EventArgs e)
+        // ===== IMPLEMENT ICaiDatView =====
+
+        public Panel PnlMain => pnlMain;
+        public Label LblTitle => lblTitle;
+        public Label LblTenDangNhap => lblTenDangNhap;
+        public Label LblEmail => lblEmail;
+
+        public Control TxtTenDangNhap => txtTenDangNhap;
+        public Control TxtEmail => txtEmail;
+
+        public Control BtnCopyUsername => btnCopyUsername;
+        public Control BtnCopyEmail => btnCopyEmail;
+        public Control BtnDoiMatKhau => btnDoiMatKhau;
+        public Control BtnDoiEmail => btnDoiEmail;
+        public Control BtnDong => btnDong;
+
+        public Guna2CirclePictureBox PicAvatar => picAvatar;
+        public Control BtnDoiAvatar => btnDoiAvatar;
+
+        // ===== EVENT HANDLERS – CHỈ GỌI CONTROLLER =====
+
+        private async void CatDat_Load(object sender, EventArgs e)
         {
+            await _controller.OnLoadAsync();
         }
 
-        // Đổi mật khẩu: mở form DoiMatKhau với đúng tài khoản
+        private void picAvatar_Paint(object sender, PaintEventArgs e)
+        {
+            _controller.OnAvatarPaint(sender, e);
+        }
+
+        private async void btnDoiAvatar_Click(object sender, EventArgs e)
+        {
+            await _controller.OnDoiAvatarAsync();
+        }
+
         private void btnDoiMatKhau_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(_taiKhoan))
-            {
-                MessageBox.Show("Không xác định được tài khoản hiện tại.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            var frm = new DoiMatKhau(_taiKhoan)
-            {
-                StartPosition = FormStartPosition.CenterParent
-            };
-
-            // Modal: chờ đổi xong rồi quay lại Cài đặt
-            frm.ShowDialog(this);
+            _controller.OnDoiMatKhau();
         }
 
-        //  Đổi email (bổ sung sau)
-        private void btnDoiEmail_Click(object sender, EventArgs e)
+        private async void btnDoiEmail_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Chức năng đổi Email sẽ được bổ sung sau.",
-                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            await _controller.OnDoiEmailAsync();
+        }
+
+        private void btnCopyUsername_Click(object sender, EventArgs e)
+        {
+            _controller.OnCopyUsername();
+        }
+
+        private void btnCopyEmail_Click(object sender, EventArgs e)
+        {
+            _controller.OnCopyEmail();
         }
 
         private void btnDong_Click(object sender, EventArgs e)
         {
-            this.Close();
+            _controller.OnDong();
         }
     }
 }
