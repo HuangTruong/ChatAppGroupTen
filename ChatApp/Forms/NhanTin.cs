@@ -129,5 +129,23 @@ namespace ChatApp
         {
             await _controller.HandleSearchTextChangedAsync(txtTimKiem.Text);
         }
+
+        private async void btnTaoNhom_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                await _controller.HandleCreateGroupClickedAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Không thể tạo nhóm: " + ex.Message,
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+            }
+        }
+
     }
 }

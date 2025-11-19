@@ -37,9 +37,7 @@
             this.lblEmail = new System.Windows.Forms.Label();
             this.guna2GradientPanel1 = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlQuenMatKhau = new Guna.UI2.WinForms.Guna2Panel();
-            this.lblTenDangNhap = new System.Windows.Forms.Label();
             this.btnXacNhan = new Guna.UI2.WinForms.Guna2Button();
-            this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
             this.guna2GradientPanel1.SuspendLayout();
             this.pnlQuenMatKhau.SuspendLayout();
             this.SuspendLayout();
@@ -79,7 +77,7 @@
             this.btnGuiMaXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuiMaXacNhan.ForeColor = System.Drawing.Color.White;
             this.btnGuiMaXacNhan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.btnGuiMaXacNhan.Location = new System.Drawing.Point(183, 206);
+            this.btnGuiMaXacNhan.Location = new System.Drawing.Point(164, 170);
             this.btnGuiMaXacNhan.Name = "btnGuiMaXacNhan";
             this.btnGuiMaXacNhan.ShadowDecoration.BorderRadius = 10;
             this.btnGuiMaXacNhan.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
@@ -104,7 +102,7 @@
             this.txtMaXacNhan.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
             this.txtMaXacNhan.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtMaXacNhan.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtMaXacNhan.Location = new System.Drawing.Point(183, 281);
+            this.txtMaXacNhan.Location = new System.Drawing.Point(164, 245);
             this.txtMaXacNhan.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMaXacNhan.Name = "txtMaXacNhan";
             this.txtMaXacNhan.PlaceholderText = "Mã Xác Nhận";
@@ -126,7 +124,7 @@
             this.txtEmail.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtEmail.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtEmail.Location = new System.Drawing.Point(183, 144);
+            this.txtEmail.Location = new System.Drawing.Point(164, 108);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PlaceholderText = "Email";
@@ -150,7 +148,7 @@
             this.lblMaXacNhan.AutoSize = true;
             this.lblMaXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblMaXacNhan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblMaXacNhan.Location = new System.Drawing.Point(47, 288);
+            this.lblMaXacNhan.Location = new System.Drawing.Point(28, 252);
             this.lblMaXacNhan.Name = "lblMaXacNhan";
             this.lblMaXacNhan.Size = new System.Drawing.Size(124, 23);
             this.lblMaXacNhan.TabIndex = 2;
@@ -161,7 +159,7 @@
             this.lblEmail.AutoSize = true;
             this.lblEmail.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblEmail.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblEmail.Location = new System.Drawing.Point(111, 151);
+            this.lblEmail.Location = new System.Drawing.Point(92, 115);
             this.lblEmail.Name = "lblEmail";
             this.lblEmail.Size = new System.Drawing.Size(60, 23);
             this.lblEmail.TabIndex = 3;
@@ -183,9 +181,7 @@
             this.pnlQuenMatKhau.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pnlQuenMatKhau.BackColor = System.Drawing.Color.Transparent;
             this.pnlQuenMatKhau.BorderRadius = 15;
-            this.pnlQuenMatKhau.Controls.Add(this.lblTenDangNhap);
             this.pnlQuenMatKhau.Controls.Add(this.btnXacNhan);
-            this.pnlQuenMatKhau.Controls.Add(this.txtTaiKhoan);
             this.pnlQuenMatKhau.Controls.Add(this.btnQuayLaiDangNhap);
             this.pnlQuenMatKhau.Controls.Add(this.lblEmail);
             this.pnlQuenMatKhau.Controls.Add(this.lblMaXacNhan);
@@ -202,17 +198,6 @@
             this.pnlQuenMatKhau.ShadowDecoration.Enabled = true;
             this.pnlQuenMatKhau.Size = new System.Drawing.Size(467, 426);
             this.pnlQuenMatKhau.TabIndex = 11;
-            // 
-            // lblTenDangNhap
-            // 
-            this.lblTenDangNhap.AutoSize = true;
-            this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTenDangNhap.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblTenDangNhap.Location = new System.Drawing.Point(28, 107);
-            this.lblTenDangNhap.Name = "lblTenDangNhap";
-            this.lblTenDangNhap.Size = new System.Drawing.Size(138, 23);
-            this.lblTenDangNhap.TabIndex = 14;
-            this.lblTenDangNhap.Text = "Tên Đăng Nhập :";
             // 
             // btnXacNhan
             // 
@@ -235,28 +220,6 @@
             this.btnXacNhan.Size = new System.Drawing.Size(193, 45);
             this.btnXacNhan.TabIndex = 13;
             this.btnXacNhan.Text = "Xác Nhận";
-            // 
-            // txtTaiKhoan
-            // 
-            this.txtTaiKhoan.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
-            this.txtTaiKhoan.BorderRadius = 10;
-            this.txtTaiKhoan.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtTaiKhoan.DefaultText = "";
-            this.txtTaiKhoan.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtTaiKhoan.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtTaiKhoan.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtTaiKhoan.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtTaiKhoan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(246)))), ((int)(((byte)(250)))));
-            this.txtTaiKhoan.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.txtTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtTaiKhoan.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtTaiKhoan.Location = new System.Drawing.Point(183, 101);
-            this.txtTaiKhoan.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtTaiKhoan.Name = "txtTaiKhoan";
-            this.txtTaiKhoan.PlaceholderText = "Tên Đăng Nhập";
-            this.txtTaiKhoan.SelectedText = "";
-            this.txtTaiKhoan.Size = new System.Drawing.Size(229, 37);
-            this.txtTaiKhoan.TabIndex = 1;
             // 
             // QuenMatKhau
             // 
@@ -285,8 +248,6 @@
         private System.Windows.Forms.Label lblEmail;
         private Guna.UI2.WinForms.Guna2GradientPanel guna2GradientPanel1;
         private Guna.UI2.WinForms.Guna2Panel pnlQuenMatKhau;
-        private Guna.UI2.WinForms.Guna2TextBox txtTaiKhoan;
         private Guna.UI2.WinForms.Guna2Button btnXacNhan;
-        private System.Windows.Forms.Label lblTenDangNhap;
     }
 }

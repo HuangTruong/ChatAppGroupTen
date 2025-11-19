@@ -12,7 +12,7 @@ namespace ChatApp
     public partial class DangKy : Form
     {
         // Controller xử lý logic đăng ký người dùng
-        private readonly RegisterController _registerController = new RegisterController();
+        private readonly DangKyController _registerController = new DangKyController();
 
         // Service gửi email xác nhận
         private readonly IEmailSender _emailSender = new SmtpEmailSender();

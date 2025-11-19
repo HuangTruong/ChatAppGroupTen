@@ -34,7 +34,6 @@ namespace ChatApp
             _fbClient = FirebaseClientFactory.Create();
             _authService = new AuthService(_fbClient);
 
-
             TaoLabelChaoMung();
             LayHeaderContainer().Resize += (s, e) => CanhGiuaChaoMung();
         }
@@ -99,6 +98,8 @@ namespace ChatApp
             // Gán event Nhắn tin
             foreach (Control c in new Control[] { pnlNhanTin, picNhanTin, lblNhanTin })
             {
+                c.Click -= pnlNhanTin_Click;           // tránh bị gắn trùng
+                c.DoubleClick -= pnlNhanTin_Click;
                 c.Click += pnlNhanTin_Click;
                 c.DoubleClick += pnlNhanTin_Click;
             }
@@ -107,6 +108,9 @@ namespace ChatApp
             if (picCaiDat != null)
             {
                 picCaiDat.Cursor = Cursors.Hand;
+
+                // remove trước rồi add, tránh bị gắn 2 lần
+                picCaiDat.Click -= picCaiDat_Click;
                 picCaiDat.Click += picCaiDat_Click;
             }
 
@@ -219,6 +223,7 @@ namespace ChatApp
 
             this.Close();
         }
+
         protected override async void OnFormClosing(FormClosingEventArgs e)
         {
             // Nếu đang có form Nhắn tin thì đóng lại để nó tự dọn Firebase stream + timer
@@ -234,8 +239,6 @@ namespace ChatApp
                     // Bỏ qua lỗi nếu có
                 }
             }
-
-            // Cập nhật trạng thái OFFLINE lên Firebase
             try
             {
                 await _authService.UpdateStatusAsync(_ten, "offline");
@@ -246,10 +249,6 @@ namespace ChatApp
             }
 
             base.OnFormClosing(e);
-        }
-
-            // Đóng TrangChu (quay về đăng nhập theo logic bên ngoài)
-            this.Close();
         }
 
         #endregion

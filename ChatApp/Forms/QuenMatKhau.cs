@@ -1,7 +1,6 @@
 ﻿using Guna.UI2.WinForms;
 using System;
 using System.Windows.Forms;
-
 using ChatApp.Controllers;
 
 namespace ChatApp
@@ -15,7 +14,7 @@ namespace ChatApp
         private string _taiKhoanDangXacNhan; // Lưu tài khoản đang xác nhận OTP
         private DoiMatKhau _doiMatKhauForm;  // Form đổi mật khẩu
 
-        private Timer _otpTimer; // Timer để hạn chế gửi OTP liên tục
+        //private Timer _otpTimer; // Timer để hạn chế gửi OTP liên tục
 
         #endregion
 
@@ -43,56 +42,75 @@ namespace ChatApp
         #region === Gửi OTP ===
 
         // Xử lý gửi mã OTP đến email
+        // Xử lý gửi mã OTP đến email
         private async void btnGuiMaXacNhan_Click(object sender, EventArgs e)
         {
-            if (!btnGuiMaXacNhan.Enabled) return; // Nếu nút bị disable thì không thực hiện
+            // Nếu đang disable (đã bấm rồi) thì bỏ qua
+            if (!btnGuiMaXacNhan.Enabled) return;
 
             string email = txtEmail.Text.Trim();
-            string taiKhoan = txtTaiKhoan.Text.Trim();
 
-            // Kiểm tra thông tin nhập
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(taiKhoan))
+            // Kiểm tra email trước, chưa khóa nút vội
+            if (string.IsNullOrWhiteSpace(email))
             {
-                MessageBox.Show("Vui lòng nhập đầy đủ thông tin!", "Thông báo",
+                MessageBox.Show("Vui lòng nhập email đã đăng ký!", "Thông báo",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
+            // Từ đây trở đi bắt đầu xử lý gửi OTP → khóa nút ngay
+            DoiTrangThaiNut(btnGuiMaXacNhan, false);
+
             try
             {
-                // Tạo OTP và lưu vào Firebase
-                string otp = await _controller.TaoVaLuuOtpAsync(taiKhoan, email);
-                if (otp == null)
+                // 1) Tìm tài khoản trong Firebase theo email
+                string taiKhoan = await _controller.TimTaiKhoanBangEmailAsync(email);
+                if (taiKhoan == null)
                 {
-                    MessageBox.Show("Tài khoản hoặc email không hợp lệ!", "Lỗi",
+                    MessageBox.Show("Không tìm thấy tài khoản nào với email này!", "Lỗi",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    // Gửi thất bại → mở lại nút cho user thử lại
+                    DoiTrangThaiNut(btnGuiMaXacNhan, true);
                     return;
                 }
 
+                // Lưu lại để xài cho bước xác nhận OTP và đổi mật khẩu
                 _taiKhoanDangXacNhan = taiKhoan;
-                _controller.GuiEmailOtp(email, otp); // Gửi OTP qua email
+                // txtTaiKhoan.Text = taiKhoan; // nếu muốn show ra
+
+                // 2) Tạo OTP và lưu vào Firebase theo tài khoản tìm được
+                string otp = await _controller.TaoVaLuuOtpAsync(taiKhoan, email);
+                if (otp == null)
+                {
+                    MessageBox.Show("Không thể tạo mã xác nhận. Vui lòng thử lại sau!", "Lỗi",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    // Gửi thất bại → mở lại nút
+                    DoiTrangThaiNut(btnGuiMaXacNhan, true);
+                    return;
+                }
+
+                // 3) Gửi OTP qua email
+                _controller.GuiEmailOtp(email, otp);
 
                 MessageBox.Show("Đã gửi mã xác nhận qua email (hạn trong 5 phút).",
                                 "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtMaXacNhan.Focus();
 
-                // Disable nút gửi OTP 60 giây
-                DoiTrangThaiNut(btnGuiMaXacNhan, false);
-                _otpTimer?.Stop();
-                _otpTimer = new Timer { Interval = 60000 };
-                _otpTimer.Tick += (s, ev) =>
-                {
-                    DoiTrangThaiNut(btnGuiMaXacNhan, true);
-                    _otpTimer.Stop();
-                };
-                _otpTimer.Start();
+                DoiTrangThaiNut(btnGuiMaXacNhan, true);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi gửi mã xác nhận: " + ex.Message, "Lỗi",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Có exception → mở lại nút để user thử lại
+                DoiTrangThaiNut(btnGuiMaXacNhan, true);
             }
         }
+
 
         #endregion
 

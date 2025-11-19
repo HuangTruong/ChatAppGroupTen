@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Controllers
 {
-    public class RegisterController
+    public class DangKyController
     {
         private readonly AuthService _authService = new AuthService();
 

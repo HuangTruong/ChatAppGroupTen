@@ -222,6 +222,7 @@
             this.btnTaoNhom.TabIndex = 4;
             this.btnTaoNhom.Text = "Tạo nhóm";
             this.btnTaoNhom.UseVisualStyleBackColor = true;
+            this.btnTaoNhom.Click += new System.EventHandler(this.btnTaoNhom_Click);
             // 
             // lblTrangThai
             // 
