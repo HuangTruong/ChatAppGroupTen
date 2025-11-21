@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ChatApp.Controllers;
+using ChatApp.Forms;
+using Guna.UI2.WinForms;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-using ChatApp.Controllers;
-using Guna.UI2.WinForms;
 
 namespace ChatApp
 {
@@ -147,5 +148,17 @@ namespace ChatApp
             }
         }
 
+        // ================== CHỌN EMOJI ==================
+        private async void picEmoji_Click(object sender, EventArgs e)
+        {
+            using (var picker = new EmojiPickerForm())
+            {
+                if (picker.ShowDialog(this) == DialogResult.OK &&
+                    !string.IsNullOrEmpty(picker.SelectedEmojiKey))
+                {
+                    await _controller.GuiEmojiAsync(picker.SelectedEmojiKey);
+                }
+            }
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace ChatApp.Models.Chat
         public string noiDung { get; set; }
         public string thoiGian { get; set; }  // ISO-8601 "o" hoặc Unix ms
         public bool laNhom { get; set; }
-    
+        public bool laEmoji { get; set; }
+        public string emojiKey { get; set; }
     }
 }

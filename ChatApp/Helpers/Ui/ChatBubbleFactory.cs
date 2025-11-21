@@ -3,13 +3,14 @@ using ChatApp.Models.Chat;     // ✅ THÊM DÒNG NÀY
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using ChatApp.Controls;
 
 namespace ChatApp.Helpers.Ui
 {
     public static class ChatBubbleFactory
     {
         public static Panel CreateRow(
-            TinNhan tn,                 // ✅ Lúc này trỏ đúng ChatApp.Models.Chat.TinNhan
+            TinNhan tn,
             bool laCuaToi,
             bool laNhom,
             int panelWidth,
@@ -24,72 +25,41 @@ namespace ChatApp.Helpers.Ui
                 Tag = laCuaToi
             };
 
+            // Padding trái/phải để căn bong bóng
             row.Padding = laCuaToi
                 ? new Padding(60, 2, 8, 8)
                 : new Padding(8, 2, 60, 8);
 
-            var bubble = new Panel
+            // Parse thời gian từ string trong TinNhan
+            DateTime utc;
+            try
             {
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(10, 6, 10, 6),
-                BackColor = laCuaToi
-                    ? Color.FromArgb(222, 242, 255)
-                    : Color.White
-            };
-
-            var stack = new FlowLayoutPanel
+                utc = TimeParser.ToUtc(tn.thoiGian);
+            }
+            catch
             {
-                FlowDirection = FlowDirection.TopDown,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-
-            if (laNhom)
-            {
-                var lblSender = new Label
-                {
-                    AutoSize = true,
-                    Text = tn.guiBoi ?? "",
-                    Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                    ForeColor = Color.DimGray,
-                    Margin = new Padding(0, 0, 0, 2)
-                };
-                stack.Controls.Add(lblSender);
+                utc = DateTime.UtcNow;
             }
 
-            var text = tn.noiDung ?? "";
-            var lblMsg = new Label
+            // ==== Tạo TinNhanBubble & map dữ liệu ====
+            var bubble = new TinNhanBubble
             {
-                AutoSize = true,
-                Text = string.IsNullOrEmpty(text) ? " " : text,
-                Font = new Font("Segoe UI", 10f),
-                ForeColor = Color.Black,
-                Margin = new Padding(0, 0, 0, 4),
-                UseMnemonic = false
+                LaCuaToi = laCuaToi,
+                LaNhom = laNhom,
+                TenNguoiGui = tn.guiBoi ?? "",
+                NoiDung = tn.noiDung ?? "",
+                ThoiGianUtc = utc,
+
+                // Emoji
+                LaEmoji = tn.laEmoji,
+                EmojiKey = tn.emojiKey
             };
 
-            int cap = maxTextWidth - bubble.Padding.Horizontal;
-            if (cap < 50) cap = 50;
-            lblMsg.MaximumSize = new Size(cap, 0);
+            bubble.Render();
 
-            var lblTime = new Label
-            {
-                AutoSize = true,
-                Text = TimeParser.ToUtc(tn.thoiGian).ToLocalTime()
-                    .ToString("HH:mm dd/MM/yyyy"),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
-                ForeColor = Color.DimGray
-            };
-
-            stack.Controls.Add(lblMsg);
-            stack.Controls.Add(lblTime);
-
-            bubble.Controls.Add(stack);
             row.Controls.Add(bubble);
 
+            // Căn trái/phải trong row
             AlignBubbleInRow(row);
 
             row.SizeChanged += (s, e) =>
@@ -102,6 +72,7 @@ namespace ChatApp.Helpers.Ui
 
             return row;
         }
+
 
         public static void AlignBubbleInRow(Panel row)
         {

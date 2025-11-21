@@ -48,7 +48,10 @@ namespace ChatApp.Services.Chat
                 guiBoi = from,
                 nhanBoi = to,
                 noiDung = content ?? string.Empty,
-                thoiGian = DateTime.UtcNow.ToString("o")
+                thoiGian = DateTime.UtcNow.ToString("o"),
+                laNhom = false,
+                laEmoji = false,
+                emojiKey = null
             };
 
             // Push để Firebase tự sinh id
@@ -56,6 +59,38 @@ namespace ChatApp.Services.Chat
             tn.id = push.Result.name;
 
             // Ghi lại bản đầy đủ gắn id
+            await _firebase.SetAsync($"cuocTroChuyen/{cid}/{tn.id}", tn);
+            return tn;
+        }
+
+        //Gửi emoji giữa 2 người
+        public async Task<TinNhan> SendDirectEmojiAsync(string from, string to, string emojiKey)
+        {
+            if (string.IsNullOrWhiteSpace(from))
+                throw new ArgumentNullException(nameof(from));
+            if (string.IsNullOrWhiteSpace(to))
+                throw new ArgumentNullException(nameof(to));
+            if (string.IsNullOrWhiteSpace(emojiKey))
+                throw new ArgumentNullException(nameof(emojiKey));
+
+            var cid = BuildCid(from, to);
+            string path = $"cuocTroChuyen/{cid}/";
+
+            var tn = new TinNhan
+            {
+                guiBoi = from,
+                nhanBoi = to,
+                // Có thể lưu text fallback, để app cũ vẫn đọc được
+                noiDung = $"[emoji:{emojiKey}]",
+                thoiGian = DateTime.UtcNow.ToString("o"),
+                laNhom = false,
+                laEmoji = true,
+                emojiKey = emojiKey
+            };
+
+            var push = await _firebase.PushAsync(path, tn);
+            tn.id = push.Result.name;
+
             await _firebase.SetAsync($"cuocTroChuyen/{cid}/{tn.id}", tn);
             return tn;
         }

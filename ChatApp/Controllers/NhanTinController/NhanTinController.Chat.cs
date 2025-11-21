@@ -214,6 +214,34 @@ namespace ChatApp.Controllers
             _view.TxtNhapTin.Focus();
         }
 
+        // ================== GỬI EMOJI ==================
+        public async Task GuiEmojiAsync(string emojiKey)
+        {
+            if (string.IsNullOrWhiteSpace(emojiKey))
+                return;
+
+            if (_isGroupChat)
+            {
+                if (string.IsNullOrEmpty(_groupId))
+                {
+                    _view.ShowInfo("Chọn nhóm trước khi gửi emoji.");
+                    return;
+                }
+
+                await _groupService.SendGroupEmojiAsync(_groupId, _tenNguoiDung, emojiKey);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(_tenDoiPhuong))
+                {
+                    _view.ShowInfo("Chọn người cần trò chuyện.");
+                    return;
+                }
+
+                await _chatService.SendDirectEmojiAsync(_tenNguoiDung, _tenDoiPhuong, emojiKey);
+            }
+        }
+
         // ================== BUBBLE CHAT ==================
 
         private Panel CreateBubbleForCurrentContext(TinNhan tn)
