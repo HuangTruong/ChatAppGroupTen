@@ -11,35 +11,132 @@ using ChatApp.Services.Firebase;
 
 namespace ChatApp.Controllers
 {
-    // View interface: form CatDat sẽ implement cái này
+    #region ======== ICaiDatView – Interface cho Form Cài đặt ========
+
+    /// <summary>
+    /// Interface view cho màn hình cài đặt (Form <c>CaiDat</c> sẽ implement).
+    /// Cung cấp các control cần thiết để controller thao tác:
+    /// - Panel bố cục chính.
+    /// - Label tiêu đề, tên đăng nhập, email.
+    /// - Textbox hiển thị username, email.
+    /// - Các nút thao tác (copy, đổi mật khẩu, đổi email, đóng).
+    /// - Avatar và nút đổi avatar.
+    /// </summary>
     public interface ICaiDatView
     {
+        /// <summary>
+        /// Panel chứa nội dung chính của form cài đặt.
+        /// </summary>
         Panel PnlMain { get; }
+
+        /// <summary>
+        /// Label tiêu đề cài đặt.
+        /// </summary>
         Label LblTitle { get; }
+
+        /// <summary>
+        /// Label mô tả dòng "Tên đăng nhập".
+        /// </summary>
         Label LblTenDangNhap { get; }
+
+        /// <summary>
+        /// Label mô tả dòng "Email".
+        /// </summary>
         Label LblEmail { get; }
 
+        /// <summary>
+        /// Control hiển thị tên đăng nhập (thường là TextBox).
+        /// </summary>
         Control TxtTenDangNhap { get; }
+
+        /// <summary>
+        /// Control hiển thị email (thường là TextBox).
+        /// </summary>
         Control TxtEmail { get; }
 
+        /// <summary>
+        /// Nút copy tên đăng nhập vào clipboard.
+        /// </summary>
         Control BtnCopyUsername { get; }
+
+        /// <summary>
+        /// Nút copy email vào clipboard.
+        /// </summary>
         Control BtnCopyEmail { get; }
+
+        /// <summary>
+        /// Nút mở form đổi mật khẩu.
+        /// </summary>
         Control BtnDoiMatKhau { get; }
+
+        /// <summary>
+        /// Nút thực hiện đổi email.
+        /// </summary>
         Control BtnDoiEmail { get; }
+
+        /// <summary>
+        /// Nút đóng form cài đặt.
+        /// </summary>
         Control BtnDong { get; }
 
+        /// <summary>
+        /// Ảnh avatar hình tròn của người dùng.
+        /// </summary>
         Guna2CirclePictureBox PicAvatar { get; }
+
+        /// <summary>
+        /// Nút chọn file ảnh và đổi avatar.
+        /// </summary>
         Control BtnDoiAvatar { get; }
     }
 
+    #endregion
+
+    /// <summary>
+    /// Controller xử lý logic cho màn hình cài đặt tài khoản:
+    /// - Hiển thị username, email hiện tại.
+    /// - Tải và vẽ avatar từ Firebase.
+    /// - Cho phép đổi avatar (chọn file, upload base64).
+    /// - Cho phép đổi email (kèm kiểm tra hợp lệ, trùng, tồn tại).
+    /// - Mở form đổi mật khẩu.
+    /// - Cung cấp các tiện ích copy username/email, đóng form.
+    /// </summary>
     public class CaiDatController
     {
+        #region ======== Trường / Services / State ========
+
+        /// <summary>
+        /// View cài đặt mà controller điều khiển.
+        /// </summary>
         private readonly ICaiDatView _view;
+
+        /// <summary>
+        /// Service xác thực dùng để cập nhật avatar, email, kiểm tra tồn tại email.
+        /// </summary>
         private readonly AuthService _authService;
 
+        /// <summary>
+        /// Tài khoản (username) hiện tại.
+        /// </summary>
         private readonly string _taiKhoan;
+
+        /// <summary>
+        /// Email hiện tại (cache local, đồng bộ với Firebase sau khi đổi).
+        /// </summary>
         private string _email;
 
+        #endregion
+
+        #region ======== Constructor ========
+
+        /// <summary>
+        /// Khởi tạo controller cài đặt:
+        /// - Lưu lại view và thông tin tài khoản/email.
+        /// - Khởi tạo <see cref="AuthService"/> với Firebase client mới.
+        /// </summary>
+        /// <param name="view">View cài đặt (Form implement <see cref="ICaiDatView"/>).</param>
+        /// <param name="taiKhoan">Tên tài khoản hiện tại.</param>
+        /// <param name="email">Email hiện tại.</param>
         public CaiDatController(ICaiDatView view, string taiKhoan, string email)
         {
             _view = view ?? throw new ArgumentNullException(nameof(view));
@@ -51,8 +148,18 @@ namespace ChatApp.Controllers
             _authService = new AuthService(FirebaseClientFactory.Create());
         }
 
-        // ====== LIFECYCLE ======
+        #endregion
 
+        #region ======== LIFECYCLE – OnLoad ========
+
+        /// <summary>
+        /// Xử lý khi form cài đặt được load:
+        /// - Đổ dữ liệu username + email vào textbox.
+        /// - Khoá sửa username (chỉ đọc).
+        /// - Căn layout tiêu đề, avatar, các dòng username/email, các nút phía dưới
+        ///   bằng <see cref="CaiDatLayoutHelper"/>.
+        /// - Tải avatar từ Firebase (nếu có).
+        /// </summary>
         public async Task OnLoadAsync()
         {
             _view.TxtTenDangNhap.Text = _taiKhoan;
@@ -60,9 +167,13 @@ namespace ChatApp.Controllers
 
             // Khoá sửa username
             if (_view.TxtTenDangNhap is TextBox tb)
+            {
                 tb.ReadOnly = true;
+            }
             else
+            {
                 _view.TxtTenDangNhap.Enabled = false;
+            }
 
             // Layout dùng helper
             CaiDatLayoutHelper.CenterTitle(_view.LblTitle, _view.PnlMain);
@@ -85,6 +196,12 @@ namespace ChatApp.Controllers
             await LoadAvatarAsync();
         }
 
+        /// <summary>
+        /// Tải avatar hiện tại của người dùng từ Firebase:
+        /// - Gọi <see cref="AuthService.GetAvatarAsync"/> lấy chuỗi base64.
+        /// - Nếu có dữ liệu, convert sang <see cref="Image"/> và gán vào <see cref="ICaiDatView.PicAvatar"/>.
+        /// - Bắt mọi lỗi network/base64 nhưng bỏ qua để form vẫn chạy bình thường.
+        /// </summary>
         private async Task LoadAvatarAsync()
         {
             if (string.IsNullOrWhiteSpace(_taiKhoan)) return;
@@ -106,8 +223,17 @@ namespace ChatApp.Controllers
             }
         }
 
-        // ====== VẼ VIỀN AVATAR ======
+        #endregion
 
+        #region ======== VẼ VIỀN AVATAR ========
+
+        /// <summary>
+        /// Vẽ viền avatar hình tròn:
+        /// - Dùng màu xanh <c>Color.FromArgb(0, 120, 215)</c>.
+        /// - Độ dày 3px, anti-alias để đường tròn mịn.
+        /// </summary>
+        /// <param name="sender">Control avatar, cần là <see cref="Guna2CirclePictureBox"/>.</param>
+        /// <param name="e">Đối tượng <see cref="PaintEventArgs"/> cung cấp Graphics.</param>
         public void OnAvatarPaint(object sender, PaintEventArgs e)
         {
             var box = sender as Guna2CirclePictureBox;
@@ -122,8 +248,19 @@ namespace ChatApp.Controllers
             }
         }
 
-        // ====== ĐỔI AVATAR ======
+        #endregion
 
+        #region ======== ĐỔI AVATAR ========
+
+        /// <summary>
+        /// Xử lý luồng đổi avatar:
+        /// - Kiểm tra tài khoản hiện tại hợp lệ.
+        /// - Mở <see cref="OpenFileDialog"/> cho phép chọn file ảnh (jpg, jpeg, png, bmp).
+        /// - Preview ảnh mới trên UI.
+        /// - Đọc file -> base64 và gọi <see cref="AuthService.UpdateAvatarAsync"/> để lưu lên Firebase.
+        /// - Trong lúc upload, disable nút "Đổi avatar" và bật UseWaitCursor nếu view là Form.
+        /// - Hiển thị thông báo thành công / lỗi cho người dùng.
+        /// </summary>
         public async Task OnDoiAvatarAsync()
         {
             if (string.IsNullOrWhiteSpace(_taiKhoan))
@@ -177,8 +314,16 @@ namespace ChatApp.Controllers
             }
         }
 
-        // ====== ĐỔI MẬT KHẨU ======
+        #endregion
 
+        #region ======== ĐỔI MẬT KHẨU ========
+
+        /// <summary>
+        /// Mở form đổi mật khẩu:
+        /// - Kiểm tra đã xác định được tài khoản hiện tại hay chưa.
+        /// - Kiểm tra view có phải là <see cref="Form"/> để làm owner cho dialog.
+        /// - Mở form <see cref="DoiMatKhau"/> dạng modal (ShowDialog).
+        /// </summary>
         public void OnDoiMatKhau()
         {
             if (string.IsNullOrWhiteSpace(_taiKhoan))
@@ -202,8 +347,21 @@ namespace ChatApp.Controllers
             frm.ShowDialog(owner);
         }
 
-        // ====== ĐỔI EMAIL ======
+        #endregion
 
+        #region ======== ĐỔI EMAIL ========
+
+        /// <summary>
+        /// Xử lý luồng đổi email:
+        /// - Lấy email mới từ textbox.
+        /// - Kiểm tra rỗng / định dạng đơn giản (chứa '@' và '.').
+        /// - Kiểm tra có trùng email hiện tại hay không.
+        /// - Hỏi confirm người dùng trước khi đổi.
+        /// - Disable nút "Đổi email" và bật UseWaitCursor trong quá trình xử lý.
+        /// - Kiểm tra email đã tồn tại trên hệ thống bằng <see cref="AuthService.EmailExistsAsync"/>.
+        /// - Nếu hợp lệ, gọi <see cref="AuthService.UpdateEmailAsync"/> để cập nhật.
+        /// - Cập nhật lại biến <see cref="_email"/> và thông báo kết quả.
+        /// </summary>
         public async Task OnDoiEmailAsync()
         {
             string emailMoi = _view.TxtEmail.Text.Trim();
@@ -230,7 +388,7 @@ namespace ChatApp.Controllers
             }
 
             var confirm = MessageBox.Show(
-                $"Bạn chắc chắn muốn đổi email sang:\n{emailMoi}?",
+                "Bạn chắc chắn muốn đổi email sang:\n" + emailMoi + "?",
                 "Xác nhận",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
@@ -270,8 +428,13 @@ namespace ChatApp.Controllers
             }
         }
 
-        // ====== TIỆN ÍCH ======
+        #endregion
 
+        #region ======== TIỆN ÍCH (COPY / ĐÓNG) ========
+
+        /// <summary>
+        /// Sao chép tên đăng nhập hiện tại vào clipboard và thông báo cho người dùng.
+        /// </summary>
         public void OnCopyUsername()
         {
             if (!string.IsNullOrWhiteSpace(_taiKhoan))
@@ -282,6 +445,9 @@ namespace ChatApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Sao chép email hiện tại (trong textbox) vào clipboard và thông báo cho người dùng.
+        /// </summary>
         public void OnCopyEmail()
         {
             string email = _view.TxtEmail.Text.Trim();
@@ -293,10 +459,15 @@ namespace ChatApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Đóng form cài đặt nếu view là <see cref="Form"/>.
+        /// </summary>
         public void OnDong()
         {
             if (_view is Form f)
                 f.Close();
         }
+
+        #endregion
     }
 }

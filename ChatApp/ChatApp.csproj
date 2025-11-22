@@ -81,6 +81,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UserControl\Conservation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\Conservation.Designer.cs">
+      <DependentUpon>Conservation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\CaiDatController.cs" />
     <Compile Include="Controllers\DangKyController.cs" />
     <Compile Include="Controllers\DangNhapController.cs" />
@@ -123,6 +129,14 @@
     <Compile Include="Helpers\Ui\ControlExtensions.cs" />
     <Compile Include="Helpers\Ui\FocusExtensions.cs" />
     <Compile Include="Helpers\Ui\MessageRenderQueue.cs" />
+    <Compile Include="Helpers\Ui\ThemeColor.cs" />
+    <Compile Include="Helpers\Ui\ThemeManger.cs" />
+    <Compile Include="UserControl\Messages.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControl\Messages.Designer.cs">
+      <DependentUpon>Messages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Chat\Nhom.cs" />
     <Compile Include="Models\Chat\TinNhan.cs" />
     <Compile Include="Models\Chat\UserListItem.cs" />
@@ -145,12 +159,6 @@
     <Compile Include="Services\Chat\TypingService.cs" />
     <Compile Include="Services\Email\IEmailSender.cs" />
     <Compile Include="Services\Email\SmtpEmailSender.cs" />
-    <Compile Include="UserControl\CuocTroChuyen.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\CuocTroChuyen.Designer.cs">
-      <DependentUpon>CuocTroChuyen.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\DangKy.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -176,18 +184,6 @@
     <Compile Include="Services\Chat\ChatService.cs" />
     <Compile Include="Services\Chat\GroupService.cs" />
     <Compile Include="Services\Firebase\FirebaseClientFactory.cs" />
-    <Compile Include="UserControl\TinNhanCuaBan.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaBan.Designer.cs">
-      <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaToi.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaToi.Designer.cs">
-      <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\TrangChu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -200,9 +196,9 @@
     <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\TinNhanBubble.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <EmbeddedResource Include="UserControl\Conservation.resx">
+      <DependentUpon>Conservation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controllers\QuanLyThanhVienNhom.resx">
       <DependentUpon>QuanLyThanhVienNhom.cs</DependentUpon>
     </EmbeddedResource>
@@ -211,9 +207,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\CuocTroChuyen.resx">
-      <DependentUpon>CuocTroChuyen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DangKy.resx">
       <DependentUpon>DangKy.cs</DependentUpon>
@@ -229,17 +222,14 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\TinNhanCuaBan.resx">
-      <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\TinNhanCuaToi.resx">
-      <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\TrangChu.resx">
       <DependentUpon>TrangChu.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\QuenMatKhau.resx">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\Messages.resx">
+      <DependentUpon>Messages.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -284,6 +274,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AvatarMacDinh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-sphere-100.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-sphere-100 %281%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-sphere-100 %282%29.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-crescent-moon-96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icons8-sun-96.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

@@ -12,20 +12,79 @@ using Guna.UI2.WinForms;
 
 namespace ChatApp.Controllers
 {
+    /// <summary>
+    /// Form quản lý thành viên nhóm:
+    /// - Hiển thị danh sách thành viên hiện tại của nhóm.
+    /// - Cho phép xoá thành viên, mute/unmute, đổi quyền (member/silver/gold).
+    /// - Cho phép tìm kiếm user toàn hệ thống để thêm vào nhóm.
+    /// - Chỉ admin vàng mới được bật/tắt các setting của nhóm (AdminOnlyChat, RequireApproval).
+    /// </summary>
     public partial class QuanLyThanhVienNhom : Form
     {
+        #region ======== Trường / State / Services ========
+
+        /// <summary>
+        /// Firebase client dùng chung cho form.
+        /// </summary>
         private readonly IFirebaseClient _firebase;
+
+        /// <summary>
+        /// Service thao tác dữ liệu nhóm (thêm/xoá/mute/đổi quyền...).
+        /// </summary>
         private readonly GroupService _groupService;
+
+        /// <summary>
+        /// ID nhóm đang quản lý.
+        /// </summary>
         private readonly string _groupId;
+
+        /// <summary>
+        /// Tên user hiện tại (người đang mở form quản lý).
+        /// </summary>
         private readonly string _currentUser;
+
+        /// <summary>
+        /// Cờ yêu cầu xác nhận khi thêm thành viên (dùng cho nút "Thêm").
+        /// </summary>
         private readonly bool _requireConfirmOnAdd;
 
+        /// <summary>
+        /// Đối tượng nhóm đang được tải và quản lý.
+        /// </summary>
         private Nhom _group;
+
+        /// <summary>
+        /// Cờ cho biết user hiện tại là admin Vàng hay không.
+        /// </summary>
         private bool _isGoldAdmin;
+
+        /// <summary>
+        /// Cờ cho biết user hiện tại là admin Bạc hay không.
+        /// </summary>
         private bool _isSilverAdmin;
 
+        /// <summary>
+        /// Cờ tạm khóa event khi đồng bộ UI setting (tránh vòng lặp khi set Checked).
+        /// </summary>
         private bool _suppressSettingsEvents;
 
+        #endregion
+
+        #region ======== Constructor & Hook sự kiện ========
+
+        /// <summary>
+        /// Khởi tạo form quản lý thành viên nhóm:
+        /// - Lưu lại các dependency (Firebase, GroupService, groupId, currentUser).
+        /// - Hook sự kiện <see cref="Form.Load"/> để load nhóm + thành viên.
+        /// - Hook sự kiện search và các checkbox cấu hình nhóm.
+        /// </summary>
+        /// <param name="firebase">Firebase client.</param>
+        /// <param name="groupService">Service nhóm.</param>
+        /// <param name="groupId">ID nhóm cần quản lý.</param>
+        /// <param name="currentUser">User hiện tại đang quản lý nhóm.</param>
+        /// <param name="requireConfirmOnAdd">
+        /// Cờ cho biết khi thêm thành viên mới có cần popup xác nhận hay không.
+        /// </param>
         public QuanLyThanhVienNhom(
             IFirebaseClient firebase,
             GroupService groupService,
@@ -62,8 +121,17 @@ namespace ChatApp.Controllers
             chkRequireApproval.CheckedChanged += ChkRequireApproval_CheckedChanged;
         }
 
-        // ================== LOAD NHÓM & THÀNH VIÊN ==================
+        #endregion
 
+        #region ======== LOAD NHÓM & THÀNH VIÊN ========
+
+        /// <summary>
+        /// Load thông tin nhóm hiện tại:
+        /// - Nếu nhóm không tồn tại thì disable các setting.
+        /// - Xác định quyền của user hiện tại (gold/silver).
+        /// - Đồng bộ trạng thái checkbox AdminOnlyChat, RequireApproval.
+        /// - Giới hạn quyền chỉnh sửa setting chỉ cho admin vàng.
+        /// </summary>
         private async Task LoadGroupAsync()
         {
             _group = await _groupService.GetAsync(_groupId);
@@ -106,6 +174,11 @@ namespace ChatApp.Controllers
             chkRequireApproval.Enabled = _isGoldAdmin;
         }
 
+        /// <summary>
+        /// Reload lại danh sách thành viên trong nhóm:
+        /// - Xóa hết control cũ trong <c>flpMembers</c>.
+        /// - Tạo card cho từng thành viên bằng <see cref="CreateMemberRow"/>.
+        /// </summary>
         private async Task ReloadMembersAsync()
         {
             if (_group == null || _group.thanhVien == null)
@@ -128,8 +201,20 @@ namespace ChatApp.Controllers
             flpMembers.ResumeLayout();
         }
 
-        // ================== ROW THÀNH VIÊN (CARD STYLE) ==================
+        #endregion
 
+        #region ======== ROW THÀNH VIÊN (CARD STYLE) ========
+
+        /// <summary>
+        /// Tạo card UI hiển thị 1 thành viên trong nhóm:
+        /// - Avatar tròn với màu theo tier (gold/silver/member).
+        /// - Tên, mô tả vai trò (vàng/bạc/thành viên + trạng thái mute).
+        /// - Nút "Xoá" bên phải.
+        /// - Context menu cho admin (xoá, mute/unmute, cấp quyền, nhượng quyền).
+        /// </summary>
+        /// <param name="userName">Tên user.</param>
+        /// <param name="info">Thông tin thành viên trong nhóm.</param>
+        /// <returns>Một <see cref="Control"/> dạng card.</returns>
         private Control CreateMemberRow(string userName, GroupMemberInfo info)
         {
             int panelWidth = Math.Max(flpMembers.ClientSize.Width, 260);
@@ -144,8 +229,8 @@ namespace ChatApp.Controllers
                 Tag = userName
             };
 
-            card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(232, 240, 255);
-            card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(245, 248, 252);
+            card.MouseEnter += delegate { card.BackColor = Color.FromArgb(232, 240, 255); };
+            card.MouseLeave += delegate { card.BackColor = Color.FromArgb(245, 248, 252); };
 
             // Avatar tròn
             var avatar = new Panel
@@ -176,7 +261,9 @@ namespace ChatApp.Controllers
                 TextAlign = ContentAlignment.MiddleCenter,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 11f, FontStyle.Bold),
-                Text = (userName ?? "?").Trim().Length > 0 ? userName.Trim()[0].ToString().ToUpper() : "?"
+                Text = (userName ?? "?").Trim().Length > 0
+                    ? userName.Trim()[0].ToString().ToUpper()
+                    : "?"
             };
             avatar.Controls.Add(lblInitial);
 
@@ -239,17 +326,17 @@ namespace ChatApp.Controllers
                 Top = 21,
                 BorderRadius = 12,
                 FillColor = Color.FromArgb(239, 68, 68),
-                HoverState = { FillColor = Color.FromArgb(248, 113, 113) },
                 Font = new Font("Segoe UI", 9f),
                 ForeColor = Color.White,
                 Text = "Xoá",
                 Cursor = Cursors.Hand
             };
+            btnRemove.HoverState.FillColor = Color.FromArgb(248, 113, 113);
             btnRemove.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnRemove.Left = card.Width - btnRemove.Width - 12;
 
             // Resize cho card
-            card.Resize += (s, e) =>
+            card.Resize += delegate
             {
                 textArea.Width = card.Width - 60 - 120;
                 lblName.Width = textArea.Width;
@@ -274,7 +361,7 @@ namespace ChatApp.Controllers
                     return;
                 }
 
-                if (MessageBox.Show($"Xoá {userName} khỏi nhóm ?", "Xác nhận",
+                if (MessageBox.Show("Xoá " + userName + " khỏi nhóm ?", "Xác nhận",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                     return;
 
@@ -283,24 +370,24 @@ namespace ChatApp.Controllers
                 await ReloadMembersAsync();
             }
 
-            btnRemove.Click += async (s, e) => await RemoveMemberAsync();
-            card.Click += async (s, e) => await RemoveMemberAsync();
+            btnRemove.Click += async delegate { await RemoveMemberAsync(); };
+            card.Click += async delegate { await RemoveMemberAsync(); };
 
             // Context menu chi tiết (mute / set quyền / nhượng quyền)
             var menu = new ContextMenuStrip();
 
             if (_isGoldAdmin || _isSilverAdmin)
             {
-                menu.Items.Add("Xoá khỏi nhóm", null, async (_, __) => await RemoveMemberAsync());
+                menu.Items.Add("Xoá khỏi nhóm", null, async delegate { await RemoveMemberAsync(); });
 
-                menu.Items.Add("Cấm chat 10 phút", null, async (_, __) =>
+                menu.Items.Add("Cấm chat 10 phút", null, async delegate
                 {
                     await _groupService.MuteMemberAsync(_groupId, userName, TimeSpan.FromMinutes(10));
                     await LoadGroupAsync();
                     await ReloadMembersAsync();
                 });
 
-                menu.Items.Add("Bỏ cấm chat", null, async (_, __) =>
+                menu.Items.Add("Bỏ cấm chat", null, async delegate
                 {
                     await _groupService.UnmuteMemberAsync(_groupId, userName);
                     await LoadGroupAsync();
@@ -312,21 +399,21 @@ namespace ChatApp.Controllers
 
             if (_isGoldAdmin)
             {
-                menu.Items.Add("Đặt làm thành viên thường", null, async (_, __) =>
+                menu.Items.Add("Đặt làm thành viên thường", null, async delegate
                 {
                     await _groupService.UpdateMemberRoleAsync(_groupId, userName, false, "member");
                     await LoadGroupAsync();
                     await ReloadMembersAsync();
                 });
 
-                menu.Items.Add("Cấp quyền bạc", null, async (_, __) =>
+                menu.Items.Add("Cấp quyền bạc", null, async delegate
                 {
                     await _groupService.UpdateMemberRoleAsync(_groupId, userName, true, "silver");
                     await LoadGroupAsync();
                     await ReloadMembersAsync();
                 });
 
-                menu.Items.Add("Cấp quyền vàng", null, async (_, __) =>
+                menu.Items.Add("Cấp quyền vàng", null, async delegate
                 {
                     await _groupService.UpdateMemberRoleAsync(_groupId, userName, true, "gold");
                     await LoadGroupAsync();
@@ -335,9 +422,10 @@ namespace ChatApp.Controllers
 
                 if (!string.Equals(userName, _currentUser, StringComparison.OrdinalIgnoreCase))
                 {
-                    menu.Items.Add("Nhượng quyền chủ nhóm cho " + userName, null, async (_, __) =>
+                    menu.Items.Add("Nhượng quyền chủ nhóm cho " + userName, null, async delegate
                     {
-                        if (MessageBox.Show("Nhượng quyền chủ nhóm cho " + userName + " ?",
+                        if (MessageBox.Show(
+                                "Nhượng quyền chủ nhóm cho " + userName + " ?",
                                 "Xác nhận",
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question) != DialogResult.Yes)
@@ -355,9 +443,9 @@ namespace ChatApp.Controllers
             // Đảm bảo hover/card-click cho các child
             foreach (Control child in new Control[] { avatar, textArea, lblName, lblRole })
             {
-                child.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(232, 240, 255);
-                child.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(245, 248, 252);
-                child.Click += async (s, e) => await RemoveMemberAsync();
+                child.MouseEnter += delegate { card.BackColor = Color.FromArgb(232, 240, 255); };
+                child.MouseLeave += delegate { card.BackColor = Color.FromArgb(245, 248, 252); };
+                child.Click += async delegate { await RemoveMemberAsync(); };
             }
 
             card.Controls.Add(avatar);
@@ -367,15 +455,29 @@ namespace ChatApp.Controllers
             return card;
         }
 
-        // ================== SEARCH USER & THÊM THÀNH VIÊN (CARD STYLE) ==================
+        #endregion
 
+        #region ======== SEARCH USER & THÊM THÀNH VIÊN (CARD STYLE) ========
+
+        /// <summary>
+        /// Chuẩn hóa chuỗi để phục vụ tìm kiếm:
+        /// - Trim, lower-case invariant.
+        /// - Loại bỏ khoảng trắng.
+        /// </summary>
         private static string Normalize(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return string.Empty;
             s = s.Trim().ToLowerInvariant();
-            return s.Replace(" ", "");
+            return s.Replace(" ", string.Empty);
         }
 
+        /// <summary>
+        /// Tìm kiếm user toàn hệ thống để thêm vào nhóm:
+        /// - Dựa trên từ khóa nhập trong ô search.
+        /// - Bỏ qua nếu keyword rỗng hoặc nhóm chưa load.
+        /// - Lấy toàn bộ user từ node "users", group theo tên để tránh trùng.
+        /// - Với mỗi user match, tạo card bằng <see cref="CreateSearchRow"/>.
+        /// </summary>
         private async Task SearchUsersAsync(string keyword)
         {
             flpSearch.Controls.Clear();
@@ -406,6 +508,15 @@ namespace ChatApp.Controllers
             }
         }
 
+        /// <summary>
+        /// Tạo card UI cho kết quả tìm kiếm user:
+        /// - Avatar tròn với chữ cái đầu.
+        /// - Tên + status ("Đã trong nhóm" hoặc "Người dùng · bấm Thêm để mời vào nhóm").
+        /// - Nút "Thêm" (hoặc "Đã thêm" nếu đã là thành viên).
+        /// </summary>
+        /// <param name="userName">Tên user cần hiển thị.</param>
+        /// <param name="isMember">Cho biết user đã là thành viên nhóm hay chưa.</param>
+        /// <returns>Card kết quả tìm kiếm.</returns>
         private Control CreateSearchRow(string userName, bool isMember)
         {
             int panelWidth = Math.Max(flpSearch.ClientSize.Width, 260);
@@ -418,8 +529,8 @@ namespace ChatApp.Controllers
                 BackColor = Color.FromArgb(245, 248, 252)
             };
 
-            card.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(232, 240, 255);
-            card.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(245, 248, 252);
+            card.MouseEnter += delegate { card.BackColor = Color.FromArgb(232, 240, 255); };
+            card.MouseLeave += delegate { card.BackColor = Color.FromArgb(245, 248, 252); };
 
             // avatar
             var avatar = new Panel
@@ -440,7 +551,9 @@ namespace ChatApp.Controllers
                 TextAlign = ContentAlignment.MiddleCenter,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 10f, FontStyle.Bold),
-                Text = (userName ?? "?").Trim().Length > 0 ? userName.Trim()[0].ToString().ToUpper() : "?"
+                Text = (userName ?? "?").Trim().Length > 0
+                    ? userName.Trim()[0].ToString().ToUpper()
+                    : "?"
             };
             avatar.Controls.Add(lblInitial);
 
@@ -477,7 +590,9 @@ namespace ChatApp.Controllers
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
                 ForeColor = isMember ? Color.FromArgb(34, 197, 94) : Color.FromArgb(100, 116, 139),
                 AutoEllipsis = true,
-                Text = isMember ? "Đã trong nhóm" : "Người dùng · bấm Thêm để mời vào nhóm"
+                Text = isMember
+                    ? "Đã trong nhóm"
+                    : "Người dùng · bấm Thêm để mời vào nhóm"
             };
             lblStatus.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -515,7 +630,8 @@ namespace ChatApp.Controllers
                 {
                     if (_requireConfirmOnAdd)
                     {
-                        if (MessageBox.Show($"Thêm {userName} vào nhóm?",
+                        if (MessageBox.Show(
+                                "Thêm " + userName + " vào nhóm?",
                                 "Xác nhận",
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question) != DialogResult.Yes)
@@ -530,7 +646,7 @@ namespace ChatApp.Controllers
             }
 
             // resize
-            card.Resize += (s, e) =>
+            card.Resize += delegate
             {
                 textArea.Width = card.Width - 56 - 110;
                 lblName.Width = textArea.Width;
@@ -545,15 +661,23 @@ namespace ChatApp.Controllers
             // đảm bảo hover cho child
             foreach (Control child in new Control[] { avatar, textArea, lblName, lblStatus })
             {
-                child.MouseEnter += (s, e) => card.BackColor = Color.FromArgb(232, 240, 255);
-                child.MouseLeave += (s, e) => card.BackColor = Color.FromArgb(245, 248, 252);
+                child.MouseEnter += delegate { card.BackColor = Color.FromArgb(232, 240, 255); };
+                child.MouseLeave += delegate { card.BackColor = Color.FromArgb(245, 248, 252); };
             }
 
             return card;
         }
 
-        // ================== SETTINGS (VÀNG BẬT/TẮT) ==================
+        #endregion
 
+        #region ======== SETTINGS (VÀNG BẬT/TẮT) ========
+
+        /// <summary>
+        /// Xử lý khi checkbox "Chỉ admin được chat" thay đổi:
+        /// - Nếu đang sync UI thì bỏ qua.
+        /// - Nếu không phải admin vàng thì không cho đổi (rollback Checked).
+        /// - Nếu hợp lệ thì gọi <see cref="GroupService.SetAdminOnlyChatAsync"/>.
+        /// </summary>
         private async void ChkAdminOnlyChat_CheckedChanged(object sender, EventArgs e)
         {
             if (_suppressSettingsEvents) return;
@@ -569,6 +693,12 @@ namespace ChatApp.Controllers
             await _groupService.SetAdminOnlyChatAsync(_groupId, chkAdminOnlyChat.Checked);
         }
 
+        /// <summary>
+        /// Xử lý khi checkbox "Yêu cầu duyệt khi thêm thành viên" thay đổi:
+        /// - Nếu đang sync UI thì bỏ qua.
+        /// - Nếu không phải admin vàng thì rollback Checked.
+        /// - Nếu hợp lệ thì gọi <see cref="GroupService.SetRequireApprovalAsync"/>.
+        /// </summary>
         private async void ChkRequireApproval_CheckedChanged(object sender, EventArgs e)
         {
             if (_suppressSettingsEvents) return;
@@ -583,5 +713,7 @@ namespace ChatApp.Controllers
 
             await _groupService.SetRequireApprovalAsync(_groupId, chkRequireApproval.Checked);
         }
+
+        #endregion
     }
 }

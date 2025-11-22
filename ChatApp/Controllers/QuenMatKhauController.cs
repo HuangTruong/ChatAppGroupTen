@@ -5,13 +5,43 @@ using ChatApp.Services.Auth;
 
 namespace ChatApp.Controllers
 {
+    /// <summary>
+    /// Controller xử lý luồng quên mật khẩu:
+    /// - Tạo / lưu mã OTP lên Firebase.
+    /// - Tra cứu tài khoản từ email.
+    /// - Kiểm tra OTP hợp lệ và dọn dẹp sau khi dùng.
+    /// - Gửi OTP qua email cho người dùng.
+    /// </summary>
     public class ForgotPasswordController
     {
+        #region ======== Trường / Services ========
+
+        /// <summary>
+        /// Service xác thực dùng để tra cứu tài khoản / kiểm tra account-email.
+        /// </summary>
         private readonly AuthService _authService = new AuthService();
+
+        /// <summary>
+        /// Service OTP dùng để lưu / lấy / xoá OTP và gửi email.
+        /// </summary>
         private readonly OtpService _otpService = new OtpService();
 
-        // ================== HÀM MỚI: TẠO OTP CHỈ TỪ EMAIL ==================
-        // Dùng khi form chỉ cho người dùng nhập email, không nhập tài khoản.
+        #endregion
+
+        #region ======== TẠO OTP CHỈ TỪ EMAIL (FORM CHỈ NHẬP EMAIL) ========
+
+        /// <summary>
+        /// Tạo và lưu mã OTP mới chỉ từ email:
+        /// 1. Tra cứu tài khoản tương ứng với email từ Firebase.
+        /// 2. Nếu tìm thấy tài khoản thì tái sử dụng hàm
+        ///    <see cref="TaoVaLuuOtpAsync(string, string)"/> để tạo OTP.
+        /// 3. Trả về chuỗi mã OTP nếu thành công, hoặc <c>null</c> nếu không hợp lệ.
+        /// </summary>
+        /// <param name="email">Địa chỉ email người dùng nhập.</param>
+        /// <returns>
+        /// Mã OTP dạng chuỗi nếu tạo thành công,
+        /// <c>null</c> nếu email rỗng hoặc không tìm thấy tài khoản tương ứng.
+        /// </returns>
         public async Task<string> TaoVaLuuOtpAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -29,15 +59,39 @@ namespace ChatApp.Controllers
             return await TaoVaLuuOtpAsync(taiKhoan, email);
         }
 
-        // ====== HÀM: FORM GỌI ĐỂ LẤY TÀI KHOẢN TỪ EMAIL ======
+        /// <summary>
+        /// Tra cứu tài khoản (username) tương ứng với email:
+        /// - Chỉ wrap lại <see cref="AuthService.GetAccountByEmailAsync(string)"/> để form gọi cho gọn.
+        /// </summary>
+        /// <param name="email">Địa chỉ email.</param>
+        /// <returns>
+        /// Tên tài khoản nếu tìm thấy, ngược lại <c>null</c>.
+        /// </returns>
         public Task<string> TimTaiKhoanBangEmailAsync(string email)
         {
             // chỉ wrap lại cho gọn, sau này nếu đổi logic thì chỉnh 1 nơi
             return _authService.GetAccountByEmailAsync(email);
         }
 
-        // ================== HÀM CŨ: GIỮ LẠI CHO TƯƠNG THÍCH ==================
-        // Tạo và lưu mã OTP mới (khi đã biết sẵn tài khoản + email)
+        #endregion
+
+        #region ======== TẠO / LƯU OTP (KHI ĐÃ BIẾT ACCOUNT + EMAIL) ========
+
+        /// <summary>
+        /// Tạo và lưu mã OTP mới khi đã biết sẵn tài khoản và email:
+        /// 1. Kiểm tra cặp (tài khoản, email) có khớp hay không bằng
+        ///    <see cref="AuthService.IsAccountEmailAsync(string, string)"/>.
+        /// 2. Nếu hợp lệ:
+        ///    - Tạo mã OTP ngẫu nhiên 6 chữ số (100000–999999).
+        ///    - Thiết lập thời gian hết hạn sau 5 phút (UTC).
+        ///    - Lưu vào Firebase qua <see cref="OtpService.SaveOtpAsync(string, ThongTinMaFirebase)"/>.
+        /// 3. Trả về mã OTP vừa tạo, hoặc <c>null</c> nếu cặp account-email không hợp lệ.
+        /// </summary>
+        /// <param name="taiKhoan">Tên tài khoản.</param>
+        /// <param name="email">Email liên kết với tài khoản.</param>
+        /// <returns>
+        /// Mã OTP nếu tạo thành công, <c>null</c> nếu cặp account/email không hợp lệ.
+        /// </returns>
         public async Task<string> TaoVaLuuOtpAsync(string taiKhoan, string email)
         {
             // Kiểm tra tài khoản + email có hợp lệ
@@ -58,13 +112,33 @@ namespace ChatApp.Controllers
             return maOtp;
         }
 
-        // Kiểm tra mã OTP hợp lệ
+        #endregion
+
+        #region ======== KIỂM TRA OTP HỢP LỆ ========
+
+        /// <summary>
+        /// Kiểm tra mã OTP người dùng nhập có hợp lệ hay không:
+        /// - Lấy OTP lưu trên Firebase bằng <see cref="OtpService.GetOtpAsync(string)"/>.
+        /// - Parse thời gian hết hạn và so sánh với <see cref="DateTime.UtcNow"/>.
+        /// - OTP hợp lệ nếu:
+        ///   + Chưa hết hạn, và
+        ///   + Mã nhập trùng với mã lưu.
+        /// - Sau khi OTP được xác nhận thành công hoặc đã hết hạn, sẽ xóa luôn
+        ///   bằng <see cref="OtpService.DeleteOtpAsync(string)"/>.
+        /// </summary>
+        /// <param name="taiKhoan">Tên tài khoản cần kiểm tra OTP.</param>
+        /// <param name="maNhap">Mã OTP người dùng nhập.</param>
+        /// <returns>
+        /// <c>true</c> nếu OTP hợp lệ,
+        /// <c>false</c> nếu OTP không tồn tại, sai hoặc đã hết hạn.
+        /// </returns>
         public async Task<bool> KiemTraOtpHopLeAsync(string taiKhoan, string maNhap)
         {
             var otp = await _otpService.GetOtpAsync(taiKhoan);
             if (otp == null) return false;
 
-            if (!DateTime.TryParse(otp.HetHanLuc, out DateTime hetHan))
+            DateTime hetHan;
+            if (!DateTime.TryParse(otp.HetHanLuc, out hetHan))
                 return false;
 
             bool hopLe = DateTime.UtcNow <= hetHan && otp.Ma == maNhap;
@@ -78,10 +152,22 @@ namespace ChatApp.Controllers
             return hopLe;
         }
 
-        // Gửi OTP qua email
+        #endregion
+
+        #region ======== GỬI OTP QUA EMAIL ========
+
+        /// <summary>
+        /// Gửi mã OTP đến email người nhận:
+        /// - Uỷ quyền cho <see cref="OtpService.GuiEmailOtp(string, string)"/>.
+        /// - Không bắt exception ở đây, để caller tự xử lý nếu cần.
+        /// </summary>
+        /// <param name="emailNhan">Địa chỉ email nhận OTP.</param>
+        /// <param name="maOtp">Mã OTP sẽ gửi.</param>
         public void GuiEmailOtp(string emailNhan, string maOtp)
         {
             _otpService.GuiEmailOtp(emailNhan, maOtp);
         }
+
+        #endregion
     }
 }

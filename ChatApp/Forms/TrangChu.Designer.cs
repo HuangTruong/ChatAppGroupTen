@@ -24,28 +24,30 @@ namespace ChatApp
             this.pnlBody = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlCaiDat = new Guna.UI2.WinForms.Guna2Panel();
             this.lblCaiDat = new System.Windows.Forms.Label();
-            this.picCaiDat = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlNhanTin = new Guna.UI2.WinForms.Guna2Panel();
             this.lblNhanTin = new System.Windows.Forms.Label();
-            this.picNhanTin = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlDangXuat = new Guna.UI2.WinForms.Guna2Panel();
             this.lblDangXuat = new System.Windows.Forms.Label();
-            this.picDangXuat = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlHeader = new Guna.UI2.WinForms.Guna2Panel();
             this.lblTenApp = new System.Windows.Forms.Label();
-            this.picLogo = new Guna.UI2.WinForms.Guna2PictureBox();
             this.lblTenDangNhap = new System.Windows.Forms.Label();
-            this.picAnhDaiDien = new Guna.UI2.WinForms.Guna2PictureBox();
             this.sepHeader = new Guna.UI2.WinForms.Guna2Separator();
+            this.picCaiDat = new Guna.UI2.WinForms.Guna2PictureBox();
+            this.picNhanTin = new Guna.UI2.WinForms.Guna2PictureBox();
+            this.picDangXuat = new Guna.UI2.WinForms.Guna2PictureBox();
+            this.picDayNightMode = new Guna.UI2.WinForms.Guna2CirclePictureBox();
+            this.picLogo = new Guna.UI2.WinForms.Guna2PictureBox();
+            this.picAnhDaiDien = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlBackground.SuspendLayout();
             this.pnlBody.SuspendLayout();
             this.pnlCaiDat.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picCaiDat)).BeginInit();
             this.pnlNhanTin.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picNhanTin)).BeginInit();
             this.pnlDangXuat.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).BeginInit();
             this.pnlHeader.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picCaiDat)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picNhanTin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNightMode)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).BeginInit();
             this.SuspendLayout();
@@ -114,19 +116,6 @@ namespace ChatApp
             this.lblCaiDat.TabIndex = 2;
             this.lblCaiDat.Text = "Cài Đặt";
             // 
-            // picCaiDat
-            // 
-            this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picCaiDat.Image = ((System.Drawing.Image)(resources.GetObject("picCaiDat.Image")));
-            this.picCaiDat.ImageRotate = 0F;
-            this.picCaiDat.Location = new System.Drawing.Point(0, 0);
-            this.picCaiDat.Name = "picCaiDat";
-            this.picCaiDat.Size = new System.Drawing.Size(68, 60);
-            this.picCaiDat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picCaiDat.TabIndex = 0;
-            this.picCaiDat.TabStop = false;
-            this.picCaiDat.Click += new System.EventHandler(this.picCaiDat_Click);
-            // 
             // pnlNhanTin
             // 
             this.pnlNhanTin.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -150,18 +139,6 @@ namespace ChatApp
             this.lblNhanTin.TabIndex = 1;
             this.lblNhanTin.Text = "Nhắn Tin";
             // 
-            // picNhanTin
-            // 
-            this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picNhanTin.Image = ((System.Drawing.Image)(resources.GetObject("picNhanTin.Image")));
-            this.picNhanTin.ImageRotate = 0F;
-            this.picNhanTin.Location = new System.Drawing.Point(0, 0);
-            this.picNhanTin.Name = "picNhanTin";
-            this.picNhanTin.Size = new System.Drawing.Size(69, 60);
-            this.picNhanTin.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picNhanTin.TabIndex = 0;
-            this.picNhanTin.TabStop = false;
-            // 
             // pnlDangXuat
             // 
             this.pnlDangXuat.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -184,22 +161,10 @@ namespace ChatApp
             this.lblDangXuat.TabIndex = 3;
             this.lblDangXuat.Text = "Đăng Xuất";
             // 
-            // picDangXuat
-            // 
-            this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picDangXuat.Image = ((System.Drawing.Image)(resources.GetObject("picDangXuat.Image")));
-            this.picDangXuat.ImageRotate = 0F;
-            this.picDangXuat.Location = new System.Drawing.Point(0, 0);
-            this.picDangXuat.Name = "picDangXuat";
-            this.picDangXuat.Size = new System.Drawing.Size(79, 60);
-            this.picDangXuat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picDangXuat.TabIndex = 0;
-            this.picDangXuat.TabStop = false;
-            this.picDangXuat.Click += new System.EventHandler(this.picDangXuat_Click);
-            // 
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.pnlHeader.Controls.Add(this.picDayNightMode);
             this.pnlHeader.Controls.Add(this.lblTenApp);
             this.pnlHeader.Controls.Add(this.picLogo);
             this.pnlHeader.Controls.Add(this.lblTenDangNhap);
@@ -223,6 +188,76 @@ namespace ChatApp
             this.lblTenApp.TabIndex = 6;
             this.lblTenApp.Text = "H4 Chat";
             // 
+            // lblTenDangNhap
+            // 
+            this.lblTenDangNhap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblTenDangNhap.AutoSize = true;
+            this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold);
+            this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
+            this.lblTenDangNhap.Location = new System.Drawing.Point(880, 40);
+            this.lblTenDangNhap.Name = "lblTenDangNhap";
+            this.lblTenDangNhap.Size = new System.Drawing.Size(0, 23);
+            this.lblTenDangNhap.TabIndex = 1;
+            // 
+            // sepHeader
+            // 
+            this.sepHeader.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.sepHeader.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(25)))));
+            this.sepHeader.Location = new System.Drawing.Point(0, 88);
+            this.sepHeader.Name = "sepHeader";
+            this.sepHeader.Size = new System.Drawing.Size(1181, 1);
+            this.sepHeader.TabIndex = 8;
+            // 
+            // picCaiDat
+            // 
+            this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picCaiDat.Image = ((System.Drawing.Image)(resources.GetObject("picCaiDat.Image")));
+            this.picCaiDat.ImageRotate = 0F;
+            this.picCaiDat.Location = new System.Drawing.Point(0, 0);
+            this.picCaiDat.Name = "picCaiDat";
+            this.picCaiDat.Size = new System.Drawing.Size(68, 60);
+            this.picCaiDat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picCaiDat.TabIndex = 0;
+            this.picCaiDat.TabStop = false;
+            this.picCaiDat.Click += new System.EventHandler(this.picCaiDat_Click);
+            // 
+            // picNhanTin
+            // 
+            this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picNhanTin.Image = ((System.Drawing.Image)(resources.GetObject("picNhanTin.Image")));
+            this.picNhanTin.ImageRotate = 0F;
+            this.picNhanTin.Location = new System.Drawing.Point(0, 0);
+            this.picNhanTin.Name = "picNhanTin";
+            this.picNhanTin.Size = new System.Drawing.Size(69, 60);
+            this.picNhanTin.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picNhanTin.TabIndex = 0;
+            this.picNhanTin.TabStop = false;
+            // 
+            // picDangXuat
+            // 
+            this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
+            this.picDangXuat.Image = ((System.Drawing.Image)(resources.GetObject("picDangXuat.Image")));
+            this.picDangXuat.ImageRotate = 0F;
+            this.picDangXuat.Location = new System.Drawing.Point(0, 0);
+            this.picDangXuat.Name = "picDangXuat";
+            this.picDangXuat.Size = new System.Drawing.Size(79, 60);
+            this.picDangXuat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picDangXuat.TabIndex = 0;
+            this.picDangXuat.TabStop = false;
+            this.picDangXuat.Click += new System.EventHandler(this.picDangXuat_Click);
+            // 
+            // picDayNightMode
+            // 
+            this.picDayNightMode.ImageRotate = 0F;
+            this.picDayNightMode.Location = new System.Drawing.Point(1029, 12);
+            this.picDayNightMode.Name = "picDayNightMode";
+            this.picDayNightMode.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picDayNightMode.Size = new System.Drawing.Size(64, 64);
+            this.picDayNightMode.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picDayNightMode.TabIndex = 9;
+            this.picDayNightMode.TabStop = false;
+            this.picDayNightMode.Click += new System.EventHandler(this.picDayNightMode_Click);
+            // 
             // picLogo
             // 
             this.picLogo.BackColor = System.Drawing.Color.Transparent;
@@ -235,17 +270,6 @@ namespace ChatApp
             this.picLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picLogo.TabIndex = 2;
             this.picLogo.TabStop = false;
-            // 
-            // lblTenDangNhap
-            // 
-            this.lblTenDangNhap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblTenDangNhap.AutoSize = true;
-            this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold);
-            this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
-            this.lblTenDangNhap.Location = new System.Drawing.Point(880, 40);
-            this.lblTenDangNhap.Name = "lblTenDangNhap";
-            this.lblTenDangNhap.Size = new System.Drawing.Size(0, 23);
-            this.lblTenDangNhap.TabIndex = 1;
             // 
             // picAnhDaiDien
             // 
@@ -260,15 +284,6 @@ namespace ChatApp
             this.picAnhDaiDien.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picAnhDaiDien.TabIndex = 0;
             this.picAnhDaiDien.TabStop = false;
-            // 
-            // sepHeader
-            // 
-            this.sepHeader.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.sepHeader.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(25)))));
-            this.sepHeader.Location = new System.Drawing.Point(0, 88);
-            this.sepHeader.Name = "sepHeader";
-            this.sepHeader.Size = new System.Drawing.Size(1181, 1);
-            this.sepHeader.TabIndex = 8;
             // 
             // TrangChu
             // 
@@ -285,15 +300,16 @@ namespace ChatApp
             this.pnlBody.ResumeLayout(false);
             this.pnlCaiDat.ResumeLayout(false);
             this.pnlCaiDat.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picCaiDat)).EndInit();
             this.pnlNhanTin.ResumeLayout(false);
             this.pnlNhanTin.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picNhanTin)).EndInit();
             this.pnlDangXuat.ResumeLayout(false);
             this.pnlDangXuat.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).EndInit();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picCaiDat)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picNhanTin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNightMode)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).EndInit();
             this.ResumeLayout(false);
@@ -320,5 +336,6 @@ namespace ChatApp
         private System.Windows.Forms.Label lblTenDangNhap;
         private Guna.UI2.WinForms.Guna2PictureBox picAnhDaiDien;
         private Guna.UI2.WinForms.Guna2Separator sepHeader;
+        private Guna.UI2.WinForms.Guna2CirclePictureBox picDayNightMode;
     }
 }

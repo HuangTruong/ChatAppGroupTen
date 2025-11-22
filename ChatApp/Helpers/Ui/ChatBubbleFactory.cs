@@ -1,15 +1,36 @@
-﻿using ChatApp.Helpers;
-using ChatApp.Models.Chat;     // ✅ THÊM DÒNG NÀY
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using ChatApp.Helpers;
+using ChatApp.Models.Chat;     // ✅ Lúc này trỏ đúng ChatApp.Models.Chat.TinNhan
 
 namespace ChatApp.Helpers.Ui
 {
+    /// <summary>
+    /// Factory tạo UI bubble chat cho từng tin nhắn:
+    /// - Hiển thị tin nhắn của mình / của người khác.
+    /// - Hỗ trợ chat nhóm (hiện tên người gửi).
+    /// - Căn canh bong bóng trái/phải theo người gửi.
+    /// </summary>
     public static class ChatBubbleFactory
     {
+        #region ======== Tạo row bubble chat ========
+
+        /// <summary>
+        /// Tạo một hàng (row) chứa bubble chat cho tin nhắn:
+        /// - Tự canh padding trái/phải tùy thuộc <paramref name="laCuaToi"/>.
+        /// - Nếu là nhóm (<paramref name="laNhom"/>) thì hiện thêm tên người gửi.
+        /// - Giới hạn chiều rộng text bằng <paramref name="maxTextWidth"/>.
+        /// - Hiển thị thời gian gửi được parse qua <see cref="TimeParser.ToUtc(string)"/>.
+        /// </summary>
+        /// <param name="tn">Đối tượng tin nhắn <see cref="TinNhan"/> cần render.</param>
+        /// <param name="laCuaToi">Cho biết đây có phải tin nhắn của chính mình hay không.</param>
+        /// <param name="laNhom">Cho biết đây có phải khung chat nhóm hay không.</param>
+        /// <param name="panelWidth">Chiều rộng tổng của row (bằng với panel chứa).</param>
+        /// <param name="maxTextWidth">Chiều rộng tối đa cho nội dung text để wrap dòng.</param>
+        /// <returns><see cref="Panel"/> đại diện cho một hàng bubble trong khung chat.</returns>
         public static Panel CreateRow(
-            TinNhan tn,                 // ✅ Lúc này trỏ đúng ChatApp.Models.Chat.TinNhan
+            TinNhan tn,
             bool laCuaToi,
             bool laNhom,
             int panelWidth,
@@ -47,12 +68,13 @@ namespace ChatApp.Helpers.Ui
                 Padding = Padding.Empty
             };
 
+            // Tên người gửi (chỉ hiển thị trong nhóm)
             if (laNhom)
             {
                 var lblSender = new Label
                 {
                     AutoSize = true,
-                    Text = tn.guiBoi ?? "",
+                    Text = tn.guiBoi ?? string.Empty,
                     Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
                     ForeColor = Color.DimGray,
                     Margin = new Padding(0, 0, 0, 2)
@@ -60,7 +82,7 @@ namespace ChatApp.Helpers.Ui
                 stack.Controls.Add(lblSender);
             }
 
-            var text = tn.noiDung ?? "";
+            var text = tn.noiDung ?? string.Empty;
             var lblMsg = new Label
             {
                 AutoSize = true,
@@ -78,7 +100,9 @@ namespace ChatApp.Helpers.Ui
             var lblTime = new Label
             {
                 AutoSize = true,
-                Text = TimeParser.ToUtc(tn.thoiGian).ToLocalTime()
+                Text = TimeParser
+                    .ToUtc(tn.thoiGian)
+                    .ToLocalTime()
                     .ToString("HH:mm dd/MM/yyyy"),
                 Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
                 ForeColor = Color.DimGray
@@ -92,28 +116,48 @@ namespace ChatApp.Helpers.Ui
 
             AlignBubbleInRow(row);
 
-            row.SizeChanged += (s, e) =>
+            row.SizeChanged += delegate
             {
                 if (row.Width != panelWidth)
                     row.Width = panelWidth;
+
                 AlignBubbleInRow(row);
             };
-            bubble.SizeChanged += (s, e) => AlignBubbleInRow(row);
+
+            bubble.SizeChanged += delegate
+            {
+                AlignBubbleInRow(row);
+            };
 
             return row;
         }
 
+        #endregion
+
+        #region ======== Căn canh bubble trái/phải trong row ========
+
+        /// <summary>
+        /// Căn vị trí bubble trong row:
+        /// - Nếu là tin nhắn của mình: canh phải.
+        /// - Nếu là tin nhắn của người khác: canh trái.
+        /// </summary>
+        /// <param name="row">
+        /// Panel row chứa bubble, có <see cref="Control.Tag"/> là <c>bool</c> cho biết có phải của mình hay không.
+        /// </param>
         public static void AlignBubbleInRow(Panel row)
         {
-            if (row == null || row.Controls.Count == 0) return;
+            if (row == null || row.Controls.Count == 0)
+                return;
 
             var bubble = row.Controls[0];
-            bool laCuaToi = row.Tag is bool b && b;
+            bool laCuaToi = row.Tag is bool && (bool)row.Tag;
 
             if (laCuaToi)
             {
                 int x = row.ClientSize.Width - row.Padding.Right - bubble.Width;
-                if (x < row.Padding.Left) x = row.Padding.Left;
+                if (x < row.Padding.Left)
+                    x = row.Padding.Left;
+
                 bubble.Left = x;
             }
             else
@@ -121,5 +165,7 @@ namespace ChatApp.Helpers.Ui
                 bubble.Left = row.Padding.Left;
             }
         }
+
+        #endregion
     }
 }
