@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 
 namespace ChatApp.Controls
@@ -12,9 +13,16 @@ namespace ChatApp.Controls
         public string NoiDung { get; set; } = "";
         public DateTime ThoiGianUtc { get; set; } = DateTime.UtcNow;
 
+        // ==== THÊM: hỗ trợ emoji ====
+        public bool LaEmoji { get; set; } = false;
+        public string EmojiKey { get; set; } = null; // ví dụ: "smile.png"
+
         private Label lblTen = new Label();
         private Label lblNoiDung = new Label();
         private Label lblGio = new Label();
+
+        // THÊM: PictureBox hiển thị emoji 72x72
+        private PictureBox picEmoji = new PictureBox();
 
         public TinNhanBubble()
         {
@@ -36,8 +44,15 @@ namespace ChatApp.Controls
             lblGio.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
             lblGio.ForeColor = Color.DimGray;
 
+            // Cấu hình emoji 72x72
+            picEmoji.Width = 20;
+            picEmoji.Height = 20;
+            picEmoji.SizeMode = PictureBoxSizeMode.Zoom;
+            picEmoji.Visible = false;
+
             this.Controls.Add(lblTen);
             this.Controls.Add(lblNoiDung);
+            this.Controls.Add(picEmoji);
             this.Controls.Add(lblGio);
 
             this.Resize += (s, e) => CanLayout();
@@ -61,8 +76,55 @@ namespace ChatApp.Controls
             lblTen.Visible = LaNhom && !string.IsNullOrEmpty(TenNguoiGui);
             lblTen.Text = TenNguoiGui;
 
-            lblNoiDung.Text = NoiDung;
+            // ====== NỘI DUNG HOẶC EMOJI ======
+            if (LaEmoji && !string.IsNullOrEmpty(EmojiKey))
+            {
+                // Ẩn text, hiện emoji
+                lblNoiDung.Visible = false;
+                picEmoji.Visible = true;
 
+                string path = Path.Combine(
+                    Application.StartupPath,
+                    "resources",
+                    "Emoji",
+                    EmojiKey
+                );
+
+                if (File.Exists(path))
+                {
+                    try
+                    {
+                        // Nếu muốn tránh lock file, có thể clone image
+                        using (var img = Image.FromFile(path))
+                        {
+                            picEmoji.Image = new Bitmap(img);
+                        }
+                    }
+                    catch
+                    {
+                        picEmoji.Image = null;
+                        picEmoji.Visible = false;
+                        lblNoiDung.Visible = true;
+                        lblNoiDung.Text = "[emoji lỗi]";
+                    }
+                }
+                else
+                {
+                    picEmoji.Image = null;
+                    picEmoji.Visible = false;
+                    lblNoiDung.Visible = true;
+                    lblNoiDung.Text = "[emoji lỗi]";
+                }
+            }
+            else
+            {
+                // Tin nhắn text bình thường
+                picEmoji.Visible = false;
+                lblNoiDung.Visible = true;
+                lblNoiDung.Text = NoiDung;
+            }
+
+            // Thời gian
             var local = ThoiGianUtc.ToLocalTime();
             lblGio.Text = local.ToString("HH:mm dd/MM/yyyy");
 
@@ -102,12 +164,29 @@ namespace ChatApp.Controls
                 y = lblTen.Bottom + 4;
             }
 
-            lblNoiDung.Location = new Point(x, y);
-            y = lblNoiDung.Bottom + 6;
+            // Nếu là emoji → đặt picEmoji, ngược lại đặt lblNoiDung
+            if (picEmoji.Visible)
+            {
+                picEmoji.Location = new Point(x, y);
+                y = picEmoji.Bottom + 6;
+            }
+            else if (lblNoiDung.Visible)
+            {
+                lblNoiDung.Location = new Point(x, y);
+                y = lblNoiDung.Bottom + 6;
+            }
 
             lblGio.Location = new Point(x, y);
+
             this.Height = lblGio.Bottom + 10;
-            this.Width = Math.Max(lblNoiDung.Right + 20, lblGio.Right + 20);
+
+            int contentRight = 0;
+            if (picEmoji.Visible)
+                contentRight = picEmoji.Right;
+            else if (lblNoiDung.Visible)
+                contentRight = lblNoiDung.Right;
+
+            this.Width = Math.Max(contentRight + 20, lblGio.Right + 20);
         }
     }
 }
