@@ -301,7 +301,37 @@ namespace ChatApp.Services.Chat
                 guiBoi = guiBoi,
                 noiDung = noiDung,
                 thoiGian = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
-                laNhom = true
+                laNhom = true,
+                laEmoji = false,
+                emojiKey = null
+            };
+
+            PushResponse res = await _firebase.PushAsync($"{GroupMessagesRoot}/{groupId}", msg);
+            string id = res.Result.name;
+
+            msg.id = id;
+            await _firebase.UpdateAsync($"{GroupMessagesRoot}/{groupId}/{id}", new { id });
+
+            return msg;
+        }
+
+        // Gửi emoji nhóm
+        public async Task<TinNhan> SendGroupEmojiAsync(string groupId, string guiBoi, string emojiKey)
+        {
+            if (string.IsNullOrWhiteSpace(groupId) ||
+                string.IsNullOrWhiteSpace(guiBoi) ||
+                string.IsNullOrWhiteSpace(emojiKey))
+                return null;
+
+            var msg = new TinNhan
+            {
+                guiBoi = guiBoi,
+                // fallback text
+                noiDung = $"[emoji:{emojiKey}]",
+                thoiGian = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
+                laNhom = true,
+                laEmoji = true,
+                emojiKey = emojiKey
             };
 
             PushResponse res = await _firebase.PushAsync(GroupMessagesRoot + "/" + groupId, msg);

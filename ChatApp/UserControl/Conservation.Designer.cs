@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.pnlBackground = new Guna.UI2.WinForms.Guna2Panel();
-            this.picAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.flpText = new System.Windows.Forms.FlowLayoutPanel();
             this.lblConservationName = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.lblLastMessage = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.picAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).BeginInit();
             this.flpText.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlBackground
@@ -47,17 +47,6 @@
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Size = new System.Drawing.Size(344, 75);
             this.pnlBackground.TabIndex = 0;
-            // 
-            // picAvatar
-            // 
-            this.picAvatar.ImageRotate = 0F;
-            this.picAvatar.Location = new System.Drawing.Point(3, 3);
-            this.picAvatar.Name = "picAvatar";
-            this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatar.Size = new System.Drawing.Size(64, 64);
-            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picAvatar.TabIndex = 0;
-            this.picAvatar.TabStop = false;
             // 
             // flpText
             // 
@@ -90,6 +79,17 @@
             this.lblLastMessage.TabIndex = 1;
             this.lblLastMessage.Text = "{Last Message}";
             // 
+            // picAvatar
+            // 
+            this.picAvatar.ImageRotate = 0F;
+            this.picAvatar.Location = new System.Drawing.Point(3, 3);
+            this.picAvatar.Name = "picAvatar";
+            this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picAvatar.Size = new System.Drawing.Size(64, 64);
+            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picAvatar.TabIndex = 0;
+            this.picAvatar.TabStop = false;
+            // 
             // Conservation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -99,9 +99,9 @@
             this.Size = new System.Drawing.Size(344, 75);
             this.pnlBackground.ResumeLayout(false);
             this.pnlBackground.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).EndInit();
             this.flpText.ResumeLayout(false);
             this.flpText.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).EndInit();
             this.ResumeLayout(false);
 
         }

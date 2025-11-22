@@ -115,6 +115,12 @@
     <Compile Include="Forms\ChonThanhVien.Designer.cs">
       <DependentUpon>ChonThanhVien.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\EmojiPickerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EmojiPickerForm.Designer.cs">
+      <DependentUpon>EmojiPickerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\XacNhanEmail.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -274,6 +280,35 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AvatarMacDinh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\Emoji\cool.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\emoji %281%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\emoji.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\love.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\party-blower.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\smile.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\smiley %281%29.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\smiley.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Emoji\thinking.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\icons8-sphere-100.png" />

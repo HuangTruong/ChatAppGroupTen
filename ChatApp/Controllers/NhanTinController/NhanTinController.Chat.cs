@@ -269,9 +269,35 @@ namespace ChatApp.Controllers
             _view.TxtNhapTin.Focus();
         }
 
-        #endregion
+        // ================== GỬI EMOJI ==================
+        public async Task GuiEmojiAsync(string emojiKey)
+        {
+            if (string.IsNullOrWhiteSpace(emojiKey))
+                return;
 
-        #region ======== TẠO BUBBLE CHAT ========
+            if (_isGroupChat)
+            {
+                if (string.IsNullOrEmpty(_groupId))
+                {
+                    _view.ShowInfo("Chọn nhóm trước khi gửi emoji.");
+                    return;
+                }
+
+                await _groupService.SendGroupEmojiAsync(_groupId, _tenNguoiDung, emojiKey);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(_tenDoiPhuong))
+                {
+                    _view.ShowInfo("Chọn người cần trò chuyện.");
+                    return;
+                }
+
+                await _chatService.SendDirectEmojiAsync(_tenNguoiDung, _tenDoiPhuong, emojiKey);
+            }
+        }
+
+        // ================== BUBBLE CHAT ==================
 
         /// <summary>
         /// Tạo bubble chat UI cho tin nhắn dựa vào ngữ cảnh hiện tại:

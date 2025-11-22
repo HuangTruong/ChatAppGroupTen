@@ -45,6 +45,8 @@ namespace ChatApp.Models.Chat
         /// True = nhóm, False = 1-1.
         /// </summary>
         public bool laNhom { get; set; }
+        public bool laEmoji { get; set; }
+        public string emojiKey { get; set; }
     }
     #endregion
 }

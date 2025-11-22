@@ -1,9 +1,10 @@
-﻿using ChatApp.Controllers;
-using ChatApp.Helpers.UI;
-using Guna.UI2.WinForms;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using ChatApp.Forms;
+using ChatApp.Helpers.UI;
+using ChatApp.Controllers;
+using Guna.UI2.WinForms;
 
 namespace ChatApp
 {
@@ -166,7 +167,7 @@ namespace ChatApp
         /// </summary>
         public FlowLayoutPanel KhungChatPanel
         {
-            get { return flbKhungChat; }
+            get { return flpKhungChat; }
         }
 
         /// <summary>
@@ -273,6 +274,19 @@ namespace ChatApp
             }
         }
 
-        #endregion
+        #endregion 
+
+        // ================== CHỌN EMOJI ==================
+        private async void picEmoji_Click(object sender, EventArgs e)
+        {
+            using (var picker = new EmojiPickerForm())
+            {
+                if (picker.ShowDialog(this) == DialogResult.OK &&
+                    !string.IsNullOrEmpty(picker.SelectedEmojiKey))
+                {
+                    await _controller.GuiEmojiAsync(picker.SelectedEmojiKey);
+                }
+            }
+        }
     }
 }

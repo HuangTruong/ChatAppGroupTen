@@ -28,14 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NhanTin));
             this.pnlTrai = new Guna.UI2.WinForms.Guna2Panel();
             this.flpDanhSachChat = new System.Windows.Forms.FlowLayoutPanel();
             this.txtTimKiem = new Guna.UI2.WinForms.Guna2TextBox();
             this.pnlGiua = new Guna.UI2.WinForms.Guna2Panel();
+            this.flpKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.guna2Panel1 = new Guna.UI2.WinForms.Guna2Panel();
+            this.picEmoji = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.btnGui = new Guna.UI2.WinForms.Guna2CircleButton();
             this.txtNhapTinNhan = new Guna.UI2.WinForms.Guna2TextBox();
-            this.flbKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlNguoiChat = new Guna.UI2.WinForms.Guna2Panel();
             this.lblTenDangNhapGiua = new System.Windows.Forms.Label();
             this.picAnhDaiDienGiua = new Guna.UI2.WinForms.Guna2CirclePictureBox();
@@ -51,6 +53,7 @@
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.guna2Panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picEmoji)).BeginInit();
             this.pnlNguoiChat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).BeginInit();
             this.pnlPhai.SuspendLayout();
@@ -65,7 +68,7 @@
             this.pnlTrai.BorderRadius = 10;
             this.pnlTrai.Controls.Add(this.flpDanhSachChat);
             this.pnlTrai.Controls.Add(this.txtTimKiem);
-            this.pnlTrai.Location = new System.Drawing.Point(12, 12);
+            this.pnlTrai.Location = new System.Drawing.Point(12, 14);
             this.pnlTrai.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlTrai.Name = "pnlTrai";
             this.pnlTrai.Size = new System.Drawing.Size(256, 629);
@@ -110,18 +113,27 @@
             // 
             this.pnlGiua.BackColor = System.Drawing.Color.Transparent;
             this.pnlGiua.BorderRadius = 10;
+            this.pnlGiua.Controls.Add(this.flpKhungChat);
             this.pnlGiua.Controls.Add(this.guna2Panel1);
-            this.pnlGiua.Controls.Add(this.flbKhungChat);
             this.pnlGiua.Controls.Add(this.pnlNguoiChat);
             this.pnlGiua.FillColor = System.Drawing.SystemColors.Control;
-            this.pnlGiua.Location = new System.Drawing.Point(288, 12);
-            this.pnlGiua.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlGiua.Location = new System.Drawing.Point(286, 14);
+            this.pnlGiua.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
             this.pnlGiua.Name = "pnlGiua";
             this.pnlGiua.Size = new System.Drawing.Size(625, 629);
             this.pnlGiua.TabIndex = 0;
             // 
+            // flpKhungChat
+            // 
+            this.flpKhungChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flpKhungChat.Location = new System.Drawing.Point(21, 104);
+            this.flpKhungChat.Name = "flpKhungChat";
+            this.flpKhungChat.Size = new System.Drawing.Size(588, 432);
+            this.flpKhungChat.TabIndex = 1;
+            // 
             // guna2Panel1
             // 
+            this.guna2Panel1.Controls.Add(this.picEmoji);
             this.guna2Panel1.Controls.Add(this.btnGui);
             this.guna2Panel1.Controls.Add(this.txtNhapTinNhan);
             this.guna2Panel1.Location = new System.Drawing.Point(21, 556);
@@ -129,6 +141,20 @@
             this.guna2Panel1.Name = "guna2Panel1";
             this.guna2Panel1.Size = new System.Drawing.Size(588, 60);
             this.guna2Panel1.TabIndex = 0;
+            // 
+            // picEmoji
+            // 
+            this.picEmoji.Image = ((System.Drawing.Image)(resources.GetObject("picEmoji.Image")));
+            this.picEmoji.ImageRotate = 0F;
+            this.picEmoji.Location = new System.Drawing.Point(476, 7);
+            this.picEmoji.Margin = new System.Windows.Forms.Padding(4);
+            this.picEmoji.Name = "picEmoji";
+            this.picEmoji.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picEmoji.Size = new System.Drawing.Size(35, 47);
+            this.picEmoji.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picEmoji.TabIndex = 2;
+            this.picEmoji.TabStop = false;
+            this.picEmoji.Click += new System.EventHandler(this.picEmoji_Click);
             // 
             // btnGui
             // 
@@ -164,19 +190,8 @@
             this.txtNhapTinNhan.Name = "txtNhapTinNhan";
             this.txtNhapTinNhan.PlaceholderText = "Nhập Tin Nhăn ...";
             this.txtNhapTinNhan.SelectedText = "";
-            this.txtNhapTinNhan.Size = new System.Drawing.Size(471, 48);
+            this.txtNhapTinNhan.Size = new System.Drawing.Size(443, 48);
             this.txtNhapTinNhan.TabIndex = 0;
-            // 
-            // flbKhungChat
-            // 
-            this.flbKhungChat.AutoScroll = true;
-            this.flbKhungChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flbKhungChat.Location = new System.Drawing.Point(21, 110);
-            this.flbKhungChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.flbKhungChat.Name = "flbKhungChat";
-            this.flbKhungChat.Size = new System.Drawing.Size(588, 420);
-            this.flbKhungChat.TabIndex = 1;
-            this.flbKhungChat.WrapContents = false;
             // 
             // pnlNguoiChat
             // 
@@ -192,7 +207,7 @@
             // 
             this.lblTenDangNhapGiua.AutoSize = true;
             this.lblTenDangNhapGiua.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(92, 32);
+            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(82, 29);
             this.lblTenDangNhapGiua.Name = "lblTenDangNhapGiua";
             this.lblTenDangNhapGiua.Size = new System.Drawing.Size(102, 17);
             this.lblTenDangNhapGiua.TabIndex = 1;
@@ -216,8 +231,8 @@
             this.pnlPhai.Controls.Add(this.lblTrangThai);
             this.pnlPhai.Controls.Add(this.btnLichSuTroChuyen);
             this.pnlPhai.Controls.Add(this.lblTenDangNhapPhai);
-            this.pnlPhai.Location = new System.Drawing.Point(931, 12);
-            this.pnlPhai.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlPhai.Location = new System.Drawing.Point(928, 14);
+            this.pnlPhai.Margin = new System.Windows.Forms.Padding(4);
             this.pnlPhai.Name = "pnlPhai";
             this.pnlPhai.Size = new System.Drawing.Size(240, 629);
             this.pnlPhai.TabIndex = 0;
@@ -228,9 +243,10 @@
             this.pnlAvatar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.pnlAvatar.Controls.Add(this.picStatus);
             this.pnlAvatar.Controls.Add(this.picAnhDaiDienPhai);
-            this.pnlAvatar.Location = new System.Drawing.Point(70, 26);
+            this.pnlAvatar.Location = new System.Drawing.Point(60, 31);
+            this.pnlAvatar.Margin = new System.Windows.Forms.Padding(4);
             this.pnlAvatar.Name = "pnlAvatar";
-            this.pnlAvatar.Size = new System.Drawing.Size(82, 80);
+            this.pnlAvatar.Size = new System.Drawing.Size(86, 93);
             this.pnlAvatar.TabIndex = 6;
             // 
             // picStatus
@@ -238,7 +254,8 @@
             this.picStatus.BackColor = System.Drawing.Color.Transparent;
             this.picStatus.FillColor = System.Drawing.Color.IndianRed;
             this.picStatus.ImageRotate = 0F;
-            this.picStatus.Location = new System.Drawing.Point(64, 59);
+            this.picStatus.Location = new System.Drawing.Point(67, 74);
+            this.picStatus.Margin = new System.Windows.Forms.Padding(4);
             this.picStatus.Name = "picStatus";
             this.picStatus.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.picStatus.Size = new System.Drawing.Size(15, 15);
@@ -249,7 +266,7 @@
             // picAnhDaiDienPhai
             // 
             this.picAnhDaiDienPhai.ImageRotate = 0F;
-            this.picAnhDaiDienPhai.Location = new System.Drawing.Point(0, 0);
+            this.picAnhDaiDienPhai.Location = new System.Drawing.Point(3, 11);
             this.picAnhDaiDienPhai.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.picAnhDaiDienPhai.Name = "picAnhDaiDienPhai";
             this.picAnhDaiDienPhai.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
@@ -266,11 +283,13 @@
             this.btnTaoNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnTaoNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnTaoNhom.ForeColor = System.Drawing.Color.White;
-            this.btnTaoNhom.Location = new System.Drawing.Point(31, 280);
+            this.btnTaoNhom.Location = new System.Drawing.Point(31, 279);
+            this.btnTaoNhom.Margin = new System.Windows.Forms.Padding(4);
             this.btnTaoNhom.Name = "btnTaoNhom";
-            this.btnTaoNhom.Size = new System.Drawing.Size(180, 45);
-            this.btnTaoNhom.TabIndex = 5;
-            this.btnTaoNhom.Text = "Tạo Nhóm";
+            this.btnTaoNhom.Size = new System.Drawing.Size(180, 46);
+            this.btnTaoNhom.TabIndex = 4;
+            this.btnTaoNhom.Text = "Tạo nhóm";
+            this.btnTaoNhom.Click += new System.EventHandler(this.btnTaoNhom_Click);
             // 
             // lblTrangThai
             // 
@@ -337,6 +356,7 @@
             this.pnlTrai.ResumeLayout(false);
             this.pnlGiua.ResumeLayout(false);
             this.guna2Panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.picEmoji)).EndInit();
             this.pnlNguoiChat.ResumeLayout(false);
             this.pnlNguoiChat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDienGiua)).EndInit();
@@ -359,7 +379,6 @@
         private System.Windows.Forms.FlowLayoutPanel flpDanhSachChat;
         private Guna.UI2.WinForms.Guna2TextBox txtTimKiem;
         private Guna.UI2.WinForms.Guna2Panel guna2Panel1;
-        private System.Windows.Forms.FlowLayoutPanel flbKhungChat;
         private Guna.UI2.WinForms.Guna2Panel pnlNguoiChat;
         private System.Windows.Forms.Label lblTenDangNhapPhai;
         private Guna.UI2.WinForms.Guna2CirclePictureBox picAnhDaiDienPhai;
@@ -372,5 +391,8 @@
         private Guna.UI2.WinForms.Guna2Button btnTaoNhom;
         private Guna.UI2.WinForms.Guna2Panel pnlAvatar;
         private Guna.UI2.WinForms.Guna2CirclePictureBox picStatus;
+        //private Guna.UI2.WinForms.Guna2Button btnTaoNhom;
+        private Guna.UI2.WinForms.Guna2CirclePictureBox picEmoji;
+        private System.Windows.Forms.FlowLayoutPanel flpKhungChat;
     }
 }

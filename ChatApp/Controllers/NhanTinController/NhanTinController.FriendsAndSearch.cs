@@ -387,7 +387,7 @@ namespace ChatApp.Controllers
                 };
 
                 // Chỉ mới tạo ra chưa tương tác dc.
-                var conservation = new Conservation(item.TenHienThi, item.LaBanBe,item.DaGuiLoiMoi, item.MoiKetBanChoMinh, item.Online);
+                var conservation = new Conservation(item.TenHienThi, item.LaBanBe,item.DaGuiLoiMoi, item.MoiKetBanChoMinh, item.Online, _friendService,this);
 
                 //Button btn = TaoNutUser(item);
                 _view.DanhSachChatPanel.Controls.Add(conservation);

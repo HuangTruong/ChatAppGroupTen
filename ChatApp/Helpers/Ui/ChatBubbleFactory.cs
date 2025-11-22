@@ -2,8 +2,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using ChatApp.Helpers;
-using ChatApp.Models.Chat;     // ✅ Lúc này trỏ đúng ChatApp.Models.Chat.TinNhan
-
+using ChatApp.Models.Chat;
+//using ChatApp.Controls;
 namespace ChatApp.Helpers.Ui
 {
     /// <summary>
@@ -45,89 +45,55 @@ namespace ChatApp.Helpers.Ui
                 Tag = laCuaToi
             };
 
+            // Padding trái/phải để căn bong bóng
             row.Padding = laCuaToi
                 ? new Padding(60, 2, 8, 8)
                 : new Padding(8, 2, 60, 8);
 
-            var bubble = new Panel
+            // Parse thời gian từ string trong TinNhan
+            DateTime utc;
+            try
             {
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(10, 6, 10, 6),
-                BackColor = laCuaToi
-                    ? Color.FromArgb(222, 242, 255)
-                    : Color.White
-            };
-
-            var stack = new FlowLayoutPanel
+                utc = TimeParser.ToUtc(tn.thoiGian);
+            }
+            catch
             {
-                FlowDirection = FlowDirection.TopDown,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty
-            };
-
-            // Tên người gửi (chỉ hiển thị trong nhóm)
-            if (laNhom)
-            {
-                var lblSender = new Label
-                {
-                    AutoSize = true,
-                    Text = tn.guiBoi ?? string.Empty,
-                    Font = new Font("Segoe UI", 8.5f, FontStyle.Bold),
-                    ForeColor = Color.DimGray,
-                    Margin = new Padding(0, 0, 0, 2)
-                };
-                stack.Controls.Add(lblSender);
+                utc = DateTime.UtcNow;
             }
 
-            var text = tn.noiDung ?? string.Empty;
-            var lblMsg = new Label
-            {
-                AutoSize = true,
-                Text = string.IsNullOrEmpty(text) ? " " : text,
-                Font = new Font("Segoe UI", 10f),
-                ForeColor = Color.Black,
-                Margin = new Padding(0, 0, 0, 4),
-                UseMnemonic = false
-            };
+            // ==== Tạo TinNhanBubble & map dữ liệu ====
+            //var bubble = new TinNhanBubble
+            //{
+            //    LaCuaToi = laCuaToi,
+            //    LaNhom = laNhom,
+            //    TenNguoiGui = tn.guiBoi ?? "",
+            //    NoiDung = tn.noiDung ?? "",
+            //    ThoiGianUtc = utc,
 
-            int cap = maxTextWidth - bubble.Padding.Horizontal;
-            if (cap < 50) cap = 50;
-            lblMsg.MaximumSize = new Size(cap, 0);
+            //    // Emoji
+            //    LaEmoji = tn.laEmoji,
+            //    EmojiKey = tn.emojiKey
+            //};
 
-            var lblTime = new Label
-            {
-                AutoSize = true,
-                Text = TimeParser
-                    .ToUtc(tn.thoiGian)
-                    .ToLocalTime()
-                    .ToString("HH:mm dd/MM/yyyy"),
-                Font = new Font("Segoe UI", 8.5f, FontStyle.Italic),
-                ForeColor = Color.DimGray
-            };
+            //bubble.Render();
 
-            stack.Controls.Add(lblMsg);
-            stack.Controls.Add(lblTime);
+            //row.Controls.Add(bubble);
 
-            bubble.Controls.Add(stack);
-            row.Controls.Add(bubble);
+            // Căn trái/phải trong row
+            //AlignBubbleInRow(row);
 
-            AlignBubbleInRow(row);
+            //row.SizeChanged += delegate
+            //{
+            //    if (row.Width != panelWidth)
+            //        row.Width = panelWidth;
 
-            row.SizeChanged += delegate
-            {
-                if (row.Width != panelWidth)
-                    row.Width = panelWidth;
+            //    AlignBubbleInRow(row);
+            //};
 
-                AlignBubbleInRow(row);
-            };
-
-            bubble.SizeChanged += delegate
-            {
-                AlignBubbleInRow(row);
-            };
+            //bubble.SizeChanged += delegate
+            //{
+            //    AlignBubbleInRow(row);
+            //};
 
             return row;
         }
