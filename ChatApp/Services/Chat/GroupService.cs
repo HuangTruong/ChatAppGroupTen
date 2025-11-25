@@ -325,5 +325,43 @@ namespace ChatApp.Services.Chat
 
             await _firebase.SetAsync($"{GroupsRoot}/{groupId}", group);
         }
+        // ================== GỬI FILE TRONG NHÓM ==================
+        public async Task<TinNhan> SendGroupFileAsync(
+            string groupId,
+            string guiBoi,
+            string fileName,
+            string fileUrl,
+            long fileSize)
+        {
+            if (string.IsNullOrWhiteSpace(groupId) || string.IsNullOrWhiteSpace(guiBoi) || string.IsNullOrWhiteSpace(fileName) || string.IsNullOrWhiteSpace(fileUrl))
+            {
+                return null;
+            }
+
+            var msg = new TinNhan
+            {
+                guiBoi = guiBoi,
+                noiDung = "[File] " + fileName,
+                thoiGian = DateTime.Now.ToString("HH:mm dd/MM/yyyy"),
+                laNhom = true,
+
+                laEmoji = false,
+                emojiKey = null,
+
+                laFile = true,
+                tenFile = fileName,
+                kichThuoc = fileSize,
+                fileUrl = fileUrl
+            };
+
+            PushResponse res = await _firebase.PushAsync($"{GroupMessagesRoot}/{groupId}", msg);
+            string id = res.Result.name;
+
+            msg.id = id;
+            await _firebase.UpdateAsync($"{GroupMessagesRoot}/{groupId}/{id}", new { id });
+
+            return msg;
+        }
+
     }
 }

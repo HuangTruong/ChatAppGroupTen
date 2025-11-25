@@ -16,5 +16,9 @@ namespace ChatApp.Models.Chat
         public bool laNhom { get; set; }
         public bool laEmoji { get; set; }
         public string emojiKey { get; set; }
+        public bool laFile { get; set; } = false; // true nếu là tin nhắn file
+        public string tenFile { get; set; }  // tên file hiển thị
+        public long kichThuoc { get; set; }  // dung lượng (bytes) – có thể =0 nếu không biết
+        public string fileUrl { get; set; }
     }
 }

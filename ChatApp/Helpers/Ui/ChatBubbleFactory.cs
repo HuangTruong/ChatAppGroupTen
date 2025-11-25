@@ -50,10 +50,16 @@ namespace ChatApp.Helpers.Ui
                 NoiDung = tn.noiDung ?? "",
                 ThoiGianUtc = utc,
 
-                // Emoji
+                //Emoji
                 LaEmoji = tn.laEmoji,
-                EmojiKey = tn.emojiKey
-            };
+                EmojiKey = tn.emojiKey,
+
+                // File
+                LaFile = tn.laFile,
+                TenFile = tn.tenFile,
+                KichThuoc = tn.kichThuoc,
+                FileUrl = tn.fileUrl,
+        };
 
             bubble.Render();
 
