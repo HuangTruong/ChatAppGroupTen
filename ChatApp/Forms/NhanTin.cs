@@ -4,6 +4,7 @@ using Guna.UI2.WinForms;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using ChatApp.Helpers.Ui;
 
 namespace ChatApp
 {
@@ -152,12 +153,32 @@ namespace ChatApp
         private async void picEmoji_Click(object sender, EventArgs e)
         {
             using (var picker = new EmojiPickerForm())
-            {
+            {   
                 if (picker.ShowDialog(this) == DialogResult.OK &&
                     !string.IsNullOrEmpty(picker.SelectedEmojiKey))
                 {
                     await _controller.GuiEmojiAsync(picker.SelectedEmojiKey);
                 }
+            }
+        }
+
+        private async void PicSendFile_Click(object sender, EventArgs e)
+        {
+            string url = FileLinkPrompt.ShowDialog(
+                "Dán link file (Google Drive, OneDrive, v.v.)",
+                "Gửi file");
+
+            if (string.IsNullOrWhiteSpace(url))
+                return;
+
+            try
+            {
+                await _controller.GuiFileLinkAsync(url);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể gửi file: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

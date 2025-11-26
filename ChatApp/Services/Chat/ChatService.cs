@@ -139,5 +139,45 @@ namespace ChatApp.Services.Chat
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             await _firebase.SetAsync($"cuocTroChuyen/{cid}/{msgId}/reads/{self}", now);
         }
+        // ================== GỬI FILE 1-1 ==================
+        public async Task<TinNhan> SendDirectFileAsync(string from, string to, string fileName, string fileUrl, long fileSize)
+        {
+            if (string.IsNullOrWhiteSpace(from))
+                throw new ArgumentNullException(nameof(from));
+            if (string.IsNullOrWhiteSpace(to))
+                throw new ArgumentNullException(nameof(to));
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentNullException(nameof(fileName));
+            if (string.IsNullOrWhiteSpace(fileUrl))
+                throw new ArgumentNullException(nameof(fileUrl));
+
+            // id cuộc trò chuyện giữa 2 người
+            var cid = BuildCid(from, to);
+            string path = $"cuocTroChuyen/{cid}/";
+
+            var tn = new TinNhan
+            {
+                guiBoi = from,
+                nhanBoi = to,
+                noiDung = "[File] " + fileName,
+                thoiGian = DateTime.UtcNow.ToString("o"),
+                laNhom = false,
+
+                laEmoji = false,
+                emojiKey = null,
+
+                laFile = true,
+                tenFile = fileName,
+                kichThuoc = fileSize,
+                fileUrl = fileUrl
+            };
+
+            var push = await _firebase.PushAsync(path, tn);
+            tn.id = push.Result.name;
+            await _firebase.SetAsync($"{path}/{tn.id}", tn);
+
+            return tn;
+        }
+
     }
 }

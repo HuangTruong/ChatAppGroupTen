@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Linq;
 
 namespace ChatApp.Controllers
 {
@@ -268,5 +270,84 @@ namespace ChatApp.Controllers
             row.ContextMenuStrip = menu;
             return row;
         }
+        // ================== GỬI FILE LINK ==================
+        public async Task GuiFileLinkAsync(string fileUrl)
+        {
+            if (string.IsNullOrWhiteSpace(fileUrl))
+            {
+                _view.ShowInfo("Link file không hợp lệ.");
+                return;
+            }
+
+            // Đoán tên file từ URL
+            string fileName = fileUrl;
+            try
+            {
+                var uri = new Uri(fileUrl);
+                var lastSegment = uri.Segments.LastOrDefault();
+                if (!string.IsNullOrEmpty(lastSegment))
+                    fileName = Uri.UnescapeDataString(lastSegment);
+            }
+            catch
+            {
+            }
+
+            long fileSize = 0;
+
+            TinNhan tn;
+
+            if (_isGroupChat)
+            {
+                if (string.IsNullOrEmpty(_groupId))
+                {
+                    _view.ShowInfo("Chọn nhóm trước khi gửi file.");
+                    return;
+                }
+
+                tn = await _groupService.SendGroupFileAsync(
+                    _groupId,
+                    _tenNguoiDung,
+                    fileName,
+                    fileUrl,
+                    fileSize
+                );
+
+                if (tn == null) return;
+
+                if (!_idsTheoDoanChat.ContainsKey(_groupId))
+                    _idsTheoDoanChat[_groupId] = new HashSet<string>();
+
+                if (_idsTheoDoanChat[_groupId].Add(tn.id))
+                    _thuTuTheoDoanChat[_groupId].Add(tn.id);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(_tenDoiPhuong))
+                {
+                    _view.ShowInfo("Chọn người cần trò chuyện.");
+                    return;
+                }
+
+                tn = await _chatService.SendDirectFileAsync(
+                    _tenNguoiDung,
+                    _tenDoiPhuong,
+                    fileName,
+                    fileUrl,
+                    fileSize
+                );
+
+                var cid = _chatService.BuildCid(_tenNguoiDung, _tenDoiPhuong);
+
+                if (!_idsTheoDoanChat.ContainsKey(cid))
+                    _idsTheoDoanChat[cid] = new HashSet<string>();
+
+                if (_idsTheoDoanChat[cid].Add(tn.id))
+                    _thuTuTheoDoanChat[cid].Add(tn.id);
+            }
+
+            // Đẩy vào queue để render
+            _renderQueue.Enqueue(tn);
+        }
+
     }
 }

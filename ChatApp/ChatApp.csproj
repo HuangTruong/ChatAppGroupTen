@@ -70,6 +70,7 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -127,6 +128,7 @@
     <Compile Include="Helpers\Ui\CaiDatLayoutHelper.cs" />
     <Compile Include="Helpers\Ui\ChatBubbleFactory.cs" />
     <Compile Include="Helpers\Ui\ControlExtensions.cs" />
+    <Compile Include="Helpers\Ui\FileLinkPrompt.cs" />
     <Compile Include="Helpers\Ui\FocusExtensions.cs" />
     <Compile Include="Helpers\Ui\MessageRenderQueue.cs" />
     <Compile Include="Models\Chat\Nhom.cs" />
@@ -235,6 +237,9 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="UserControl\TinNhanBubble.resx">
+      <DependentUpon>TinNhanBubble.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControl\TinNhanCuaBan.resx">
       <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
     </EmbeddedResource>
@@ -319,6 +324,7 @@
     <Content Include="Resources\Emoji\thinking.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icon-send-file.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
