@@ -18,8 +18,7 @@ namespace ChatApp.Services.Auth
             public int Attempts { get; set; } = 0;
         }
 
-        private static readonly ConcurrentDictionary<string, Entry> _store
-            = new ConcurrentDictionary<string, Entry>();
+        private static readonly ConcurrentDictionary<string, Entry> _store = new ConcurrentDictionary<string, Entry>();
 
         private const int ExpireMinutes = 5;          // Mã sống 5 phút
         private const int ResendCooldownSeconds = 60; // 60s mới cho gửi lại
@@ -56,19 +55,19 @@ namespace ChatApp.Services.Auth
             return true;
         }
 
-        public static async Task SendNewCodeAsync(string email, IEmailSender sender)
+        public static async Task SendNewCodeAsync(string email)
         {
             var code = GenerateCode();
 
             _store.AddOrUpdate(email,
-                _ => new Entry
+                _new => new Entry
                 {
                     Code = code,
                     ExpireAt = DateTime.UtcNow.AddMinutes(ExpireMinutes),
                     LastSentAt = DateTime.UtcNow,
                     Attempts = 0
                 },
-                (_, old) =>
+                (_new, old) =>
                 {
                     old.Code = code;
                     old.ExpireAt = DateTime.UtcNow.AddMinutes(ExpireMinutes);
@@ -86,6 +85,7 @@ namespace ChatApp.Services.Auth
                 .Append("</div>")
                 .ToString();
 
+            var sender = new SmtpEmailSender();
             await sender.SendEmailAsync(email, "Mã xác nhận đăng ký ChatApp", html);
         }
 

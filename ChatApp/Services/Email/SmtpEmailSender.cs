@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Services.Email
 {
-    public class SmtpEmailSender : IEmailSender
+    public class SmtpEmailSender
     {
         private const string SmtpHost = "smtp.gmail.com";
         private const int SmtpPort = 587;

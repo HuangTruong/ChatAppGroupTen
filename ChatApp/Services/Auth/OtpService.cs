@@ -12,19 +12,16 @@ namespace ChatApp.Services.Auth
     public class OtpService
     {
         private readonly IFirebaseClient _client;
-        private readonly IEmailSender _emailSender;
 
         // Dùng mặc định: tự tạo FirebaseClient + SmtpEmailSender
-        public OtpService()
-            : this(FirebaseClientFactory.Create(), new SmtpEmailSender())
-        {
+        public OtpService() {
+            _client = FirebaseClientFactory.Create();
         }
 
         // Cho phép truyền từ ngoài vào (nếu sau này muốn DI / test)
-        public OtpService(IFirebaseClient client, IEmailSender emailSender)
+        public OtpService(IFirebaseClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
         }
 
         // Lưu thông tin mã OTP của một tài khoản lên Firebase.
@@ -87,7 +84,8 @@ namespace ChatApp.Services.Auth
 </div>";
 
                 // Gọi async nhưng block lại cho đơn giản (Form đang dùng void)
-                _emailSender
+                var sender = new SmtpEmailSender();
+                sender
                     .SendEmailAsync(emailNhan, subject, body)
                     .GetAwaiter()
                     .GetResult();

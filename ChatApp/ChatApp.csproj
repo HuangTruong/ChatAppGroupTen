@@ -220,6 +220,9 @@
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\XacNhanEmail.resx">
+      <DependentUpon>XacNhanEmail.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UserControl\CuocTroChuyen.resx">
       <DependentUpon>CuocTroChuyen.cs</DependentUpon>
     </EmbeddedResource>

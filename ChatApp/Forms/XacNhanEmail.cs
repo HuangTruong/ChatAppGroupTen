@@ -8,14 +8,12 @@ namespace ChatApp
     public partial class XacNhanEmail : Form
     {
         private readonly string _email;
-        private readonly IEmailSender _sender;
         private int _countdown;
 
-        public XacNhanEmail(string email, IEmailSender sender)
+        public XacNhanEmail(string email)
         {
             InitializeComponent();
             _email = email;
-            _sender = sender;
         }
 
         private async void XacNhanEmail_Load(object sender, EventArgs e)
@@ -26,7 +24,7 @@ namespace ChatApp
             {
                 try
                 {
-                    await EmailVerificationService.SendNewCodeAsync(_email, _sender);
+                    await EmailVerificationService.SendNewCodeAsync(_email);
                     BatDemNguoc(60);
                 }
                 catch (Exception ex)
@@ -60,18 +58,31 @@ namespace ChatApp
             {
                 timerCooldown.Stop();
                 btnGuiLai.Enabled = true;
-                CapNhatNhanDemNguoc();
             }
-            else
-            {
-                CapNhatNhanDemNguoc();
-            }
+            CapNhatNhanDemNguoc();
         }
 
-        private void btnHuy_Click(object sender, EventArgs e)
+        private async void btnGuiLai_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            if (!EmailVerificationService.CanResend(_email, out var wait))
+            {
+                MessageBox.Show($"Vui lòng đợi {wait}s nữa rồi thử lại.",
+                    "Chưa thể gửi lại", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            try
+            {
+                await EmailVerificationService.SendNewCodeAsync(_email);
+                BatDemNguoc(60);
+                MessageBox.Show("Đã gửi lại mã xác nhận.",
+                    "Đã gửi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể gửi mã: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void btnXacNhan_Click(object sender, EventArgs e)
@@ -95,27 +106,10 @@ namespace ChatApp
             }
         }
 
-        private async void btnGuiLai_Click(object sender, EventArgs e)
+        private void btnHuy_Click(object sender, EventArgs e)
         {
-            if (!EmailVerificationService.CanResend(_email, out var wait))
-            {
-                MessageBox.Show($"Vui lòng đợi {wait}s nữa rồi thử lại.",
-                    "Chưa thể gửi lại", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            try
-            {
-                await EmailVerificationService.SendNewCodeAsync(_email, _sender);
-                BatDemNguoc(60);
-                MessageBox.Show("Đã gửi lại mã xác nhận.",
-                    "Đã gửi", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Không thể gửi mã: " + ex.Message,
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
     }
 }

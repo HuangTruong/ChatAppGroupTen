@@ -2,7 +2,10 @@
 using ChatApp.Services;
 using ChatApp.Services.Auth;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace ChatApp.Controllers
 {
@@ -37,31 +40,15 @@ namespace ChatApp.Controllers
             if (await _authService.EmailExistsAsync(user.Email))
                 throw new Exception("Email đã tồn tại!");
 
+            // 5. Kiểm tra email có hợp lệ không
+            var pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (string.IsNullOrWhiteSpace(user.Email) || !Regex.IsMatch(user.Email, pattern))
+            {
+                throw new Exception("Định dạng email không hợp lệ.");
+            }
 
             // 6. Đăng ký lên Firebase
             await _authService.RegisterAsync(user);
-        }
-
-
-        // Check email đã tồn tại chưa (dùng trước khi gửi OTP)
-        public async Task<bool> KiemTraEmailTonTaiAsync(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-                return false;
-
-            email = email.Trim();
-            return await _authService.EmailExistsAsync(email);
-        }
-
-        // Check tài khoản đã tồn tại chưa (dùng trước khi gửi OTP)
-        public async Task<bool> KiemTraTaiKhoanTonTaiAsync(string taiKhoan)
-        {
-            if (string.IsNullOrWhiteSpace(taiKhoan))
-                return false;
-
-            taiKhoan = taiKhoan.Trim();
-            var user = await _authService.GetUserAsync(taiKhoan);
-            return user != null;
         }
     }
 }

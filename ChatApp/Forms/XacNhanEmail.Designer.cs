@@ -34,58 +34,84 @@
             // 
             // lblTitle
             // 
-            this.lblTitle.Text = "Nhập mã xác nhận đã gửi tới:";
             this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F);
-            this.lblTitle.Location = new System.Drawing.Point(24, 18);
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.Location = new System.Drawing.Point(27, 29);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(239, 23);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Nhập mã xác nhận đã gửi tới:";
             // 
             // lblEmail
             // 
-            this.lblEmail.Text = "email@example.com";
             this.lblEmail.AutoSize = true;
-            this.lblEmail.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblEmail.Location = new System.Drawing.Point(24, 45);
+            this.lblEmail.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEmail.Location = new System.Drawing.Point(27, 56);
+            this.lblEmail.Name = "lblEmail";
+            this.lblEmail.Size = new System.Drawing.Size(169, 23);
+            this.lblEmail.TabIndex = 1;
+            this.lblEmail.Text = "email@example.com";
             // 
             // txtMa
             // 
             this.txtMa.BorderRadius = 12;
-            this.txtMa.PlaceholderText = "Nhập mã 6 số";
-            this.txtMa.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.txtMa.Location = new System.Drawing.Point(28, 80);
-            this.txtMa.Size = new System.Drawing.Size(290, 40);
+            this.txtMa.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtMa.DefaultText = "";
+            this.txtMa.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtMa.Location = new System.Drawing.Point(31, 91);
+            this.txtMa.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtMa.MaxLength = 6;
+            this.txtMa.Name = "txtMa";
+            this.txtMa.PlaceholderText = "Nhập mã 6 số";
+            this.txtMa.SelectedText = "";
+            this.txtMa.Size = new System.Drawing.Size(290, 40);
+            this.txtMa.TabIndex = 2;
             this.txtMa.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // btnXacNhan
             // 
-            this.btnXacNhan.Text = "Xác nhận";
             this.btnXacNhan.BorderRadius = 10;
-            this.btnXacNhan.Location = new System.Drawing.Point(28, 136);
+            this.btnXacNhan.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnXacNhan.ForeColor = System.Drawing.Color.White;
+            this.btnXacNhan.Location = new System.Drawing.Point(31, 147);
+            this.btnXacNhan.Name = "btnXacNhan";
             this.btnXacNhan.Size = new System.Drawing.Size(120, 40);
+            this.btnXacNhan.TabIndex = 3;
+            this.btnXacNhan.Text = "Xác nhận";
             this.btnXacNhan.Click += new System.EventHandler(this.btnXacNhan_Click);
             // 
             // btnGuiLai
             // 
-            this.btnGuiLai.Text = "Gửi lại mã";
             this.btnGuiLai.BorderRadius = 10;
-            this.btnGuiLai.Location = new System.Drawing.Point(158, 136);
+            this.btnGuiLai.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGuiLai.ForeColor = System.Drawing.Color.White;
+            this.btnGuiLai.Location = new System.Drawing.Point(161, 147);
+            this.btnGuiLai.Name = "btnGuiLai";
             this.btnGuiLai.Size = new System.Drawing.Size(120, 40);
+            this.btnGuiLai.TabIndex = 4;
+            this.btnGuiLai.Text = "Gửi lại mã";
             this.btnGuiLai.Click += new System.EventHandler(this.btnGuiLai_Click);
             // 
             // btnHuy
             // 
-            this.btnHuy.Text = "Hủy";
             this.btnHuy.BorderRadius = 10;
-            this.btnHuy.Location = new System.Drawing.Point(288, 136);
+            this.btnHuy.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHuy.ForeColor = System.Drawing.Color.White;
+            this.btnHuy.Location = new System.Drawing.Point(291, 147);
+            this.btnHuy.Name = "btnHuy";
             this.btnHuy.Size = new System.Drawing.Size(80, 40);
+            this.btnHuy.TabIndex = 5;
+            this.btnHuy.Text = "Hủy";
             this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
             // 
             // lblDemNguoc
             // 
-            this.lblDemNguoc.Text = "";
             this.lblDemNguoc.AutoSize = true;
             this.lblDemNguoc.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblDemNguoc.Location = new System.Drawing.Point(25, 186);
+            this.lblDemNguoc.Name = "lblDemNguoc";
+            this.lblDemNguoc.Size = new System.Drawing.Size(0, 20);
+            this.lblDemNguoc.TabIndex = 6;
             // 
             // timerCooldown
             // 
@@ -102,11 +128,13 @@
             this.Controls.Add(this.btnHuy);
             this.Controls.Add(this.lblDemNguoc);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Name = "XacNhanEmail";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Xác nhận email";
             this.Load += new System.EventHandler(this.XacNhanEmail_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
     }
 }

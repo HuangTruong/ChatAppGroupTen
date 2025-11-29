@@ -23,7 +23,7 @@ namespace ChatApp
         private void btnDangKy_Click(object sender, EventArgs e)
         {
             var DangKyForm = new DangKy();
-            DangKyForm.Tag = this;  // Giữ tham chiếu form hiện tại để quay lại sau
+            DangKyForm.FormClosed += (s,args) => this.Show();  // Quay lại Form Đăng nhập khi Form Đăng kí đóng
             DangKyForm.Show();
             this.Hide();
         }
