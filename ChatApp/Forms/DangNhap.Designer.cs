@@ -28,166 +28,166 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lnkQuenMatKhau = new System.Windows.Forms.LinkLabel();
-            this.btnDangKy = new Guna.UI2.WinForms.Guna2Button();
-            this.btnDangNhap = new Guna.UI2.WinForms.Guna2Button();
-            this.lblTieuDe = new System.Windows.Forms.Label();
+            this.lnkForgotPassword = new System.Windows.Forms.LinkLabel();
+            this.btnRegister = new Guna.UI2.WinForms.Guna2Button();
+            this.btnLogin = new Guna.UI2.WinForms.Guna2Button();
+            this.lblTittle = new System.Windows.Forms.Label();
             this.pnlLogin = new Guna.UI2.WinForms.Guna2Panel();
-            this.txtTaiKhoan = new Guna.UI2.WinForms.Guna2TextBox();
-            this.txtMatKhau = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtPassword = new Guna.UI2.WinForms.Guna2TextBox();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlLogin.SuspendLayout();
             this.pnlBackground.SuspendLayout();
             this.SuspendLayout();
             // 
-            // lnkQuenMatKhau
+            // lnkForgotPassword
             // 
-            this.lnkQuenMatKhau.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.lnkQuenMatKhau.AutoSize = true;
-            this.lnkQuenMatKhau.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lnkQuenMatKhau.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(13)))), ((int)(((byte)(71)))), ((int)(((byte)(161)))));
-            this.lnkQuenMatKhau.Location = new System.Drawing.Point(136, 227);
-            this.lnkQuenMatKhau.Name = "lnkQuenMatKhau";
-            this.lnkQuenMatKhau.Size = new System.Drawing.Size(125, 23);
-            this.lnkQuenMatKhau.TabIndex = 8;
-            this.lnkQuenMatKhau.TabStop = true;
-            this.lnkQuenMatKhau.Text = "Quên mật khẩu";
-            this.lnkQuenMatKhau.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkQuenMatKhau_LinkClicked);
+            this.lnkForgotPassword.ActiveLinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.lnkForgotPassword.AutoSize = true;
+            this.lnkForgotPassword.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lnkForgotPassword.LinkColor = System.Drawing.Color.FromArgb(((int)(((byte)(13)))), ((int)(((byte)(71)))), ((int)(((byte)(161)))));
+            this.lnkForgotPassword.Location = new System.Drawing.Point(136, 187);
+            this.lnkForgotPassword.Name = "lnkForgotPassword";
+            this.lnkForgotPassword.Size = new System.Drawing.Size(125, 23);
+            this.lnkForgotPassword.TabIndex = 8;
+            this.lnkForgotPassword.TabStop = true;
+            this.lnkForgotPassword.Text = "Quên mật khẩu";
+            this.lnkForgotPassword.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkQuenMatKhau_LinkClicked);
             // 
-            // btnDangKy
+            // btnRegister
             // 
-            this.btnDangKy.BackColor = System.Drawing.Color.Transparent;
-            this.btnDangKy.BorderRadius = 10;
-            this.btnDangKy.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDangKy.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangKy.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangKy.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnDangKy.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnDangKy.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.btnDangKy.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDangKy.ForeColor = System.Drawing.Color.White;
-            this.btnDangKy.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(110)))), ((int)(((byte)(114)))));
-            this.btnDangKy.Location = new System.Drawing.Point(203, 259);
-            this.btnDangKy.Name = "btnDangKy";
-            this.btnDangKy.ShadowDecoration.BorderRadius = 10;
-            this.btnDangKy.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
-            this.btnDangKy.ShadowDecoration.Depth = 10;
-            this.btnDangKy.ShadowDecoration.Enabled = true;
-            this.btnDangKy.Size = new System.Drawing.Size(150, 45);
-            this.btnDangKy.TabIndex = 7;
-            this.btnDangKy.Text = "Đăng Ký";
-            this.btnDangKy.Click += new System.EventHandler(this.btnDangKy_Click);
+            this.btnRegister.BackColor = System.Drawing.Color.Transparent;
+            this.btnRegister.BorderRadius = 10;
+            this.btnRegister.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnRegister.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnRegister.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnRegister.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnRegister.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnRegister.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
+            this.btnRegister.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRegister.ForeColor = System.Drawing.Color.White;
+            this.btnRegister.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(99)))), ((int)(((byte)(110)))), ((int)(((byte)(114)))));
+            this.btnRegister.Location = new System.Drawing.Point(203, 219);
+            this.btnRegister.Name = "btnRegister";
+            this.btnRegister.ShadowDecoration.BorderRadius = 10;
+            this.btnRegister.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
+            this.btnRegister.ShadowDecoration.Depth = 10;
+            this.btnRegister.ShadowDecoration.Enabled = true;
+            this.btnRegister.Size = new System.Drawing.Size(150, 45);
+            this.btnRegister.TabIndex = 7;
+            this.btnRegister.Text = "Đăng Ký";
+            this.btnRegister.Click += new System.EventHandler(this.btnDangKy_Click);
             // 
-            // btnDangNhap
+            // btnLogin
             // 
-            this.btnDangNhap.BackColor = System.Drawing.Color.Transparent;
-            this.btnDangNhap.BorderRadius = 10;
-            this.btnDangNhap.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDangNhap.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangNhap.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnDangNhap.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnDangNhap.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnDangNhap.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.btnDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnDangNhap.ForeColor = System.Drawing.Color.White;
-            this.btnDangNhap.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.btnDangNhap.Location = new System.Drawing.Point(47, 259);
-            this.btnDangNhap.Name = "btnDangNhap";
-            this.btnDangNhap.ShadowDecoration.BorderRadius = 10;
-            this.btnDangNhap.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
-            this.btnDangNhap.ShadowDecoration.Depth = 10;
-            this.btnDangNhap.ShadowDecoration.Enabled = true;
-            this.btnDangNhap.Size = new System.Drawing.Size(150, 45);
-            this.btnDangNhap.TabIndex = 6;
-            this.btnDangNhap.Text = "Đăng Nhập";
-            this.btnDangNhap.Click += new System.EventHandler(this.btnDangNhap_Click);
+            this.btnLogin.BackColor = System.Drawing.Color.Transparent;
+            this.btnLogin.BorderRadius = 10;
+            this.btnLogin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnLogin.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnLogin.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnLogin.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnLogin.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnLogin.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.btnLogin.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnLogin.ForeColor = System.Drawing.Color.White;
+            this.btnLogin.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
+            this.btnLogin.Location = new System.Drawing.Point(47, 219);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.ShadowDecoration.BorderRadius = 10;
+            this.btnLogin.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
+            this.btnLogin.ShadowDecoration.Depth = 10;
+            this.btnLogin.ShadowDecoration.Enabled = true;
+            this.btnLogin.Size = new System.Drawing.Size(150, 45);
+            this.btnLogin.TabIndex = 6;
+            this.btnLogin.Text = "Đăng Nhập";
+            this.btnLogin.Click += new System.EventHandler(this.btnDangNhap_Click);
             // 
-            // lblTieuDe
+            // lblTittle
             // 
-            this.lblTieuDe.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.lblTieuDe.AutoSize = true;
-            this.lblTieuDe.Font = new System.Drawing.Font("Segoe UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTieuDe.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblTieuDe.Location = new System.Drawing.Point(59, 47);
-            this.lblTieuDe.Name = "lblTieuDe";
-            this.lblTieuDe.Size = new System.Drawing.Size(277, 31);
-            this.lblTieuDe.TabIndex = 1;
-            this.lblTieuDe.Text = "ĐĂNG NHẬP HỆ THỐNG";
-            this.lblTieuDe.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTittle.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.lblTittle.AutoSize = true;
+            this.lblTittle.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTittle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
+            this.lblTittle.Location = new System.Drawing.Point(28, 29);
+            this.lblTittle.Name = "lblTittle";
+            this.lblTittle.Size = new System.Drawing.Size(340, 38);
+            this.lblTittle.TabIndex = 1;
+            this.lblTittle.Text = "ĐĂNG NHẬP HỆ THỐNG";
+            this.lblTittle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pnlLogin
             // 
             this.pnlLogin.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pnlLogin.BackColor = System.Drawing.Color.Transparent;
             this.pnlLogin.BorderRadius = 20;
-            this.pnlLogin.Controls.Add(this.lnkQuenMatKhau);
-            this.pnlLogin.Controls.Add(this.txtTaiKhoan);
-            this.pnlLogin.Controls.Add(this.btnDangKy);
-            this.pnlLogin.Controls.Add(this.lblTieuDe);
-            this.pnlLogin.Controls.Add(this.btnDangNhap);
-            this.pnlLogin.Controls.Add(this.txtMatKhau);
+            this.pnlLogin.Controls.Add(this.lnkForgotPassword);
+            this.pnlLogin.Controls.Add(this.txtEmail);
+            this.pnlLogin.Controls.Add(this.btnRegister);
+            this.pnlLogin.Controls.Add(this.lblTittle);
+            this.pnlLogin.Controls.Add(this.btnLogin);
+            this.pnlLogin.Controls.Add(this.txtPassword);
             this.pnlLogin.FillColor = System.Drawing.Color.White;
-            this.pnlLogin.Location = new System.Drawing.Point(191, 51);
+            this.pnlLogin.Location = new System.Drawing.Point(196, 75);
             this.pnlLogin.Name = "pnlLogin";
             this.pnlLogin.ShadowDecoration.BorderRadius = 20;
             this.pnlLogin.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
             this.pnlLogin.ShadowDecoration.Depth = 20;
             this.pnlLogin.ShadowDecoration.Enabled = true;
-            this.pnlLogin.Size = new System.Drawing.Size(400, 350);
+            this.pnlLogin.Size = new System.Drawing.Size(400, 295);
             this.pnlLogin.TabIndex = 9;
             // 
-            // txtTaiKhoan
+            // txtEmail
             // 
-            this.txtTaiKhoan.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
-            this.txtTaiKhoan.BorderRadius = 15;
-            this.txtTaiKhoan.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtTaiKhoan.DefaultText = "";
-            this.txtTaiKhoan.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtTaiKhoan.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtTaiKhoan.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtTaiKhoan.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtTaiKhoan.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
-            this.txtTaiKhoan.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtTaiKhoan.FocusedState.FillColor = System.Drawing.Color.Transparent;
-            this.txtTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtTaiKhoan.HoverState.BorderColor = System.Drawing.Color.Transparent;
-            this.txtTaiKhoan.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtTaiKhoan.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
-            this.txtTaiKhoan.Location = new System.Drawing.Point(65, 128);
-            this.txtTaiKhoan.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtTaiKhoan.Name = "txtTaiKhoan";
-            this.txtTaiKhoan.PlaceholderText = "Tên Đăng Nhập";
-            this.txtTaiKhoan.SelectedText = "";
-            this.txtTaiKhoan.Size = new System.Drawing.Size(270, 40);
-            this.txtTaiKhoan.TabIndex = 0;
+            this.txtEmail.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
+            this.txtEmail.BorderRadius = 15;
+            this.txtEmail.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtEmail.DefaultText = "";
+            this.txtEmail.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtEmail.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtEmail.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtEmail.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtEmail.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
+            this.txtEmail.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
+            this.txtEmail.FocusedState.FillColor = System.Drawing.Color.Transparent;
+            this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtEmail.HoverState.BorderColor = System.Drawing.Color.Transparent;
+            this.txtEmail.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtEmail.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
+            this.txtEmail.Location = new System.Drawing.Point(65, 88);
+            this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtEmail.Name = "txtEmail";
+            this.txtEmail.PlaceholderText = "Email";
+            this.txtEmail.SelectedText = "";
+            this.txtEmail.Size = new System.Drawing.Size(270, 40);
+            this.txtEmail.TabIndex = 0;
             // 
-            // txtMatKhau
+            // txtPassword
             // 
-            this.txtMatKhau.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
-            this.txtMatKhau.BorderRadius = 15;
-            this.txtMatKhau.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtMatKhau.DefaultText = "";
-            this.txtMatKhau.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtMatKhau.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtMatKhau.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtMatKhau.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtMatKhau.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
-            this.txtMatKhau.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtMatKhau.HoverState.BorderColor = System.Drawing.Color.Transparent;
-            this.txtMatKhau.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtMatKhau.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
-            this.txtMatKhau.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
-            this.txtMatKhau.IconRightCursor = System.Windows.Forms.Cursors.Hand;
-            this.txtMatKhau.Location = new System.Drawing.Point(65, 176);
-            this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.txtMatKhau.Name = "txtMatKhau";
-            this.txtMatKhau.PasswordChar = '●';
-            this.txtMatKhau.PlaceholderText = "Mật Khẩu";
-            this.txtMatKhau.SelectedText = "";
-            this.txtMatKhau.Size = new System.Drawing.Size(270, 40);
-            this.txtMatKhau.TabIndex = 4;
-            this.txtMatKhau.IconRightClick += new System.EventHandler(this.txtMatKhau_IconRightClick);
+            this.txtPassword.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
+            this.txtPassword.BorderRadius = 15;
+            this.txtPassword.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtPassword.DefaultText = "";
+            this.txtPassword.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtPassword.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtPassword.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtPassword.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtPassword.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
+            this.txtPassword.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
+            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtPassword.HoverState.BorderColor = System.Drawing.Color.Transparent;
+            this.txtPassword.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtPassword.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+            this.txtPassword.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
+            this.txtPassword.IconRightCursor = System.Windows.Forms.Cursors.Hand;
+            this.txtPassword.Location = new System.Drawing.Point(65, 136);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '●';
+            this.txtPassword.PlaceholderText = "Mật Khẩu";
+            this.txtPassword.SelectedText = "";
+            this.txtPassword.Size = new System.Drawing.Size(270, 40);
+            this.txtPassword.TabIndex = 4;
+            this.txtPassword.IconRightClick += new System.EventHandler(this.txtMatKhau_IconRightClick);
             // 
             // pnlBackground
             // 
@@ -222,12 +222,12 @@
         }
 
         #endregion
-        private Guna.UI2.WinForms.Guna2TextBox txtMatKhau;
-        private System.Windows.Forms.Label lblTieuDe;
-        private Guna.UI2.WinForms.Guna2Button btnDangKy;
-        private Guna.UI2.WinForms.Guna2Button btnDangNhap;
-        private Guna.UI2.WinForms.Guna2TextBox txtTaiKhoan;
-        private System.Windows.Forms.LinkLabel lnkQuenMatKhau;
+        private Guna.UI2.WinForms.Guna2TextBox txtPassword;
+        private System.Windows.Forms.Label lblTittle;
+        private Guna.UI2.WinForms.Guna2Button btnRegister;
+        private Guna.UI2.WinForms.Guna2Button btnLogin;
+        private Guna.UI2.WinForms.Guna2TextBox txtEmail;
+        private System.Windows.Forms.LinkLabel lnkForgotPassword;
         private Guna.UI2.WinForms.Guna2Panel pnlLogin;
         private Guna.UI2.WinForms.Guna2GradientPanel pnlBackground;
     }

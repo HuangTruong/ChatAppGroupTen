@@ -3,300 +3,184 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Guna.UI2.WinForms;
-
-using ChatApp.Helpers.Ui;
-using ChatApp.Services.Auth;
 using ChatApp.Services.Firebase;
 
 namespace ChatApp.Controllers
 {
-    // View interface: form CatDat sẽ implement cái này
-    public interface ICaiDatView
-    {
-        Panel PnlMain { get; }
-        Label LblTitle { get; }
-        Label LblTenDangNhap { get; }
-        Label LblEmail { get; }
-
-        Control TxtTenDangNhap { get; }
-        Control TxtEmail { get; }
-
-        Control BtnCopyUsername { get; }
-        Control BtnCopyEmail { get; }
-        Control BtnDoiMatKhau { get; }
-        Control BtnDoiEmail { get; }
-        Control BtnDong { get; }
-
-        Guna2CirclePictureBox PicAvatar { get; }
-        Control BtnDoiAvatar { get; }
-    }
-
+    /// <summary>
+    /// Controller cho màn hình Cài đặt:
+    /// - Tải avatar hiện tại.
+    /// - Cập nhật avatar.
+    /// - Đổi tên hiển thị.
+    /// - Đổi mật khẩu (và cập nhật lại token).
+    /// </summary>
     public class CaiDatController
     {
-        private readonly ICaiDatView _view;
+        #region ====== FIELDS ======
+
+        /// <summary>
+        /// Dịch vụ Auth làm việc với Firebase.
+        /// </summary>
         private readonly AuthService _authService;
 
-        private readonly string _taiKhoan;
-        private string _email;
+        /// <summary>
+        /// Mã người dùng Firebase (localId).
+        /// </summary>
+        private readonly string _localId;
 
-        public CaiDatController(ICaiDatView view, string taiKhoan, string email)
+        /// <summary>
+        /// Token hiện tại của người dùng. Có thể được cập nhật khi đổi mật khẩu.
+        /// </summary>
+        private string _token; // bỏ readonly để cập nhật token mới
+
+        #endregion
+
+        #region ====== KHỞI TẠO ======
+
+        /// <summary>
+        /// Khởi tạo controller cài đặt với localId và token hiện tại.
+        /// </summary>
+        public CaiDatController(string localId, string token)
         {
-            _view = view ?? throw new ArgumentNullException(nameof(view));
-            _taiKhoan = !string.IsNullOrWhiteSpace(taiKhoan)
-                ? taiKhoan
-                : throw new ArgumentNullException(nameof(taiKhoan));
-            _email = email ?? string.Empty;
-
-            _authService = new AuthService(FirebaseClientFactory.Create());
+            _localId = localId;
+            _token = token;
+            _authService = new AuthService();
         }
 
-        // ====== LIFECYCLE ======
+        #endregion
 
-        public async Task OnLoadAsync()
+        #region ====== LẤY AVATAR ======
+
+        /// <summary>
+        /// Tải avatar người dùng từ Firebase (base64 → Image).
+        /// </summary>
+        /// <returns>
+        /// Đối tượng <see cref="Image"/> nếu có avatar, 
+        /// hoặc null nếu không có / bị lỗi.
+        /// </returns>
+        public async Task<Image> LoadAvatarAsync()
         {
-            _view.TxtTenDangNhap.Text = _taiKhoan;
-            _view.TxtEmail.Text = _email;
-
-            // Khoá sửa username
-            if (_view.TxtTenDangNhap is TextBox tb)
-                tb.ReadOnly = true;
-            else
-                _view.TxtTenDangNhap.Enabled = false;
-
-            // Layout dùng helper
-            CaiDatLayoutHelper.CenterTitle(_view.LblTitle, _view.PnlMain);
-            CaiDatLayoutHelper.CenterAvatarAndButton(
-                _view.PicAvatar,
-                _view.BtnDoiAvatar,
-                _view.PnlMain);
-
-            CaiDatLayoutHelper.AlignAccountEmailRows(
-                _view.LblTenDangNhap, _view.TxtTenDangNhap, _view.BtnCopyUsername,
-                _view.LblEmail, _view.TxtEmail, _view.BtnCopyEmail,
-                _view.PnlMain);
-
-            CaiDatLayoutHelper.CenterBottomButtons(
-                _view.BtnDoiMatKhau,
-                _view.BtnDoiEmail,
-                _view.BtnDong,
-                _view.PnlMain);
-
-            await LoadAvatarAsync();
-        }
-
-        private async Task LoadAvatarAsync()
-        {
-            if (string.IsNullOrWhiteSpace(_taiKhoan)) return;
-
             try
             {
-                string base64 = await _authService.GetAvatarAsync(_taiKhoan);
-                if (string.IsNullOrWhiteSpace(base64)) return;
+                string base64 = await _authService.GetAvatarAsync(_localId);
+                if (string.IsNullOrEmpty(base64))
+                {
+                    return null;
+                }
 
                 byte[] bytes = Convert.FromBase64String(base64);
                 using (var ms = new MemoryStream(bytes))
                 {
-                    _view.PicAvatar.Image = Image.FromStream(ms);
+                    return Image.FromStream(ms);
                 }
             }
             catch
             {
-                // Ignore lỗi (network/base64) để form vẫn chạy bình thường
+                // Có thể log ra nếu cần, hiện tại trả null cho UI tự xử lý
+                return null;
             }
         }
 
-        // ====== VẼ VIỀN AVATAR ======
+        #endregion
 
-        public void OnAvatarPaint(object sender, PaintEventArgs e)
+        #region ====== CẬP NHẬT AVATAR ======
+
+        /// <summary>
+        /// Cập nhật avatar người dùng từ file ảnh trên máy.
+        /// </summary>
+        /// <param name="filePath">Đường dẫn file ảnh người dùng chọn.</param>
+        /// <returns>true nếu cập nhật thành công, false nếu lỗi.</returns>
+        public async Task<bool> UpdateAvatarAsync(string filePath)
         {
-            var box = sender as Guna2CirclePictureBox;
-            if (box == null) return;
-
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-            using (var pen = new Pen(Color.FromArgb(0, 120, 215), 3)) // viền xanh
-            {
-                var rect = new Rectangle(2, 2, box.Width - 4, box.Height - 4);
-                e.Graphics.DrawEllipse(pen, rect);
-            }
-        }
-
-        // ====== ĐỔI AVATAR ======
-
-        public async Task OnDoiAvatarAsync()
-        {
-            if (string.IsNullOrWhiteSpace(_taiKhoan))
-            {
-                MessageBox.Show("Không xác định được tài khoản hiện tại.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            using (var ofd = new OpenFileDialog())
-            {
-                ofd.Filter = "Ảnh đại diện (*.jpg;*.jpeg;*.png;*.bmp)|*.jpg;*.jpeg;*.png;*.bmp";
-                ofd.Title = "Chọn ảnh đại diện";
-
-                if (ofd.ShowDialog() != DialogResult.OK)
-                    return;
-
-                try
-                {
-                    // Preview trước trên UI
-                    using (var img = Image.FromFile(ofd.FileName))
-                    {
-                        _view.PicAvatar.Image = new Bitmap(img);
-                    }
-
-                    // File -> base64
-                    byte[] bytes = File.ReadAllBytes(ofd.FileName);
-                    string base64 = Convert.ToBase64String(bytes);
-
-                    _view.BtnDoiAvatar.Enabled = false;
-                    _view.BtnDoiAvatar.Text = "Đang tải lên...";
-
-                    if (_view is Form f1) f1.UseWaitCursor = true;
-
-                    await _authService.UpdateAvatarAsync(_taiKhoan, base64);
-
-                    MessageBox.Show("Cập nhật ảnh đại diện thành công!", "Thông báo",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Lỗi khi cập nhật ảnh đại diện: " + ex.Message, "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                finally
-                {
-                    _view.BtnDoiAvatar.Enabled = true;
-                    _view.BtnDoiAvatar.Text = "Đổi avatar";
-                    if (_view is Form f2) f2.UseWaitCursor = false;
-                }
-            }
-        }
-
-        // ====== ĐỔI MẬT KHẨU ======
-
-        public void OnDoiMatKhau()
-        {
-            if (string.IsNullOrWhiteSpace(_taiKhoan))
-            {
-                MessageBox.Show("Không xác định được tài khoản hiện tại.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            if (!(_view is Form owner))
-            {
-                MessageBox.Show("Không thể mở form đổi mật khẩu.", "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            var frm = new DoiMatKhau(_taiKhoan)
-            {
-                StartPosition = FormStartPosition.CenterParent
-            };
-            frm.ShowDialog(owner);
-        }
-
-        // ====== ĐỔI EMAIL ======
-
-        public async Task OnDoiEmailAsync()
-        {
-            string emailMoi = _view.TxtEmail.Text.Trim();
-
-            if (string.IsNullOrWhiteSpace(emailMoi))
-            {
-                MessageBox.Show("Email không được để trống.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (!emailMoi.Contains("@") || !emailMoi.Contains("."))
-            {
-                MessageBox.Show("Vui lòng nhập email hợp lệ.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (string.Equals(emailMoi, _email, StringComparison.OrdinalIgnoreCase))
-            {
-                MessageBox.Show("Email mới đang trùng với email hiện tại.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            var confirm = MessageBox.Show(
-                $"Bạn chắc chắn muốn đổi email sang:\n{emailMoi}?",
-                "Xác nhận",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
-
-            if (confirm != DialogResult.Yes) return;
-
-            _view.BtnDoiEmail.Enabled = false;
-            _view.BtnDoiEmail.Text = "Đang lưu...";
-            if (_view is Form f1) f1.UseWaitCursor = true;
-
             try
             {
-                bool exists = await _authService.EmailExistsAsync(emailMoi);
-                if (exists)
-                {
-                    MessageBox.Show("Email này đã được sử dụng cho tài khoản khác.", "Lỗi",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                byte[] bytes = File.ReadAllBytes(filePath);
+                string base64 = Convert.ToBase64String(bytes);
 
-                await _authService.UpdateEmailAsync(_taiKhoan, emailMoi);
-                _email = emailMoi;
-
-                MessageBox.Show("Đổi email thành công!", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await _authService.UpdateAvatarAsync(_localId, base64);
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể đổi email: " + ex.Message, "Lỗi",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                _view.BtnDoiEmail.Enabled = true;
-                _view.BtnDoiEmail.Text = "Đổi email";
-                if (_view is Form f2) f2.UseWaitCursor = false;
+                MessageBox.Show("Lỗi cập nhật avatar: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
-        // ====== TIỆN ÍCH ======
+        #endregion
 
-        public void OnCopyUsername()
+        #region ====== ĐỔI TÊN HIỂN THỊ ======
+
+        /// <summary>
+        /// Đổi tên hiển thị (display name) của người dùng.
+        /// </summary>
+        /// <param name="newUsername">Tên hiển thị mới.</param>
+        /// <returns>true nếu cập nhật thành công, false nếu lỗi.</returns>
+        public async Task<bool> ChangeUsernameAsync(string newUsername)
         {
-            if (!string.IsNullOrWhiteSpace(_taiKhoan))
+            try
             {
-                Clipboard.SetText(_taiKhoan);
-                MessageBox.Show("Đã sao chép tên đăng nhập vào clipboard.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (string.IsNullOrWhiteSpace(newUsername))
+                {
+                    MessageBox.Show("Tên hiển thị không được trống!",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                await _authService.UpdateUsernameAsync(_localId, newUsername);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi đổi tên hiển thị: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
-        public void OnCopyEmail()
+        #endregion
+
+        #region ====== ĐỔI MẬT KHẨU ======
+
+        /// <summary>
+        /// Đổi mật khẩu tài khoản hiện tại, đồng thời cập nhật token mới.
+        /// </summary>
+        /// <param name="newPassword">Mật khẩu mới.</param>
+        /// <returns>true nếu đổi thành công, false nếu lỗi.</returns>
+        public async Task<bool> ChangePasswordAsync(string newPassword)
         {
-            string email = _view.TxtEmail.Text.Trim();
-            if (!string.IsNullOrEmpty(email))
+            try
             {
-                Clipboard.SetText(email);
-                MessageBox.Show("Đã sao chép email vào clipboard.", "Thông báo",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (string.IsNullOrWhiteSpace(newPassword))
+                {
+                    MessageBox.Show("Mật khẩu mới không được để trống!",
+                        "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                var result = await _authService.UpdatePasswordAsync(_token, newPassword);
+
+                if (!result.success)
+                {
+                    MessageBox.Show("Đổi mật khẩu thất bại!",
+                        "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+
+                // Cập nhật token mới sau khi đổi mật khẩu
+                _token = result.newToken;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi đổi mật khẩu: " + ex.Message,
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
         }
 
-        public void OnDong()
-        {
-            if (_view is Form f)
-                f.Close();
-        }
+        #endregion
     }
 }

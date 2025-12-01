@@ -1,220 +1,177 @@
-﻿using Guna.UI2.WinForms;
-using System;
+﻿using System;
 using System.Windows.Forms;
+using Guna.UI2.WinForms;
 using ChatApp.Controllers;
 
 namespace ChatApp
 {
+    /// <summary>
+    /// Form Quên mật khẩu:
+    /// - Nhập email đã đăng ký.
+    /// - Gửi yêu cầu reset mật khẩu (link Firebase gửi qua email).
+    /// - Cho phép quay lại form Đăng nhập.
+    /// </summary>
     public partial class QuenMatKhau : Form
     {
-        #region === Biến ===
+        #region ====== FIELDS ======
 
-        private readonly ForgotPasswordController _controller = new ForgotPasswordController(); // Controller xử lý logic quên mật khẩu
+        /// <summary>
+        /// Controller xử lý logic quên mật khẩu (gọi Firebase / AuthService).
+        /// </summary>
+        private readonly ForgotPasswordController _controller = new ForgotPasswordController();
 
-        private string _taiKhoanDangXacNhan; // Lưu tài khoản đang xác nhận OTP
-        private DoiMatKhau _doiMatKhauForm;  // Form đổi mật khẩu
-
-        //private Timer _otpTimer; // Timer để hạn chế gửi OTP liên tục
+        /// <summary>
+        /// Cờ phân biệt trường hợp user bấm nút "Quay lại đăng nhập"
+        /// với việc tắt form bằng nút X.
+        /// </summary>
+        private bool isClosed = false;
 
         #endregion
 
-        #region === Khởi tạo ===
+        #region ====== KHỞI TẠO FORM ======
 
+        /// <summary>
+        /// Khởi tạo form Quên mật khẩu, gán sự kiện load form.
+        /// </summary>
         public QuenMatKhau()
         {
             InitializeComponent();
-            this.Load += QuenMatKhau_Load; // Gán sự kiện load form
+
+            // Gán sự kiện load form
+            this.Load += QuenMatKhau_Load;
         }
 
+        /// <summary>
+        /// Khi form được load:
+        /// - Gắn sự kiện click cho nút Xác nhận.
+        /// </summary>
         private void QuenMatKhau_Load(object sender, EventArgs e)
         {
-            // Gán sự kiện click cho nút gửi OTP
-            btnGuiMaXacNhan.Click -= btnGuiMaXacNhan_Click;
-            btnGuiMaXacNhan.Click += btnGuiMaXacNhan_Click;
-
-            // Gán sự kiện click cho nút xác nhận OTP
+            // Đảm bảo chỉ gắn handler một lần
             btnXacNhan.Click -= btnXacNhan_Click;
             btnXacNhan.Click += btnXacNhan_Click;
         }
 
         #endregion
 
-        #region === Gửi OTP ===
+        #region ====== XỬ LÝ XÁC NHẬN (GỬI LINK RESET) ======
 
-        // Xử lý gửi mã OTP đến email
-        // Xử lý gửi mã OTP đến email
-        private async void btnGuiMaXacNhan_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Sự kiện bấm nút "Xác nhận":
+        /// - Kiểm tra email hợp lệ.
+        /// - Gọi controller để gửi email reset mật khẩu.
+        /// - Thông báo kết quả cho người dùng.
+        /// </summary>
+        private async void btnXacNhan_Click(object sender, EventArgs e)
         {
             // Nếu đang disable (đã bấm rồi) thì bỏ qua
-            if (!btnGuiMaXacNhan.Enabled) return;
+            if (!btnXacNhan.Enabled)
+            {
+                return;
+            }
 
             string email = txtEmail.Text.Trim();
 
             // Kiểm tra email trước, chưa khóa nút vội
             if (string.IsNullOrWhiteSpace(email))
             {
-                MessageBox.Show("Vui lòng nhập email đã đăng ký!", "Thông báo",
-                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Vui lòng nhập email đã đăng ký!",
+                    "Thông báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+
                 return;
             }
 
-            // Từ đây trở đi bắt đầu xử lý gửi OTP → khóa nút ngay
-            DoiTrangThaiNut(btnGuiMaXacNhan, false);
+            // Từ đây trở đi bắt đầu xử lý → khóa nút ngay để tránh spam
+            DoiTrangThaiNut(btnXacNhan, false);
 
             try
             {
-                // 1) Tìm tài khoản trong Firebase theo email
-                string taiKhoan = await _controller.TimTaiKhoanBangEmailAsync(email);
-                if (taiKhoan == null)
+                // 1) Gửi yêu cầu quên mật khẩu (Firebase sẽ gửi link reset về email)
+                bool success = await _controller.QuenMatKhauAsync(email);
+
+                if (success)
                 {
-                    MessageBox.Show("Không tìm thấy tài khoản nào với email này!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    // Gửi thất bại → mở lại nút cho user thử lại
-                    DoiTrangThaiNut(btnGuiMaXacNhan, true);
-                    return;
+                    MessageBox.Show(
+                        "Đã gửi link đặt lại mật khẩu đến email của bạn. Vui lòng kiểm tra hộp thư.",
+                        "Thông báo",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
                 }
-
-                // Lưu lại để xài cho bước xác nhận OTP và đổi mật khẩu
-                _taiKhoanDangXacNhan = taiKhoan;
-                // txtTaiKhoan.Text = taiKhoan; // nếu muốn show ra
-
-                // 2) Tạo OTP và lưu vào Firebase theo tài khoản tìm được
-                string otp = await _controller.TaoVaLuuOtpAsync(taiKhoan, email);
-                if (otp == null)
+                else
                 {
-                    MessageBox.Show("Không thể tạo mã xác nhận. Vui lòng thử lại sau!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    // Gửi thất bại → mở lại nút
-                    DoiTrangThaiNut(btnGuiMaXacNhan, true);
-                    return;
+                    MessageBox.Show(
+                        "Không tìm thấy tài khoản với email này hoặc có lỗi xảy ra!",
+                        "Lỗi",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                 }
-
-                // 3) Gửi OTP qua email
-                _controller.GuiEmailOtp(email, otp);
-
-                MessageBox.Show("Đã gửi mã xác nhận qua email (hạn trong 5 phút).",
-                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtMaXacNhan.Focus();
-
-                DoiTrangThaiNut(btnGuiMaXacNhan, true);
-
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi gửi mã xác nhận: " + ex.Message, "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                // Có exception → mở lại nút để user thử lại
-                DoiTrangThaiNut(btnGuiMaXacNhan, true);
-            }
-        }
-
-
-        #endregion
-
-        #region === Xác nhận OTP ===
-
-        // Xử lý xác nhận OTP và mở form đổi mật khẩu
-        private async void btnXacNhan_Click(object sender, EventArgs e)
-        {
-            DoiTrangThaiNut(btnXacNhan, false); // Disable nút khi đang xử lý
-
-            try
-            {
-                string maNhap = txtMaXacNhan.Text.Trim();
-
-                if (string.IsNullOrWhiteSpace(maNhap))
-                {
-                    MessageBox.Show("Vui lòng nhập mã xác nhận!", "Thông báo",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(_taiKhoanDangXacNhan))
-                {
-                    MessageBox.Show("Bạn chưa gửi mã xác nhận!", "Thông báo",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Kiểm tra OTP hợp lệ
-                bool hopLe = await _controller.KiemTraOtpHopLeAsync(_taiKhoanDangXacNhan, maNhap);
-
-                if (!hopLe)
-                {
-                    MessageBox.Show("Mã xác nhận không đúng hoặc đã hết hạn!", "Lỗi",
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                MessageBox.Show("Xác nhận thành công! Vui lòng đổi mật khẩu mới.",
-                                "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                MoFormDoiMatKhau(_taiKhoanDangXacNhan); // Mở form đổi mật khẩu
-                this.Hide();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi xác nhận mã: " + ex.Message, "Lỗi",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    "Lỗi khi gửi email: " + ex.Message,
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
             finally
             {
-                DoiTrangThaiNut(btnXacNhan, true); // Bật lại nút
+                // Mở lại nút, tắt cursor chờ
+                DoiTrangThaiNut(btnXacNhan, true);
             }
         }
 
         #endregion
 
-        #region === Tiện ích ===
+        #region ====== TIỆN ÍCH ======
 
-        // Thay đổi trạng thái nút (enable/disable)
+        /// <summary>
+        /// Thay đổi trạng thái nút (enable/disable),
+        /// đồng thời quản lý AcceptButton và con trỏ chờ.
+        /// </summary>
+        /// <param name="btn">Nút Guna2Button cần thay đổi trạng thái.</param>
+        /// <param name="enable">true nếu bật nút, false nếu vô hiệu hóa.</param>
         private void DoiTrangThaiNut(Guna2Button btn, bool enable)
         {
             btn.Enabled = enable;
-            this.AcceptButton = enable ? btn : null; // ENTER chỉ active khi nút enable
-            this.UseWaitCursor = !enable; // Hiển thị cursor chờ khi disable
-        }
 
-        // Mở form đổi mật khẩu, nếu đã mở thì focus
-        private void MoFormDoiMatKhau(string taiKhoan)
-        {
-            if (_doiMatKhauForm != null && !_doiMatKhauForm.IsDisposed)
-            {
-                _doiMatKhauForm.Show();
-                _doiMatKhauForm.Activate();
-            }
-            else
-            {
-                _doiMatKhauForm = new DoiMatKhau(taiKhoan);
-                _doiMatKhauForm.Tag = this; // Lưu form hiện tại để truy cập khi cần
-                _doiMatKhauForm.FormClosed += (s, _) => _doiMatKhauForm = null;
-                _doiMatKhauForm.Show();
-            }
+            // ENTER chỉ active khi nút đang enable
+            this.AcceptButton = enable ? btn : null;
+
+            // Hiển thị cursor chờ khi đang xử lý
+            this.UseWaitCursor = !enable;
         }
 
         #endregion
 
-        #region === Quay lại đăng nhập ===
+        #region ====== QUAY LẠI ĐĂNG NHẬP / ĐÓNG FORM ======
 
-        // Quay về form đăng nhập
+        /// <summary>
+        /// Sự kiện nút "Quay lại đăng nhập":
+        /// - Đặt cờ isClosed và đóng form.
+        /// Form gọi bên ngoài sẽ quyết định hiển thị lại form Đăng nhập.
+        /// </summary>
         private void btnQuayLaiDangNhap_Click(object sender, EventArgs e)
         {
-            if (this.Tag is Form formDangNhap && !formDangNhap.IsDisposed)
-                formDangNhap.Show();
-            else
-                new DangNhap().Show();
-
+            isClosed = true;
             this.Close();
         }
 
-        #endregion
-
+        /// <summary>
+        /// Sự kiện khi form Quên mật khẩu bị đóng.
+        /// Ở đây có cờ isClosed để tránh vòng lặp đóng form.
+        /// </summary>
         private void QuenMatKhau_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit();
+            if (!isClosed)
+            {
+                this.Close();
+            }
         }
+
+        #endregion
     }
 }

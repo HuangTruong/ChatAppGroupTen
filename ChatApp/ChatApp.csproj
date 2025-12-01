@@ -35,11 +35,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Firebase, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FirebaseDatabase.net.5.0.0\lib\netstandard2.0\Firebase.dll</HintPath>
+    </Reference>
     <Reference Include="FireSharp, Version=2.0.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FireSharp.2.0.4\lib\portable-net45+sl5+wp8+win8\FireSharp.dll</HintPath>
     </Reference>
     <Reference Include="Guna.UI2, Version=2.0.4.7, Culture=neutral, PublicKeyToken=8b9d14aa5142e261, processorArchitecture=MSIL">
       <HintPath>..\packages\Guna.UI2.WinForms.2.0.4.7\lib\net472\Guna.UI2.dll</HintPath>
+    </Reference>
+    <Reference Include="LiteDB, Version=5.0.21.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteDB.5.0.21\lib\net45\LiteDB.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Threading.Tasks, Version=1.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.dll</HintPath>
@@ -57,6 +63,9 @@
     <Reference Include="System">
       <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.dll</HintPath>
     </Reference>
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Design" />
@@ -69,8 +78,18 @@
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Reactive, Version=6.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.6.1.0\lib\net472\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -80,41 +99,18 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CaiDatController.cs" />
     <Compile Include="Controllers\DangKyController.cs" />
     <Compile Include="Controllers\DangNhapController.cs" />
-    <Compile Include="Controllers\DoiMatKhauController.cs" />
-    <Compile Include="Controllers\NhanTinController\NhanTinController.Chat.cs" />
-    <Compile Include="Controllers\NhanTinController\NhanTinController.Core.cs" />
-    <Compile Include="Controllers\NhanTinController\NhanTinController.FriendsAndSearch.cs" />
-    <Compile Include="Controllers\NhanTinController\NhanTinController.Groups.cs" />
-    <Compile Include="Controllers\QuanLyThanhVienNhom.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controllers\QuanLyThanhVienNhom.Designer.cs">
-      <DependentUpon>QuanLyThanhVienNhom.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controllers\QuenMatKhauController.cs" />
-    <Compile Include="Controllers\TrangChuController.cs" />
     <Compile Include="Forms\CaiDat.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CaiDat.Designer.cs">
       <DependentUpon>CaiDat.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ChonThanhVien.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ChonThanhVien.Designer.cs">
-      <DependentUpon>ChonThanhVien.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\EmojiPickerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\EmojiPickerForm.Designer.cs">
-      <DependentUpon>EmojiPickerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\XacNhanEmail.cs">
       <SubType>Form</SubType>
@@ -122,19 +118,7 @@
     <Compile Include="Forms\XacNhanEmail.Designer.cs">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\Common\ChatInputHandler.cs" />
-    <Compile Include="Helpers\Common\KeySanitizer.cs" />
-    <Compile Include="Helpers\Common\TimeParser.cs" />
-    <Compile Include="Helpers\Ui\CaiDatLayoutHelper.cs" />
-    <Compile Include="Helpers\Ui\ChatBubbleFactory.cs" />
-    <Compile Include="Helpers\Ui\ControlExtensions.cs" />
-    <Compile Include="Helpers\Ui\FileLinkPrompt.cs" />
-    <Compile Include="Helpers\Ui\FocusExtensions.cs" />
-    <Compile Include="Helpers\Ui\MessageRenderQueue.cs" />
-    <Compile Include="Models\Chat\Nhom.cs" />
-    <Compile Include="Models\Chat\TinNhan.cs" />
-    <Compile Include="Models\Chat\UserListItem.cs" />
-    <Compile Include="Models\Otp\ThongTinMaFirebase.cs" />
+    <Compile Include="Helpers\KeySanitizer.cs" />
     <Compile Include="Models\Users\User.cs" />
     <Compile Include="Forms\NhanTin.cs">
       <SubType>Form</SubType>
@@ -148,17 +132,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\Auth\EmailVerificationService.cs" />
-    <Compile Include="Services\Chat\FriendService.cs" />
-    <Compile Include="Services\Chat\StatusService.cs" />
-    <Compile Include="Services\Chat\TypingService.cs" />
-    <Compile Include="Services\Email\IEmailSender.cs" />
     <Compile Include="Services\Email\SmtpEmailSender.cs" />
-    <Compile Include="UserControl\CuocTroChuyen.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\CuocTroChuyen.Designer.cs">
-      <DependentUpon>CuocTroChuyen.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Services\Firebase\AuthService.cs" />
+    <Compile Include="Services\Firebase\FirebaseConfig.cs" />
+    <Compile Include="Services\Firebase\HttpService.cs" />
     <Compile Include="Forms\DangKy.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,31 +148,8 @@
     <Compile Include="Forms\DangNhap.Designer.cs">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DoiMatKhau.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\DoiMatKhau.Designer.cs">
-      <DependentUpon>DoiMatKhau.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\Auth\AuthService.cs" />
-    <Compile Include="Services\Auth\OtpService.cs" />
-    <Compile Include="Services\Chat\ChatService.cs" />
-    <Compile Include="Services\Chat\GroupService.cs" />
-    <Compile Include="Services\Firebase\FirebaseClientFactory.cs" />
-    <Compile Include="UserControl\TinNhanCuaBan.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaBan.Designer.cs">
-      <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaToi.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControl\TinNhanCuaToi.Designer.cs">
-      <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\TrangChu.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,12 +162,6 @@
     <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\TinNhanBubble.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <EmbeddedResource Include="Controllers\QuanLyThanhVienNhom.resx">
-      <DependentUpon>QuanLyThanhVienNhom.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CaiDat.resx">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </EmbeddedResource>
@@ -223,31 +171,16 @@
     <EmbeddedResource Include="Forms\XacNhanEmail.resx">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\CuocTroChuyen.resx">
-      <DependentUpon>CuocTroChuyen.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\DangKy.resx">
       <DependentUpon>DangKy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DangNhap.resx">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DoiMatKhau.resx">
-      <DependentUpon>DoiMatKhau.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\TinNhanBubble.resx">
-      <DependentUpon>TinNhanBubble.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\TinNhanCuaBan.resx">
-      <DependentUpon>TinNhanCuaBan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControl\TinNhanCuaToi.resx">
-      <DependentUpon>TinNhanCuaToi.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TrangChu.resx">
       <DependentUpon>TrangChu.cs</DependentUpon>
@@ -290,9 +223,7 @@
   <ItemGroup>
     <None Include="Resources\icons8-person-90 %281%29.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\Logo.jpg" />
   </ItemGroup>

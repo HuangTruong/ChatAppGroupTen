@@ -6,62 +6,120 @@ using ChatApp.Controllers;
 
 namespace ChatApp
 {
+    /// <summary>
+    /// Form Đăng nhập:
+    /// - Cho phép người dùng nhập email / mật khẩu.
+    /// - Xử lý đăng nhập qua LoginController.
+    /// - Điều hướng sang các form Đăng ký, Quên mật khẩu, Trang chủ.
+    /// </summary>
     public partial class DangNhap : Form
     {
-        private readonly LoginController _loginController = new LoginController();
-        bool isMatKhau = true;  // Theo dõi trạng thái ẩn/hiện mật khẩu
+        #region ====== FIELDS ======
 
+        /// <summary>
+        /// Controller xử lý logic đăng nhập với Firebase / backend.
+        /// </summary>
+        private readonly LoginController _loginController = new LoginController();
+
+        /// <summary>
+        /// Cờ theo dõi trạng thái ẩn / hiện mật khẩu.
+        /// true  = đang ẩn mật khẩu;
+        /// false = đang hiển thị mật khẩu.
+        /// </summary>
+        private bool isMatKhau = true;
+
+        #endregion
+
+        #region ====== KHỞI TẠO FORM ======
+
+        /// <summary>
+        /// Khởi tạo form Đăng nhập, thiết lập focus và phím tắt ENTER.
+        /// </summary>
         public DangNhap()
         {
             InitializeComponent();
 
-            txtTaiKhoan.Focus(); // Khi form mở, con trỏ nằm sẵn ở ô tài khoản
-            this.AcceptButton = btnDangNhap; // Cho phép nhấn ENTER để kích hoạt nút Đăng nhập
+            // Khi form mở, con trỏ nằm sẵn ở ô tài khoản
+            txtEmail.Focus();
+
+            // Cho phép nhấn ENTER để kích hoạt nút Đăng nhập
+            this.AcceptButton = btnLogin;
         }
 
-        #region Sư kiện nút Đăng ký ,mở form Đăng ký
+        #endregion
+
+        #region ====== ĐIỀU HƯỚNG: ĐĂNG KÝ / QUÊN MẬT KHẨU ======
+
+        /// <summary>
+        /// Mở form Đăng ký khi người dùng bấm nút "Đăng ký".
+        /// </summary>
         private void btnDangKy_Click(object sender, EventArgs e)
         {
-            var DangKyForm = new DangKy();
-            DangKyForm.FormClosed += (s,args) => this.Show();  // Quay lại Form Đăng nhập khi Form Đăng kí đóng
-            DangKyForm.Show();
+            var dangKyForm = new DangKy();
+
+            // Khi form Đăng ký đóng, hiện lại form Đăng nhập
+            dangKyForm.FormClosed += (s, args) => this.Show();
+
+            dangKyForm.Show();
             this.Hide();
         }
-        #endregion
 
-        #region Sự kiện link Quên mật khẩu , mở form Quên mật khẩu
+        /// <summary>
+        /// Mở form Quên mật khẩu khi người dùng bấm link "Quên mật khẩu".
+        /// </summary>
         private void lnkQuenMatKhau_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            var QuenMKForm = new QuenMatKhau();
-            QuenMKForm.Tag = this;
-            QuenMKForm.Show();
+            var quenMkForm = new QuenMatKhau();
+
+            // Khi form Quên mật khẩu đóng, hiện lại form Đăng nhập
+            quenMkForm.FormClosed += (s, args) => this.Show();
+
+            quenMkForm.Show();
             this.Hide();
         }
+
         #endregion
 
-        #region Sự kiện nút Đăng nhập
+        #region ====== XỬ LÝ ĐĂNG NHẬP ======
+
+        /// <summary>
+        /// Sự kiện bấm nút Đăng nhập.
+        /// Gọi LoginController để kiểm tra tài khoản, nếu thành công thì chuyển sang form Trang chủ.
+        /// </summary>
         private async void btnDangNhap_Click(object sender, EventArgs e)
         {
-            if (!btnDangNhap.Enabled) return;
+            // Nếu nút đang bị disable (đang xử lý) thì bỏ qua
+            if (!btnLogin.Enabled)
+            {
+                return;
+            }
 
-            btnDangNhap.Enabled = false;
+            // Vô hiệu hóa nút đăng nhập để tránh spam
+            btnLogin.Enabled = false;
             this.UseWaitCursor = true;
 
             try
             {
-                var user = await _loginController.DangNhapAsync(txtTaiKhoan.Text, txtMatKhau.Text);
+                // Gọi controller xử lý đăng nhập (Firebase / backend)
+                var (localId, token) = await _loginController.DangNhapAsync(
+                    txtEmail.Text,
+                    txtPassword.Text);
 
                 MessageBox.Show("Đăng nhập thành công!", "Thông báo",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                // Ẩn form đăng nhập, mở form Trang chủ
                 this.Hide();
-                var home = new TrangChu(user.Ten, user.TaiKhoan);
+                var home = new TrangChu(localId, token);
+
+                // Khi form Trang chủ đóng, hiện lại form Đăng nhập
                 home.FormClosed += (s, e2) => this.Show();
                 home.Show();
 
-                txtTaiKhoan.Clear();
-                txtMatKhau.Clear();
-                txtTaiKhoan.Focus();
+                // Reset lại input
+                txtEmail.Clear();
+                txtPassword.Clear();
+                txtEmail.Focus();
             }
             catch (Exception ex)
             {
@@ -71,36 +129,54 @@ namespace ChatApp
                 // Nếu sai mật khẩu -> xóa mật khẩu, giữ nguyên tài khoản
                 if (ex.Message.Contains("Mật khẩu không đúng"))
                 {
-                    txtMatKhau.Clear();
-                    txtMatKhau.Focus();
+                    txtPassword.Clear();
+                    txtPassword.Focus();
                 }
             }
             finally
             {
-                btnDangNhap.Enabled = true;
+                // Bật lại nút và tắt con trỏ chờ
+                btnLogin.Enabled = true;
                 this.UseWaitCursor = false;
             }
         }
 
         #endregion
 
-        #region Sự kiện click vào icon con mắt để ẩn/hiện mật khẩu
+        #region ====== ẨN / HIỆN MẬT KHẨU ======
+
+        /// <summary>
+        /// Sự kiện click vào icon con mắt bên phải ô mật khẩu
+        /// để bật / tắt chế độ ẩn mật khẩu.
+        /// </summary>
         private void txtMatKhau_IconRightClick(object sender, EventArgs e)
         {
+            // Đảo trạng thái cờ
             isMatKhau = !isMatKhau;
-            txtMatKhau.PasswordChar = isMatKhau ? '●' : '\0';
-            txtMatKhau.IconRight = isMatKhau
+
+            // Nếu isMatKhau = true -> dùng ký tự '●', ngược lại hiển thị rõ
+            txtPassword.PasswordChar = isMatKhau ? '●' : '\0';
+
+            // Thay đổi icon tương ứng (ẩn / hiện mật khẩu)
+            txtPassword.IconRight = isMatKhau
                 ? Properties.Resources.AnMatKhau
                 : Properties.Resources.HienMatKhau;
         }
+
         #endregion
 
-        #region Sự kiện form closed. Đóng toàn bộ ứng dụng khi form đăng nhập bị tắt
+        #region ====== VÒNG ĐỜI FORM ======
+
+        /// <summary>
+        /// Khi form Đăng nhập bị đóng (user tắt cửa sổ),
+        /// thoát toàn bộ ứng dụng.
+        /// </summary>
         private void DangNhap_FormClosed(object sender, FormClosedEventArgs e)
         {
             Application.Exit();
             Environment.Exit(0);
         }
+
         #endregion
     }
 }

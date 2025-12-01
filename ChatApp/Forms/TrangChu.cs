@@ -1,173 +1,148 @@
-﻿using ChatApp.Models.Users;
-using ChatApp.Services.Auth;
-using ChatApp.Services.Firebase;
-using FireSharp.Interfaces;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using FireSharp.Interfaces;
+
+using ChatApp.Models.Users;
+using ChatApp.Services.Firebase;
 
 namespace ChatApp
 {
+    /// <summary>
+    /// Form Trang chủ:
+    /// - Là màn hình chính sau khi đăng nhập.
+    /// - Điều hướng tới:
+    ///   + Màn hình Nhắn tin.
+    ///   + Màn hình Cài đặt tài khoản.
+    ///   + Đăng xuất (cập nhật trạng thái offline).
+    /// </summary>
     public partial class TrangChu : Form
     {
-        private readonly string _ten;          // Tên hiển thị (từ form login)
-        private readonly string _taiKhoan;     // Khóa để query Firebase
+        #region ====== FIELDS ======
 
-        private readonly IFirebaseClient _fbClient;
-        private readonly AuthService _authService; // dùng để cập nhật status
+        /// <summary>
+        /// Mã người dùng Firebase (localId).
+        /// </summary>
+        private readonly string _localId;
 
+        /// <summary>
+        /// Token đăng nhập hiện tại.
+        /// </summary>
+        private readonly string _token;
+
+        /// <summary>
+        /// Dịch vụ Auth để cập nhật trạng thái người dùng (online/offline).
+        /// </summary>
+        private readonly AuthService _authService;
+
+        /// <summary>
+        /// Form nhắn tin (màn hình chat chính).
+        /// </summary>
         private NhanTin _nhanTinForm;
+
+        /// <summary>
+        /// Cờ đánh dấu đang mở form Nhắn tin (tránh double-click mở nhiều lần).
+        /// </summary>
         private bool _isOpeningNhanTin = false;
 
-        private Label lblChaoMung;
-        private readonly ToolTip _tipTen = new ToolTip();
+        #endregion
 
-        private User _currentUser;             // dữ liệu user lấy từ Firebase
+        #region ====== KHỞI TẠO FORM ======
 
-        public TrangChu(string ten, string taiKhoan)
+        /// <summary>
+        /// Khởi tạo form Trang chủ với localId và token hiện tại.
+        /// </summary>
+        /// <param name="localId">Mã người dùng Firebase.</param>
+        /// <param name="token">Token đăng nhập.</param>
+        public TrangChu(string localId, string token)
         {
             InitializeComponent();
 
-            _ten = ten;
-            _taiKhoan = taiKhoan;
-            _fbClient = FirebaseClientFactory.Create();
-            _authService = new AuthService(_fbClient);
+            _localId = localId;
+            _token = token;
 
-            TaoLabelChaoMung();
-            LayHeaderContainer().Resize += (s, e) => CanhGiuaChaoMung();
-        }
-
-        #region Label chào mừng
-
-        private void TaoLabelChaoMung()
-        {
-            lblChaoMung = new Label
-            {
-                AutoSize = true,
-                Text = "Chào mừng",
-                Font = new Font("Segoe UI", 14f, FontStyle.Bold),
-                ForeColor = Color.White,
-                BackColor = Color.Transparent,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Padding = new Padding(6, 0, 6, 0)
-            };
-
-            var header = LayHeaderContainer();
-            header.Controls.Add(lblChaoMung);
-            CanhGiuaChaoMung();
-        }
-
-        private Control LayHeaderContainer()
-        {
-            return (lblTenDangNhap != null && lblTenDangNhap.Parent != null)
-                ? (Control)lblTenDangNhap.Parent
-                : this;
-        }
-
-        private void DatNoiDungChaoMung(string tenHienThi)
-        {
-            string display = string.IsNullOrWhiteSpace(tenHienThi)
-                ? (_ten ?? _taiKhoan)
-                : tenHienThi;
-
-            lblChaoMung.Text = $"Chào mừng '{display}'";
-            _tipTen.SetToolTip(lblChaoMung, display);
-
-            if (lblTenDangNhap != null)
-                lblTenDangNhap.Text = string.Empty;
-
-            CanhGiuaChaoMung();
-        }
-
-        private void CanhGiuaChaoMung()
-        {
-            if (lblChaoMung == null) return;
-
-            Control header = LayHeaderContainer();
-            lblChaoMung.Left = Math.Max((header.ClientSize.Width - lblChaoMung.Width) / 2, 8);
-            lblChaoMung.Top = Math.Max((header.ClientSize.Height - lblChaoMung.Height) / 2, 0);
+            _authService = new AuthService();
         }
 
         #endregion
 
-        #region Load form
+        #region ====== LOAD FORM ======
 
+        /// <summary>
+        /// Sự kiện khi form Trang chủ được load:
+        /// - Gán event click/double-click cho cụm "Nhắn tin".
+        /// - Gán event click cho icon Cài đặt.
+        /// - Gán event click cho icon Đăng xuất.
+        /// </summary>
         private async void TrangChu_Load(object sender, EventArgs e)
         {
-            // Gán event Nhắn tin
-            foreach (Control c in new Control[] { pnlNhanTin, picNhanTin, lblNhanTin })
+            // ===== Nút Nhắn tin =====
+            Control[] nhanTinControls = { pnlNhanTin, picNhanTin, lblNhanTin };
+            foreach (var c in nhanTinControls)
             {
-                c.Click -= pnlNhanTin_Click;           // tránh bị gắn trùng
+                c.Cursor = Cursors.Hand;
+
+                // Tránh gán trùng event trước đó
+                c.Click -= pnlNhanTin_Click;
                 c.DoubleClick -= pnlNhanTin_Click;
+
                 c.Click += pnlNhanTin_Click;
                 c.DoubleClick += pnlNhanTin_Click;
             }
 
-            // Gán event Cài đặt
+            // ===== Nút Cài đặt =====
             if (picCaiDat != null)
             {
                 picCaiDat.Cursor = Cursors.Hand;
-
-                // remove trước rồi add, tránh bị gắn 2 lần
                 picCaiDat.Click -= picCaiDat_Click;
                 picCaiDat.Click += picCaiDat_Click;
             }
 
-            await LoadUserFromFirebase();
-        }
-
-        private async Task LoadUserFromFirebase()
-        {
-            try
+            // ===== Nút Đăng xuất =====
+            if (picDangXuat != null)
             {
-                // chỉnh path cho đúng cấu trúc DB của bạn
-                var res = await _fbClient.GetAsync($"users/{_taiKhoan}");
-                _currentUser = res.ResultAs<User>();
+                picDangXuat.Cursor = Cursors.Hand;
+                picDangXuat.Click -= picDangXuat_Click;
+                picDangXuat.Click += picDangXuat_Click;
+            }
 
-                DatNoiDungChaoMung(_currentUser?.Ten ?? _ten ?? _taiKhoan);
-            }
-            catch
-            {
-                _currentUser = null;
-                DatNoiDungChaoMung(_ten ?? _taiKhoan);
-            }
+            // Nếu sau này bạn muốn: có thể load thêm thông tin user, avatar, status... ở đây
         }
 
         #endregion
 
-        #region Nhắn tin
+        #region ====== NHẮN TIN ======
 
+        /// <summary>
+        /// Sự kiện click/double-click vào vùng Nhắn tin:
+        /// - Mở form NhanTin (màn hình chat chính).
+        /// - Ẩn form Trang chủ trong lúc chat.
+        /// </summary>
         private void pnlNhanTin_Click(object sender, EventArgs e)
         {
-            if (_isOpeningNhanTin) return;
+            // Nếu đang trong quá trình mở thì bỏ qua (tránh double click)
+            if (_isOpeningNhanTin)
+            {
+                return;
+            }
+
             _isOpeningNhanTin = true;
+
+            // Vô hiệu hoá vùng Nhắn tin để tránh click liên tiếp
             ToggleNhanTinTargets(false);
 
             try
             {
-                if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
-                {
-                    _nhanTinForm.WindowState = FormWindowState.Normal;
-                    _nhanTinForm.Show();
-                    _nhanTinForm.Activate();
-                    _nhanTinForm.BringToFront();
-                    this.Hide();
-                    return;
-                }
+                _nhanTinForm = new NhanTin(_localId, _token);
 
-                _nhanTinForm = new NhanTin(_taiKhoan, _ten) // truyền taiKhoan nếu form chat cần
-                {
-                    StartPosition = FormStartPosition.CenterParent
-                };
+                // Khi form Nhắn tin đóng thì hiện lại Trang chủ
+                _nhanTinForm.FormClosed += (s, args) => this.Show();
 
-                _nhanTinForm.FormClosed += (s, args) =>
-                {
-                    _nhanTinForm = null;
-                    this.Show();
-                };
-
+                // Show form Nhắn tin, Trang chủ làm owner
                 _nhanTinForm.Show(this);
+
+                // Ẩn form Trang chủ khi đang ở màn hình Nhắn tin
                 this.Hide();
             }
             finally
@@ -177,78 +152,52 @@ namespace ChatApp
             }
         }
 
+        /// <summary>
+        /// Bật / tắt trạng thái enable cho cụm điều khiển Nhắn tin
+        /// và hiển thị cursor chờ khi cần.
+        /// </summary>
+        /// <param name="enabled">true nếu cho phép click; false để khóa.</param>
         private void ToggleNhanTinTargets(bool enabled)
         {
             pnlNhanTin.Enabled = enabled;
             picNhanTin.Enabled = enabled;
             lblNhanTin.Enabled = enabled;
+
+            // Khi đang xử lý mở form, hiển thị cursor chờ
             this.UseWaitCursor = !enabled;
         }
 
         #endregion
 
-        #region Cài đặt
+        #region ====== CÀI ĐẶT ======
 
+        /// <summary>
+        /// Sự kiện click vào icon Cài đặt:
+        /// - Mở form CatDat để đổi avatar, mật khẩu, tên hiển thị.
+        /// </summary>
         private void picCaiDat_Click(object sender, EventArgs e)
         {
-            if (_currentUser == null)
+            using (var frm = new CatDat(_localId, _token))
             {
-                MessageBox.Show("Không lấy được thông tin tài khoản từ Firebase.",
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            string taiKhoan = _currentUser.TaiKhoan ?? _taiKhoan;
-            string email = _currentUser.Email ?? string.Empty;
-
-            using (var frm = new CatDat(taiKhoan, email))
-            {
-                frm.StartPosition = FormStartPosition.CenterParent;
                 frm.ShowDialog(this);
             }
         }
 
         #endregion
 
-        #region Đăng xuất
+        #region ====== ĐĂNG XUẤT ======
 
-        private void picDangXuat_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Sự kiện click icon Đăng xuất:
+        /// - Cập nhật trạng thái người dùng sang "offline".
+        /// - Đóng form Trang chủ (có thể trả control về form Đăng nhập bên ngoài).
+        /// </summary>
+        private async void picDangXuat_Click(object sender, EventArgs e)
         {
-            if (_currentUser == null)
-            {
-                MessageBox.Show("Không lấy được thông tin tài khoản từ Firebase.",
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+            // Cập nhật trạng thái offline trước khi đóng
+            await _authService.UpdateStatusAsync(_localId, "offline");
 
             this.Close();
-        }
-
-        protected override async void OnFormClosing(FormClosingEventArgs e)
-        {
-            // Nếu đang có form Nhắn tin thì đóng lại để nó tự dọn Firebase stream + timer
-            if (_nhanTinForm != null && !_nhanTinForm.IsDisposed)
-            {
-                try
-                {
-                    _nhanTinForm.Close();
-                    _nhanTinForm = null;
-                }
-                catch
-                {
-                    // Bỏ qua lỗi nếu có
-                }
-            }
-            try
-            {
-                await _authService.UpdateStatusAsync(_ten, "offline");
-            }
-            catch
-            {
-                // Không làm crash app nếu lỗi mạng/Firebase
-            }
-
-            base.OnFormClosing(e);
         }
 
         #endregion
