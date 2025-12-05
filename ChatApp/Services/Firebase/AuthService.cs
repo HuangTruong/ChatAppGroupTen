@@ -317,5 +317,40 @@ namespace ChatApp.Services.Firebase
         }
 
         #endregion
+
+        #region ====== TẢI DỮ LIỆU USER (PROFILE) ======
+
+        /// <summary>
+        /// Tải thông tin chi tiết (hồ sơ) của một người dùng từ Realtime Database.
+        /// Dùng để lấy FullName, DisplayName, Avatar... của người dùng khác.
+        /// </summary>
+        /// <param name="localId">ID của người dùng cần truy vấn (UID).</param>
+        /// <returns>Đối tượng User chứa hồ sơ người dùng.</returns>
+        public async Task<User> GetUserByIdAsync(string localId)
+        {
+            if (string.IsNullOrWhiteSpace(localId))
+            {
+                return null;
+            }
+
+            string safeId = KeySanitizer.SafeKey(localId);
+
+            // Đường dẫn truy vấn: /users/{localId}
+            string url = Db($"users/{safeId}");
+
+            // Sử dụng HttpService để GET dữ liệu và deserialize sang User Model
+            var userProfile = await _http.GetAsync<User>(url);
+
+            if (userProfile != null)
+            {
+                // Gán LocalId vào User object để đảm bảo thông tin đầy đủ
+                // (Đây là giải pháp cho vấn đề ta đã thảo luận trước đó)
+                userProfile.LocalId = localId;
+            }
+
+            return userProfile;
+        }
+
+        #endregion
     }
 }
