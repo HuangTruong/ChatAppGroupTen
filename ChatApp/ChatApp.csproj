@@ -105,12 +105,43 @@
     <Compile Include="Controllers\CaiDatController.cs" />
     <Compile Include="Controllers\DangKyController.cs" />
     <Compile Include="Controllers\DangNhapController.cs" />
+    <Compile Include="Controllers\FriendController.cs" />
     <Compile Include="Controllers\QuenMatKhauController.cs" />
+    <Compile Include="Controls\FriendRequestItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\FriendRequestItem.Designer.cs">
+      <DependentUpon>FriendRequestItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\UserListItem.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\UserListItem.Designer.cs">
+      <DependentUpon>UserListItem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\CaiDat.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\CaiDat.Designer.cs">
       <DependentUpon>CaiDat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormLoiMoiKetBan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
+      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\frmFriendsList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmFriendsList.Designer.cs">
+      <DependentUpon>frmFriendsList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TimKiemBanBe.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TimKiemBanBe.Designer.cs">
+      <DependentUpon>TimKiemBanBe.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\XacNhanEmail.cs">
       <SubType>Form</SubType>
@@ -119,6 +150,7 @@
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\KeySanitizer.cs" />
+    <Compile Include="Models\Friends\FriendRequest.cs" />
     <Compile Include="Models\Users\User.cs" />
     <Compile Include="Forms\NhanTin.cs">
       <SubType>Form</SubType>
@@ -135,6 +167,7 @@
     <Compile Include="Services\Email\SmtpEmailSender.cs" />
     <Compile Include="Services\Firebase\AuthService.cs" />
     <Compile Include="Services\Firebase\FirebaseConfig.cs" />
+    <Compile Include="Services\Firebase\FriendService.cs" />
     <Compile Include="Services\Firebase\HttpService.cs" />
     <Compile Include="Forms\DangKy.cs">
       <SubType>Form</SubType>
@@ -162,11 +195,26 @@
     <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Controls\FriendRequestItem.resx">
+      <DependentUpon>FriendRequestItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\UserListItem.resx">
+      <DependentUpon>UserListItem.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\CaiDat.resx">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
+      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmFriendsList.resx">
+      <DependentUpon>frmFriendsList.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TimKiemBanBe.resx">
+      <DependentUpon>TimKiemBanBe.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\XacNhanEmail.resx">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
@@ -231,6 +279,9 @@
     <None Include="Resources\AvatarMacDinh.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\check.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Emoji\cool.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -256,6 +307,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Emoji\thinking.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\plus.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\icon-send-file.png" />

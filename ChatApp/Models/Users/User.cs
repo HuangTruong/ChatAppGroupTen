@@ -38,6 +38,7 @@
         /// - Có thể là chuỗi base64, hoặc URL tùy cách bạn thiết kế DB.
         /// </summary>
         public string Avatar { get; set; }
+        public string LocalId { get; internal set; }
 
         #endregion
     }
