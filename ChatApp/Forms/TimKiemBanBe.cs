@@ -1,6 +1,4 @@
-﻿using ChatApp.Controllers;
-using ChatApp.Controls;
-using ChatApp.Controls;
+﻿using ChatApp.Controls;
 using ChatApp.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -9,7 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
+using ChatApp.Controllers;
+
 
 namespace ChatApp.Forms
 {

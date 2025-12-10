@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ChatApp.Helpers;
+using ChatApp.Models.Users;
+using System;
 using System.Text;
 using System.Threading.Tasks;
-using ChatApp.Helpers;
-using ChatApp.Models.Users;
 
 namespace ChatApp.Services.Firebase
 {
@@ -10,6 +10,7 @@ namespace ChatApp.Services.Firebase
     /// Cung cấp các chức năng xác thực với Firebase Auth
     /// và thao tác thông tin người dùng trên Firebase Realtime Database.
     /// </summary>
+
     public class AuthService
     {
         #region ====== FIELDS & HELPERS ======
@@ -119,6 +120,48 @@ namespace ChatApp.Services.Firebase
             string token = res.idToken; // Token chuẩn của Firebase
 
             return (localId, token);
+        }
+        /// <summary>
+        /// Ánh xạ email hoặc username thành email thật lưu trong Firebase.
+        /// - Nếu người dùng gõ email (có @) thì trả về nguyên.
+        /// - Nếu gõ username thì tìm trong node users theo DisplayName.
+        /// </summary>
+        public async Task<string> ResolveEmailAsync(string emailOrUsername)
+        {
+            if (string.IsNullOrWhiteSpace(emailOrUsername))
+                return null;
+
+            emailOrUsername = emailOrUsername.Trim();
+
+            // Nếu đã là email (có @) thì trả về luôn
+            if (emailOrUsername.Contains("@"))
+                return emailOrUsername;
+
+            // Ngược lại: coi như username -> tìm trong /users theo DisplayName
+            // Cấu trúc: users/{localId}/DisplayName, Email, ...
+            var users = await _http.GetAsync<System.Collections.Generic.Dictionary<string, User>>(
+                            Db("users")
+                        ).ConfigureAwait(false);
+
+            if (users == null)
+                return null;
+
+            foreach (var pair in users)
+            {
+                var u = pair.Value;
+                if (u == null)
+                    continue;
+
+                if (!string.IsNullOrEmpty(u.DisplayName) &&
+                    string.Equals(u.DisplayName, emailOrUsername, StringComparison.OrdinalIgnoreCase))
+                {
+                    // Tìm thấy user có DisplayName = username -> trả về Email
+                    return u.Email;
+                }
+            }
+
+            // Không tìm thấy
+            return null;
         }
 
         #region ====== ĐĂNG KÝ + LƯU USER VÀO REALTIME DATABASE ======

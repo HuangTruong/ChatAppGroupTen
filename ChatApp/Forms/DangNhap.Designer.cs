@@ -153,12 +153,12 @@
             this.txtEmail.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtEmail.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtEmail.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
-            this.txtEmail.Location = new System.Drawing.Point(65, 88);
+            this.txtEmail.Location = new System.Drawing.Point(47, 95);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.PlaceholderText = "Email";
+            this.txtEmail.PlaceholderText = "Nhập Email hoặc Tên đăng nhập";
             this.txtEmail.SelectedText = "";
-            this.txtEmail.Size = new System.Drawing.Size(270, 40);
+            this.txtEmail.Size = new System.Drawing.Size(306, 40);
             this.txtEmail.TabIndex = 0;
             // 
             // txtPassword
@@ -179,13 +179,13 @@
             this.txtPassword.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
             this.txtPassword.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtPassword.IconRightCursor = System.Windows.Forms.Cursors.Hand;
-            this.txtPassword.Location = new System.Drawing.Point(65, 136);
+            this.txtPassword.Location = new System.Drawing.Point(47, 143);
             this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '●';
-            this.txtPassword.PlaceholderText = "Mật Khẩu";
+            this.txtPassword.PlaceholderText = "Nhập Mật Khẩu";
             this.txtPassword.SelectedText = "";
-            this.txtPassword.Size = new System.Drawing.Size(270, 40);
+            this.txtPassword.Size = new System.Drawing.Size(306, 40);
             this.txtPassword.TabIndex = 4;
             this.txtPassword.IconRightClick += new System.EventHandler(this.txtMatKhau_IconRightClick);
             // 

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-
-// Thư viện tự tạo
 using ChatApp.Controllers;
 using ChatApp.Models.Users;
 using ChatApp.Services.Email;

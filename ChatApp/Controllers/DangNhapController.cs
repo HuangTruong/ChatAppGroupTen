@@ -1,6 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using ChatApp.Helpers;
 using ChatApp.Services.Firebase;
+using System;
+using System.Threading.Tasks;
 
 namespace ChatApp.Controllers
 {
@@ -80,6 +81,30 @@ namespace ChatApp.Controllers
             return (localId, token);
         }
 
+        /// <summary>
+        /// Ánh xạ email hoặc username thành email thật lưu trong Firebase.
+        /// - Nếu người dùng gõ email (có @) thì trả về nguyên.
+        /// - Nếu gõ username thì gọi AuthService để tra email tương ứng.
+        /// </summary>
+        public async Task<string> ResolveEmailAsync(string emailOrUsername)
+        {
+            if (string.IsNullOrWhiteSpace(emailOrUsername))
+                throw new ArgumentException("Email hoặc tên đăng nhập không được để trống.");
+
+            emailOrUsername = emailOrUsername.Trim();
+
+            // Nếu là email thì trả luôn
+            if (emailOrUsername.Contains("@"))
+                return emailOrUsername;
+
+            // Nhờ AuthService tra username -> email
+            string emailThucTe = await _authService.ResolveEmailAsync(emailOrUsername);
+
+            if (string.IsNullOrEmpty(emailThucTe))
+                throw new Exception("Không tìm thấy tài khoản với tên đăng nhập này.");
+
+            return emailThucTe;
+        }
         #endregion
     }
 }
