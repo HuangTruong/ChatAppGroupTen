@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-
-// Các thư viện tự tạo
 using ChatApp.Controllers;
 
 namespace ChatApp
@@ -101,8 +99,9 @@ namespace ChatApp
             try
             {
                 // Gọi controller xử lý đăng nhập (Firebase / backend)
+                string emailThucTe = await _loginController.ResolveEmailAsync(txtEmail.Text);
                 var (localId, token) = await _loginController.DangNhapAsync(
-                    txtEmail.Text,
+                    emailThucTe,
                     txtPassword.Text);
 
                 MessageBox.Show("Đăng nhập thành công!", "Thông báo",

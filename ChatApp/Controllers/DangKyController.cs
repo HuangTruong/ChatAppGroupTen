@@ -76,7 +76,15 @@ namespace ChatApp.Controllers
                 throw new Exception("Email đã tồn tại!");
             }
 
-            // 5. Đăng ký lên Firebase
+            // 5. Kiểm tra DisplayName không chứa ký tự đặc biệt
+            // Chỉ cho phép: a-z, A-Z, 0-9, 
+            const string displayNamePattern = @"^[a-zA-Z0-9]+$";
+            if (!Regex.IsMatch(user.DisplayName, displayNamePattern))
+            {
+                throw new Exception("Tên hiển thị chỉ được chứa chữ, số (không có khoảng trắng hoặc ký tự đặc biệt khác).");
+            }
+
+            // 6. Đăng ký lên Firebase
             try
             {
                 await _authService.RegisterAsync(user, password);
