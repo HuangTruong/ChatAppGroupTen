@@ -6,13 +6,30 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
 {
     public partial class UserListItem : UserControl
     {
+        #region ====== SỰ KIỆN VÀ FIELDS NỘI BỘ ======
+
         // 1. KHAI BÁO SỰ KIỆN TÙY CHỈNH
+
+        /// <summary>
+        /// Sự kiện được kích hoạt khi người dùng nhấn vào biểu tượng hành động.
+        /// Sự kiện này truyền về LocalId của người dùng đang được hiển thị.
+        /// </summary>
         public event EventHandler<string> ActionButtonClicked;
 
         // 2. FIELDS
+
+        /// <summary>
+        /// Lưu trữ LocalId của người dùng hiện tại (là người nhận hành động).
+        /// </summary>
         private string _userId;
 
-        // 3. HÀM KHỞI TẠO
+        #endregion
+
+        #region ====== HÀM KHỞI TẠO (CONSTRUCTOR) ======
+
+        /// <summary>
+        /// Khởi tạo UserListItem.
+        /// </summary>
         public UserListItem()
         {
             InitializeComponent();
@@ -24,36 +41,12 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
             pbAction.Cursor = Cursors.Hand;
         }
 
-        // 4. CÁC THUỘC TÍNH PUBLIC (CHO FORM CHÍNH GÁN DỮ LIỆU)
+        #endregion
 
-        /// <summary>
-        /// Thuộc tính để gán và hiển thị ảnh Avatar.
-        /// </summary>
-        public Image AvatarImage
-        {
-            get => pbAvatar.Image;
-            set
-            {
-                pbAvatar.Image = value;
-                pbAvatar.SizeMode = PictureBoxSizeMode.Zoom;
-            }
-        }
-
-        /// <summary>
-        /// Thuộc tính để gán và hiển thị ảnh Icon hành động (+ hoặc Tick).
-        /// </summary>
-        public Image ActionIcon
-        {
-            get => pbAction.Image;
-            set
-            {
-                pbAction.Image = value;
-                pbAction.SizeMode = PictureBoxSizeMode.Zoom;
-            }
-        }
-
+        #region ====== THUỘC TÍNH (PROPERTIES) ======
         /// <summary>
         /// Thuộc tính để bật/tắt nút Action và cung cấp feedback hình ảnh.
+        /// Khi vô hiệu hóa (false), con trỏ sẽ trở lại mặc định.
         /// </summary>
         public bool IsActionEnabled
         {
@@ -62,24 +55,30 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
             {
                 pbAction.Enabled = value;
                 // Cung cấp feedback hình ảnh/trạng thái cho người dùng
-                pbAction.Cursor = value ? Cursors.Hand : Cursors.Default;   
+                pbAction.Cursor = value ? Cursors.Hand : Cursors.Default;
+                // Tùy chọn: Thêm hiệu ứng mờ (Opacity) nếu vô hiệu hóa
+                pbAction.BackColor = value ? Color.Transparent : Color.LightGray;
             }
         }
 
-        // 5. PHƯƠNG THỨC SET DỮ LIỆU CƠ BẢN
+        #endregion
+
+        #region ====== PHƯƠNG THỨC VÀ SỰ KIỆN ======
 
         /// <summary>
-        /// Gán LocalId và Tên hiển thị.
+        /// Gán LocalId và Tên hiển thị cho Control.
         /// </summary>
-        /// <param name="localId">Mã định danh người dùng.</param>
-        /// <param name="fullName">Họ tên đầy đủ.</param>
         public void SetUserData(string localId, string fullName)
         {
             _userId = localId;
             lblUserName.Text = fullName;
+            this.Tag = localId;
         }
 
-        // 6. XỬ LÝ SỰ KIỆN CLICK CỦA PICTUREBOX
+        /// <summary>
+        /// Xử lý sự kiện Click của PictureBox hành động.
+        /// Nếu nút được bật, kích hoạt sự kiện ActionButtonClicked và truyền _userId ra ngoài.
+        /// </summary>
         private void BtnAction_Click(object sender, EventArgs e)
         {
             if (IsActionEnabled)
@@ -88,5 +87,7 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
                 ActionButtonClicked?.Invoke(this, _userId);
             }
         }
+
+        #endregion
     }
 }

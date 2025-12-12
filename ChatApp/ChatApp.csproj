@@ -260,12 +260,6 @@
     <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\frmFriendsList.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\frmFriendsList.Designer.cs">
-      <DependentUpon>frmFriendsList.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\TimKiemBanBe.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -335,9 +329,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\frmFriendsList.resx">
-      <DependentUpon>frmFriendsList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>

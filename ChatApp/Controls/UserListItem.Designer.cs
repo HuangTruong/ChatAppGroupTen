@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserListItem));
             this.pbAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.lblUserName = new System.Windows.Forms.Label();
             this.pbAction = new System.Windows.Forms.PictureBox();
@@ -57,9 +58,11 @@
             // 
             // pbAction
             // 
+            this.pbAction.Image = ((System.Drawing.Image)(resources.GetObject("pbAction.Image")));
             this.pbAction.Location = new System.Drawing.Point(201, 17);
             this.pbAction.Name = "pbAction";
             this.pbAction.Size = new System.Drawing.Size(34, 34);
+            this.pbAction.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbAction.TabIndex = 2;
             this.pbAction.TabStop = false;
             // 

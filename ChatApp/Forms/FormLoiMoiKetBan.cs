@@ -1,5 +1,5 @@
 ﻿using ChatApp.Controllers;
-using ChatApp.Controls; 
+using ChatApp.Controls;
 using ChatApp.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -12,9 +12,13 @@ namespace ChatApp.Forms
 {
     public partial class FormLoiMoiKetBan : Form
     {
+        #region ====== THUỘC TÍNH NỘI BỘ======
+
         private readonly FriendController _friendController;
         private readonly string _currentLocalId;
         private readonly string _currentToken;
+
+        #endregion
 
         public FormLoiMoiKetBan(string localId, string token)
         {
@@ -25,34 +29,27 @@ namespace ChatApp.Forms
 
             _friendController = new FriendController(_currentLocalId);
 
-            flpView.AutoScroll = true;
-            flpView.WrapContents = false;
-            flpView.FlowDirection = FlowDirection.TopDown;
-
             this.Load += async (sender, e) => await LoadFriendRequestsUsingFlowPanel();
         }
 
-        // --- PHƯƠNG THỨC TẢI DANH SÁCH LỜI MỜI ---
+        #region ====== TẢI DỮ LIỆU VÀ HIỂN THỊ ======
 
+        /// <summary>
+        /// Tải danh sách lời mời kết bạn đang chờ.
+        /// </summary>
         private async Task LoadFriendRequestsUsingFlowPanel()
         {
             try
             {
                 flpView.Controls.Clear();
 
-                // 1. LẤY DANH SÁCH LỜI MỜI
+                // 1. LẤY DANH SÁCH LỜI MỜI (trả về List<User> Profile của người gửi)
                 List<User> friendRequests = await _friendController.LoadFriendRequestsAsync();
 
                 // --- XỬ LÝ TRƯỜNG HỢP RỖNG ---
                 if (friendRequests == null || friendRequests.Count == 0)
                 {
-                    Label lblEmpty = new Label();
-                    lblEmpty.Text = "Bạn không có lời mời kết bạn nào.";
-                    lblEmpty.Dock = DockStyle.Top;
-                    lblEmpty.TextAlign = ContentAlignment.MiddleCenter;
-                    lblEmpty.ForeColor = Color.Gray;
-                    lblEmpty.Height = 50;
-                    flpView.Controls.Add(lblEmpty);
+                    DisplayEmptyMessage();
                     return;
                 }
 
@@ -61,10 +58,11 @@ namespace ChatApp.Forms
                 {
                     var requestControl = new FriendRequestItem();
 
-                    // I. Gán dữ liệu cơ bản
+                    // Gán dữ liệu cơ bản (User Profile)
                     requestControl.SetUserData(localId: user.LocalId, fullName: user.FullName);
+                    requestControl.Width = flpView.ClientSize.Width;
 
-                    // Cài đặt Dock và Sự kiện
+                    // Cài đặt Sự kiện (Sự kiện nhấn nút Accept/Reject)
                     requestControl.ActionButtonClicked += RequestControl_HandleAction;
 
                     flpView.Controls.Add(requestControl);
@@ -76,8 +74,13 @@ namespace ChatApp.Forms
             }
         }
 
-        // --- PHƯƠNG THỨC XỬ LÝ CHẤP NHẬN HOẶC TỪ CHỐI (Giữ nguyên) ---
+        #endregion
 
+        #region ====== XỬ LÝ HÀNH ĐỘNG (ACCEPT/REJECT) ======
+
+        /// <summary>
+        /// Xử lý sự kiện nhấn nút Chấp nhận hoặc Từ chối từ FriendRequestItem.
+        /// </summary>
         private async void RequestControl_HandleAction(object sender, string requesterId, FriendRequestItem.RequestAction action)
         {
             FriendRequestItem clickedItem = (FriendRequestItem)sender;
@@ -85,10 +88,10 @@ namespace ChatApp.Forms
 
             try
             {
-                // Vô hiệu hóa nút tạm thời
+                // Vô hiệu hóa nút tạm thời.
                 clickedItem.IsActionEnabled = false;
 
-                // 1. Thực hiện hành động (Accept/Reject)
+                // 1. Thực hiện hành động (Accept/Reject) thông qua Controller
                 if (action == FriendRequestItem.RequestAction.Accept)
                 {
                     await _friendController.AcceptFriendRequestAsync(requesterId);
@@ -98,27 +101,49 @@ namespace ChatApp.Forms
                     await _friendController.RejectFriendRequestAsync(requesterId);
                 }
 
-                // 💥 2. XÓA USER CONTROL KHỎI FLOW LAYOUT PANEL
+                // 2. XÓA USER CONTROL KHỎI FLOW LAYOUT PANEL sau khi xử lý thành công
                 flpView.Controls.Remove(clickedItem);
 
-                // (Tùy chọn: Kiểm tra nếu danh sách trống thì thêm label "Không có lời mời nào")
+                // 3. Kiểm tra và hiển thị Label rỗng nếu đây là lời mời cuối cùng
                 if (flpView.Controls.Count == 0)
                 {
-                    Label lblEmpty = new Label();
-                    lblEmpty.Text = "Bạn không có lời mời kết bạn nào.";
-                    lblEmpty.Dock = DockStyle.Top;
-                    lblEmpty.TextAlign = ContentAlignment.MiddleCenter;
-                    lblEmpty.ForeColor = Color.Gray;
-                    lblEmpty.Height = 50;
-                    flpView.Controls.Add(lblEmpty);
+                    DisplayEmptyMessage();
                 }
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Lỗi khi {actionName} lời mời: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                // Bật lại nút nếu thất bại để người dùng có thể thử lại
                 clickedItem.IsActionEnabled = true;
             }
         }
+
+        #endregion
+
+        #region ====== CÁC PHƯƠNG THỨC HỖ TRỢ HIỂN THỊ ======
+
+        /// <summary>
+        /// Tạo và hiển thị Label thông báo khi danh sách lời mời rỗng.
+        /// </summary>
+        private void DisplayEmptyMessage()
+        {
+            // Luôn xóa controls cũ trước khi thêm thông báo rỗng
+            flpView.Controls.Clear();
+
+            Label lblEmpty = new Label();
+            lblEmpty.Text = "Bạn không có lời mời kết bạn nào.";
+            // 💥 Quan trọng: Cần set Width bằng với FlowLayoutPanel để căn giữa được
+            lblEmpty.Width = flpView.ClientSize.Width;
+
+            lblEmpty.TextAlign = ContentAlignment.MiddleCenter;
+            lblEmpty.ForeColor = Color.Gray;
+            lblEmpty.Height = 50;
+
+            flpView.Controls.Add(lblEmpty);
+        }
+
+        #endregion
     }
 }

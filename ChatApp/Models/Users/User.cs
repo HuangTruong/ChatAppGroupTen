@@ -9,6 +9,11 @@
         #region ====== THUỘC TÍNH ======
 
         /// <summary>
+        /// ID duy nhất của người dùng (Firebase LocalId (UID)).
+        /// </summary>
+        public string LocalId { get; internal set; }
+
+        /// <summary>
         /// Tên hiển thị trong ứng dụng (nickname / username).
         /// </summary>
         public string DisplayName { get; set; }
@@ -38,8 +43,6 @@
         /// - Có thể là chuỗi base64, hoặc URL tùy cách bạn thiết kế DB.
         /// </summary>
         public string Avatar { get; set; }
-        public string LocalId { get; internal set; }
-
         #endregion
     }
 }

@@ -1,4 +1,5 @@
-﻿using ChatApp.Controls;
+﻿using ChatApp.Controllers;
+using ChatApp.Controls;
 using ChatApp.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -7,18 +8,23 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ChatApp.Controllers;
-
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar; // Nên xóa nếu không dùng
 
 namespace ChatApp.Forms
 {
+    /// <summary>
+    /// Form cho phép người dùng tìm kiếm và gửi lời mời kết bạn đến các user khác trong hệ thống.
+    /// </summary>
     public partial class TimKiemBanBe : Form
     {
+        #region ====== THUỘC TÍNH NỘI BỘ======
+
         private readonly FriendController _friendController;
         private readonly string _currentLocalId;
         private readonly string _currentToken;
 
-        // Khởi tạo Form: Bắt buộc nhận localId và token
+        #endregion
+
         public TimKiemBanBe(string localId, string token)
         {
             InitializeComponent();
@@ -27,57 +33,35 @@ namespace ChatApp.Forms
             _currentLocalId = localId;
             _currentToken = token;
 
-            // 2. Khởi tạo Controller
+            // 2. Khởi tạo Controller (Cần đảm bảo FriendController đã được truyền đúng dependencies)
             _friendController = new FriendController(_currentLocalId);
 
-            // 3. Cài đặt các thuộc tính của FlowLayoutPanel
-            flpView.AutoScroll = true;
-            flpView.WrapContents = false; // Đảm bảo các item xếp theo chiều dọc
-
-            // 4. Load dữ liệu khi Form được hiển thị
+            // 3. Load dữ liệu khi Form được hiển thị
             this.Load += async (sender, e) => await LoadAllUsersUsingFlowPanel();
         }
 
+        #region ====== PHƯƠNG THỨC TẢI DỮ LIỆU VÀ HIỂN THỊ ======
+
+        /// <summary>
+        /// Tải tất cả user (trừ người dùng hiện tại) và hiển thị chúng lên FlowLayoutPanel.
+        /// </summary>
         private async Task LoadAllUsersUsingFlowPanel()
         {
             try
             {
                 flpView.Controls.Clear();
 
-                // =======================================================
-                // 1. TẢI ẢNH ICON (+) CHỈ MỘT LẦN
-                // =======================================================
-                string path = Path.Combine(Application.StartupPath, @"Resources\plus.png");
-                path = Path.GetFullPath(path);
-
-                Image plusIcon = null;
-                if (File.Exists(path))
-                {
-                    plusIcon = Image.FromFile(path);
-                }
-                else
-                {
-                    MessageBox.Show("Không tìm thấy ảnh: " + path, "Lỗi Tải Ảnh", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                // 2. Lấy danh sách người dùng
                 List<User> userList = await _friendController.LoadAllUsersForDisplayAsync();
 
-                // 3. Duyệt và tạo Control
                 foreach (var user in userList)
                 {
                     var userControl = new UserListItem();
 
-                    // I. GÁN DỮ LIỆU CƠ BẢN
                     userControl.SetUserData(
                         localId: user.LocalId,
                         fullName: user.FullName
                     );
 
-                    // II. GÁN ICON HÀNH ĐỘNG (+)
-                    userControl.ActionIcon = plusIcon;
-
-                    // Cài đặt Dock và Sự kiện
                     userControl.ActionButtonClicked += UserControl_SendRequest;
 
                     flpView.Controls.Add(userControl);
@@ -89,32 +73,38 @@ namespace ChatApp.Forms
             }
         }
 
+        #endregion
+
+        #region ====== XỬ LÝ SỰ KIỆN HÀNH ĐỘNG ======
+
         /// <summary>
         /// Xử lý sự kiện nhấn nút Gửi lời mời từ UserListItem.
         /// </summary>
         private async void UserControl_SendRequest(object sender, string receiverId)
         {
+            // Ép kiểu sender về UserListItem để tương tác với control đó
             UserListItem clickedItem = (UserListItem)sender;
 
             try
             {
-                // Vô hiệu hóa nút tạm thời
                 clickedItem.IsActionEnabled = false;
 
-                // Gửi lời mời qua Controller
+                // Gửi lời mời qua Controller.
                 await _friendController.SendRequestAsync(receiverId);
 
-                MessageBox.Show("Đã gửi lời mời kết bạn!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Đã gửi lời mời kết bạn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Tải lại danh sách để cập nhật trạng thái người dùng
+                // Tải lại danh sách để cập nhật trạng thái người dùng.
+                // Hiện tại, việc tải lại toàn bộ form sẽ xóa item đã gửi đi.
                 await LoadAllUsersUsingFlowPanel();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi gửi lời mời: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                // Bật lại nút nếu thất bại
                 clickedItem.IsActionEnabled = true;
             }
         }
+
+        #endregion
     }
 }

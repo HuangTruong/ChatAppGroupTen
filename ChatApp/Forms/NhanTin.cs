@@ -549,6 +549,18 @@ namespace ChatApp
             }
         }
         #endregion
+
+        private void btnSearchFriends_Click(object sender, EventArgs e)
+        {
+            TimKiemBanBe timKiemBanBe = new TimKiemBanBe(idDangNhap, tokenDangNhap);
+            timKiemBanBe.Show();
+        }
+
+        private void btnRequest_Click(object sender, EventArgs e)
+        {
+            FormLoiMoiKetBan formLoiMoiKetBan = new FormLoiMoiKetBan(idDangNhap, tokenDangNhap);
+            formLoiMoiKetBan.Show();
+        }
     }
 }
 

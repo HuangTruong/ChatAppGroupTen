@@ -39,6 +39,7 @@
             this.lblTenDangNhapGiua = new System.Windows.Forms.Label();
             this.picAnhDaiDienGiua = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlPhai = new Guna.UI2.WinForms.Guna2Panel();
+            this.btnRequest = new System.Windows.Forms.Button();
             this.btnSearchFriends = new System.Windows.Forms.Button();
             this.btnTaoNhom = new System.Windows.Forms.Button();
             this.lblTrangThai = new System.Windows.Forms.Label();
@@ -46,7 +47,6 @@
             this.lblTenDangNhapPhai = new System.Windows.Forms.Label();
             this.picAnhDaiDienPhai = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
-            this.btnRequest = new System.Windows.Forms.Button();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.guna2Panel1.SuspendLayout();
@@ -180,7 +180,6 @@
             this.txtNhapTinNhan.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.txtNhapTinNhan.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtNhapTinNhan.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-
             this.txtNhapTinNhan.Location = new System.Drawing.Point(2, 6);
             this.txtNhapTinNhan.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.txtNhapTinNhan.Name = "txtNhapTinNhan";
@@ -193,7 +192,6 @@
             // 
             this.flbKhungChat.AutoScroll = true;
             this.flbKhungChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-
             this.flbKhungChat.Location = new System.Drawing.Point(16, 89);
             this.flbKhungChat.Margin = new System.Windows.Forms.Padding(2);
             this.flbKhungChat.Name = "flbKhungChat";
@@ -207,7 +205,6 @@
             this.pnlNguoiChat.Controls.Add(this.picAnhDaiDienGiua);
             this.pnlNguoiChat.Location = new System.Drawing.Point(16, 12);
             this.pnlNguoiChat.Margin = new System.Windows.Forms.Padding(2);
-
             this.pnlNguoiChat.Name = "pnlNguoiChat";
             this.pnlNguoiChat.Size = new System.Drawing.Size(441, 62);
             this.pnlNguoiChat.TabIndex = 0;
@@ -225,10 +222,8 @@
             // picAnhDaiDienGiua
             // 
             this.picAnhDaiDienGiua.ImageRotate = 0F;
-
             this.picAnhDaiDienGiua.Location = new System.Drawing.Point(2, 2);
             this.picAnhDaiDienGiua.Margin = new System.Windows.Forms.Padding(2);
-
             this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
             this.picAnhDaiDienGiua.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.picAnhDaiDienGiua.Size = new System.Drawing.Size(48, 52);
@@ -244,13 +239,21 @@
             this.pnlPhai.Controls.Add(this.btnLichSuTroChuyen);
             this.pnlPhai.Controls.Add(this.lblTenDangNhapPhai);
             this.pnlPhai.Controls.Add(this.picAnhDaiDienPhai);
-
             this.pnlPhai.Location = new System.Drawing.Point(698, 10);
             this.pnlPhai.Margin = new System.Windows.Forms.Padding(2);
-
             this.pnlPhai.Name = "pnlPhai";
             this.pnlPhai.Size = new System.Drawing.Size(180, 511);
             this.pnlPhai.TabIndex = 0;
+            // 
+            // btnRequest
+            // 
+            this.btnRequest.Location = new System.Drawing.Point(52, 301);
+            this.btnRequest.Name = "btnRequest";
+            this.btnRequest.Size = new System.Drawing.Size(75, 23);
+            this.btnRequest.TabIndex = 5;
+            this.btnRequest.Text = "Lời mời";
+            this.btnRequest.UseVisualStyleBackColor = true;
+            this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
             // 
             // btnSearchFriends
             // 
@@ -260,11 +263,10 @@
             this.btnSearchFriends.TabIndex = 0;
             this.btnSearchFriends.Text = "Tìm kiếm bạn bè";
             this.btnSearchFriends.UseVisualStyleBackColor = true;
-
+            this.btnSearchFriends.Click += new System.EventHandler(this.btnSearchFriends_Click);
             // 
             // btnTaoNhom
             // 
-
             this.btnTaoNhom.Location = new System.Drawing.Point(52, 227);
             this.btnTaoNhom.Name = "btnTaoNhom";
             this.btnTaoNhom.Size = new System.Drawing.Size(75, 23);
@@ -333,23 +335,12 @@
             this.pnlBackground.Size = new System.Drawing.Size(886, 531);
             this.pnlBackground.TabIndex = 1;
             // 
-            // btnRequest
-            // 
-            this.btnRequest.Location = new System.Drawing.Point(52, 301);
-            this.btnRequest.Name = "btnRequest";
-            this.btnRequest.Size = new System.Drawing.Size(75, 23);
-            this.btnRequest.TabIndex = 5;
-            this.btnRequest.Text = "Lời mời";
-            this.btnRequest.UseVisualStyleBackColor = true;
-
-            // 
             // NhanTin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(886, 531);
             this.Controls.Add(this.pnlBackground);
-
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
