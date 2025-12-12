@@ -14,24 +14,15 @@ namespace ChatApp.Controllers
     public class FriendController
     {
         private readonly FriendService _friendService = new FriendService();
-        private readonly AuthService _authService = new AuthService(); // Dùng lại AuthService để lấy profile user
+        private readonly AuthService _authService = new AuthService();
         private readonly string _localId;
-
-        // 💥 ĐIỂM BỔ SUNG 1: Expose AuthService cho UI (để tải ảnh)
-        public AuthService AuthService => _authService;
 
         public FriendController(string localId)
         {
             _localId = localId;
         }
+        #region ====== TẢI DANH SÁCH NGƯỜI DÙNG ĐỂ TÌM KIẾM ======
 
-        /*==============================================================
-         * FORM 1: DANH SÁCH TẤT CẢ USER (Để gửi lời mời)
-         *==============================================================*/
-
-        /// <summary>
-        /// Tải danh sách tất cả người dùng (trừ người dùng hiện tại).
-        /// </summary>
         public async Task<List<User>> LoadAllUsersForDisplayAsync()
         {
             // 1. Tải danh sách tất cả người dùng (Dictionary<LocalId, User>)
@@ -40,25 +31,25 @@ namespace ChatApp.Controllers
             // 2. Tải danh sách các ID cần loại trừ
             // Lấy danh sách bạn bè
             var friendDict = await _friendService.GetFriendListAsync(_localId);
-            var friendIds = friendDict.Keys.ToHashSet(); // Dùng HashSet để tìm kiếm nhanh hơn
+            var friendIds = friendDict.Keys.ToHashSet();
 
             // Lấy danh sách lời mời đã gửi đi (Outgoing Requests)
             var outgoingDict = await _friendService.GetOutgoingRequestsAsync(_localId);
             var outgoingIds = outgoingDict
-                                .Where(kvp => kvp.Value.status == "pending") // Chỉ lấy những cái đang chờ
+                                .Where(kvp => kvp.Value.status == "pending")
                                 .Select(kvp => kvp.Key)
                                 .ToHashSet();
 
             // 3. Thực hiện lọc
             var filteredUsers = allUsersDict.Values
                 .Where(user =>
-                    // 🛑 A. Loại trừ chính mình (Logic đã có trong Service, nhưng giữ lại để an toàn)
+                    // Loại trừ chính mình
                     user.LocalId != _localId &&
 
-                    // 🛑 B. Loại trừ những người đã là bạn bè
+                    // Loại trừ những người đã là bạn bè
                     !friendIds.Contains(user.LocalId) &&
 
-                    // 🛑 C. Loại trừ những người đã gửi lời mời (đang chờ)
+                    // Loại trừ những người đã gửi lời mời (đang chờ)
                     !outgoingIds.Contains(user.LocalId)
                 )
                 .ToList();
@@ -66,10 +57,9 @@ namespace ChatApp.Controllers
             return filteredUsers;
         }
 
-        /// <summary>
-        /// Xử lý gửi lời mời kết bạn.
-        /// </summary>
-        /// <param name="receiverId">ID của người nhận lời mời.</param>
+        #endregion
+
+        #region ====== GỬI LỜI MỜI KẾT BẠN ======
         public async Task SendRequestAsync(string receiverId)
         {
             if (string.IsNullOrEmpty(receiverId)) return;
@@ -77,18 +67,17 @@ namespace ChatApp.Controllers
             await _friendService.SendFriendRequestAsync(_localId, receiverId);
         }
 
-        /*==============================================================
-         * FORM 2: DANH SÁCH LỜI MỜI KẾT BẠN ĐANG CHỜ
-         *==============================================================*/
+        #endregion
+
+        #region ====== TẢI DỮ LIỆU LỜI MỜI VÀ GÁN PROFILE ======
 
         /// <summary>
-        /// Tải danh sách lời mời kết bạn đang chờ và kèm theo thông tin hồ sơ của người gửi.
-        /// (Dùng nội bộ và cho hàm LoadFriendRequestsAsync)
+        /// Tải tất cả các lời mời kết bạn đang chờ nhận của người dùng hiện tại, 
+        /// sau đó tải và gán thông tin hồ sơ (Profile) của người gửi vào từng lời mời.
         /// </summary>
         public async Task<List<FriendRequest>> LoadIncomingRequestsForDisplayAsync()
         {
             // 1. Tải các request đang chờ
-            // Kết quả là Dictionary<SenderId, FriendRequest>
             var requestsDict = await _friendService.GetIncomingRequestsAsync(_localId);
 
             if (requestsDict == null || requestsDict.Count == 0)
@@ -108,8 +97,6 @@ namespace ChatApp.Controllers
                 User senderProfile = await _authService.GetUserByIdAsync(senderId);
 
                 // Gán profile vào request để UI có thể hiển thị Tên, Avatar...
-                // Giả định FriendRequest model của bạn có thuộc tính Profile và OtherUserId
-                // để lưu profile và ID của người khác (sender)
                 request.Profile = senderProfile;
                 request.OtherUserId = senderId;
 
@@ -119,9 +106,8 @@ namespace ChatApp.Controllers
             return resultList;
         }
 
-        // 💥 ĐIỂM BỔ SUNG 2: Hàm công khai mà Form LoiMoiKetBan gọi
         /// <summary>
-        /// Tải danh sách người dùng đã gửi lời mời đến user hiện tại (trả về dưới dạng User profile).
+        /// Tải danh sách người dùng đã gửi lời mời đến user hiện tại (trích xuất User profile).
         /// </summary>
         public async Task<List<User>> LoadFriendRequestsAsync()
         {
@@ -135,8 +121,12 @@ namespace ChatApp.Controllers
                 .ToList();
         }
 
+        #endregion
+
+        #region ====== XỬ LÝ LỜI MỜI KẾT BẠN ======
+
         /// <summary>
-        /// Chấp nhận lời mời kết bạn (Hàm gốc gọi đến Service).
+        /// Chấp nhận lời mời kết bạn.
         /// </summary>
         public async Task AcceptFriendRequestAsync(string senderId)
         {
@@ -150,5 +140,7 @@ namespace ChatApp.Controllers
         {
             await _friendService.RejectFriendRequestAsync(_localId, senderId);
         }
+
+        #endregion
     }
 }

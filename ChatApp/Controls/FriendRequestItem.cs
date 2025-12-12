@@ -6,17 +6,26 @@ namespace ChatApp.Controls
 {
     public partial class FriendRequestItem : UserControl
     {
-        // Trường private để lưu ID người gửi lời mời
         private string _requesterId;
 
-        // Định nghĩa 2 loại hành động mà Control này có thể kích hoạt
+        /// <summary>
+        /// Định nghĩa 2 loại hành động mà Control này có thể kích hoạt (Accept hoặc Reject).
+        /// </summary>
         public enum RequestAction
         {
             Accept,
             Reject
         }
 
+        /// <summary>
+        /// Định nghĩa mẫu ủy quyền (delegate) cho sự kiện ActionButtonClicked.
+        /// Sự kiện này truyền ID người gửi lời mời và hành động được chọn.
+        /// </summary>
         public delegate void ActionButtonClickedEventHandler(object sender, string requesterId, RequestAction action);
+
+        /// <summary>
+        /// Sự kiện được kích hoạt khi người dùng nhấn nút Chấp nhận hoặc Từ chối.
+        /// </summary>
         public event ActionButtonClickedEventHandler ActionButtonClicked;
 
         public FriendRequestItem()
@@ -35,7 +44,7 @@ namespace ChatApp.Controls
         #region ====== PUBLIC PROPERTIES VÀ SET DATA ======
 
         /// <summary>
-        /// Gán dữ liệu cơ bản cho Control.
+        /// Gán dữ liệu cơ bản cho Control (ID người gửi và Tên hiển thị).
         /// </summary>
         public void SetUserData(string localId, string fullName)
         {
@@ -44,16 +53,8 @@ namespace ChatApp.Controls
         }
 
         /// <summary>
-        /// Gán hình ảnh Avatar (PictureBox: pbAvatar).
-        /// </summary>
-        public Image AvatarImage
-        {
-            get => pbAvatar.Image;
-            set => pbAvatar.Image = value;
-        }
-
-        /// <summary>
-        /// Bật/Tắt khả năng tương tác của các nút hành động.
+        /// Bật/Tắt khả năng tương tác của các nút hành động (Accept/Reject).
+        /// Dùng để ngăn chặn double click hoặc thao tác khi đang xử lý.
         /// </summary>
         public bool IsActionEnabled
         {
@@ -68,16 +69,17 @@ namespace ChatApp.Controls
 
         #endregion
 
-        #region ====== XỬ LÝ SỰ KIỆN CLICK ======
+        #region ====== XỬ LÝ SỰ KIỆN CLICK CHUNG ======
 
         /// <summary>
         /// Xử lý sự kiện click chung cho cả nút Chấp nhận và Từ chối.
         /// </summary>
         private void ActionButton_Click(object sender, EventArgs e)
         {
-            if (ActionButtonClicked == null) return;
+            // Kiểm tra xem sự kiện có được gán ở Form chính không
+            if (ActionButtonClicked == null || !(sender is PictureBox)) return;
 
-            // Xác định nút nào được nhấn
+            // Xác định hành động (Accept/Reject)
             RequestAction action;
             if (sender == pbAccept)
             {
@@ -92,7 +94,7 @@ namespace ChatApp.Controls
                 return;
             }
 
-            // Truyền ID từ trường private
+            // Truyền ID người gửi (_requesterId) và hành động ra ngoài Form chính
             ActionButtonClicked(this, _requesterId, action);
         }
 
