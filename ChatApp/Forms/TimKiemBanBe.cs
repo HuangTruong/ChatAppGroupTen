@@ -49,7 +49,7 @@ namespace ChatApp.Forms
         {
             try
             {
-                flpView.Controls.Clear();
+                pnlView.Controls.Clear();
 
                 List<User> userList = await _friendController.LoadAllUsersForDisplayAsync();
 
@@ -64,7 +64,10 @@ namespace ChatApp.Forms
 
                     userControl.ActionButtonClicked += UserControl_SendRequest;
 
-                    flpView.Controls.Add(userControl);
+                    userControl.Dock = DockStyle.Top;
+
+                    pnlView.Controls.Add(userControl);
+                    pnlView.Controls.SetChildIndex(userControl, 0); // Để cho thứ tự tin nhắn không bị ngược
                 }
             }
             catch (Exception ex)

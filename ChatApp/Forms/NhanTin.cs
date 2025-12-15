@@ -1,13 +1,16 @@
-﻿using ChatApp.Forms;
-using System.Windows.Forms;
+﻿using ChatApp.Controllers;
+using ChatApp.Controls;
+using ChatApp.Forms;
+using ChatApp.Models.Users;
+using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
+using Guna.UI2.WinForms;
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ChatApp.Controllers;
-using ChatApp.Models.Users;
-using Guna.UI2.WinForms;
+using System.Windows.Forms;
 
 namespace ChatApp
 {
@@ -53,6 +56,12 @@ namespace ChatApp
         private readonly List<ChatMessage> danhSachTinNhanDangVe =
             new List<ChatMessage>();
 
+        /// <summary>
+        /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
+        /// </summary>
+        private readonly ThemeService _themeService = new ThemeService();
+
+
         #endregion
 
         #region ====== HÀM KHỞI TẠO ======
@@ -77,13 +86,8 @@ namespace ChatApp
             btnGui.Click += btnGui_Click;
             txtNhapTinNhan.KeyDown += TxtNhapTinNhan_KeyDown;
 
-            // Layout danh sách chat (bên trái)
-            flpDanhSachChat.WrapContents = false;
-
-            // Layout khung chat (ở giữa)
-            flbKhungChat.FlowDirection = FlowDirection.TopDown;
-            flbKhungChat.WrapContents = false;
-            flbKhungChat.AutoScroll = true;
+            // Chế độ ngày đêm
+            _themeService = new ThemeService();
         }
 
     
@@ -110,6 +114,10 @@ namespace ChatApp
         private async void NhanTin_Load(object sender, EventArgs e)
         {
             await LoadUsersAsync();
+
+            // Load chế độ ngày đêm
+            bool isDark = await _themeService.GetThemeAsync(idDangNhap);
+            ThemeManager.ApplyTheme(this, isDark);
         }
 
         private void NhanTin_FormClosed(object sender, FormClosedEventArgs e)
@@ -126,6 +134,7 @@ namespace ChatApp
         /// </summary>
         private async Task LoadUsersAsync()
         {
+            // Clear danh sách người dùng để load lại
             flpDanhSachChat.Controls.Clear();
 
             try
@@ -161,18 +170,16 @@ namespace ChatApp
         /// </summary>
         private void AddUserItem(string userId, User user)
         {
-            Guna2Button nutNguoiDung = new Guna2Button();
-            nutNguoiDung.Width = flpDanhSachChat.ClientSize.Width - 10;
-            nutNguoiDung.Height = 48;
-            nutNguoiDung.Margin = new Padding(3);
-            nutNguoiDung.TextAlign = HorizontalAlignment.Left;
-            nutNguoiDung.Cursor = Cursors.Hand;
-            nutNguoiDung.Tag = userId;
-            nutNguoiDung.Text = GetUserFullName(user);
+            Conversations conversations = new Conversations();
+            conversations.Cursor = Cursors.Hand;
+            conversations.Width = flpDanhSachChat.ClientSize.Width - 10;
+            conversations.SetInfo(GetUserFullName(user), userId);
+            conversations.Tag = userId;
 
-            nutNguoiDung.Click += UserItem_Click;
+            // Gán sự kiện click
+            conversations.ItemClicked += UserItem_Click;
 
-            flpDanhSachChat.Controls.Add(nutNguoiDung);
+            flpDanhSachChat.Controls.Add(conversations);
         }
 
         /// <summary>
@@ -231,17 +238,13 @@ namespace ChatApp
 
         private void UserItem_Click(object sender, EventArgs e)
         {
-            Guna2Button nutNguoiDung = sender as Guna2Button;
-            if (nutNguoiDung == null)
-            {
+            var conversations = sender as Conversations;
+            if (conversations == null)
                 return;
-            }
 
-            string idNguoiDung = nutNguoiDung.Tag as string;
+            string idNguoiDung = conversations.Tag as string;
             if (string.IsNullOrEmpty(idNguoiDung))
-            {
                 return;
-            }
 
             OpenConversation(idNguoiDung);
         }
@@ -265,7 +268,7 @@ namespace ChatApp
                 lblTenDangNhapPhai.Text = ten;
             }
 
-            flbKhungChat.Controls.Clear();
+            pnlKhungChat.Controls.Clear();
             danhSachTinNhanDangVe.Clear();
 
             boDieuKhienNhanTin.StartListenConversation(
@@ -314,9 +317,9 @@ namespace ChatApp
 
             if (messages == null || messages.Count == 0)
             {
-                flbKhungChat.SuspendLayout();
-                flbKhungChat.Controls.Clear();
-                flbKhungChat.ResumeLayout();
+                pnlKhungChat.SuspendLayout();
+                pnlKhungChat.Controls.Clear();
+                pnlKhungChat.ResumeLayout();
                 danhSachTinNhanDangVe.Clear();
                 return;
             }
@@ -324,14 +327,14 @@ namespace ChatApp
             int soLuongCu = danhSachTinNhanDangVe.Count;
             int soLuongMoi = messages.Count;
 
-            flbKhungChat.SuspendLayout();
+            pnlKhungChat.SuspendLayout();
 
             try
             {
                 if (soLuongCu == 0 || soLuongMoi < soLuongCu)
                 {
                     // Lần đầu hoặc có thay đổi bất thường -> vẽ lại toàn bộ
-                    flbKhungChat.Controls.Clear();
+                    pnlKhungChat.Controls.Clear();
                     danhSachTinNhanDangVe.Clear();
 
                     int i = 0;
@@ -356,16 +359,16 @@ namespace ChatApp
                     }
                 }
 
-                if (flbKhungChat.Controls.Count > 0)
+                if (pnlKhungChat.Controls.Count > 0)
                 {
                     Control controlCuoi =
-                        flbKhungChat.Controls[flbKhungChat.Controls.Count - 1];
-                    flbKhungChat.ScrollControlIntoView(controlCuoi);
+                        pnlKhungChat.Controls[pnlKhungChat.Controls.Count - 1];
+                    pnlKhungChat.ScrollControlIntoView(controlCuoi);
                 }
             }
             finally
             {
-                flbKhungChat.ResumeLayout();
+                pnlKhungChat.ResumeLayout();
             }
         }
 
@@ -374,112 +377,18 @@ namespace ChatApp
         /// </summary>
         private void AddMessageBubble(ChatMessage msg)
         {
-            if (msg == null)
-            {
-                return;
-            }
+            bool isMine = msg.IsMine;
 
-            bool laTinCuaToi = msg.IsMine;
+            string displayName = isMine ? "Bạn" : lblTenDangNhapGiua.Text;
+            string message = msg.Text ?? "";
+            string time = FormatTimestamp(msg.Timestamp);
 
-            // Bong bóng: chứa TÊN NGƯỜI GỬI + TEXT + THỜI GIAN
-            FlowLayoutPanel bongBong = new FlowLayoutPanel();
-            bongBong.AutoSize = true;
-            bongBong.WrapContents = false;
-            bongBong.FlowDirection = FlowDirection.TopDown;
-            bongBong.MaximumSize = new Size(flbKhungChat.ClientSize.Width - 120, 0);
-            bongBong.Padding = new Padding(8);
-            bongBong.Margin = new Padding(0, 3, 0, 10);
+            MessageBubbles bubble = new MessageBubbles();
+            bubble.SetMessage(displayName, message, time, isMine);
+            bubble.Dock = DockStyle.Top;
 
-            if (laTinCuaToi)
-            {
-                bongBong.BackColor = Color.FromArgb(180, 216, 255); // xanh nhạt cho mình
-            }
-            else
-            {
-                bongBong.BackColor = Color.White; // trắng cho người kia
-            }
-
-            // ===== Label TÊN NGƯỜI GỬI =====
-            Label lblNameUser = new Label();
-            lblNameUser.AutoSize = true;
-            lblNameUser.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            lblNameUser.ForeColor = Color.Black;
-
-            string tenNguoiGui = "Unknown";
-            User nguoiGui;
-
-            if (laTinCuaToi)
-            {
-                // Tin của mình -> lấy tên mình từ tatCaNguoiDung (nếu có)
-                if (tatCaNguoiDung != null &&
-                    tatCaNguoiDung.TryGetValue(idDangNhap, out nguoiGui))
-                {
-                    tenNguoiGui = GetUserFullName(nguoiGui);
-                }
-                else
-                {
-                    tenNguoiGui = "Bạn";
-                }
-            }
-            else
-            {
-                // Tin của người kia -> lấy theo SenderId
-                if (tatCaNguoiDung != null &&
-                    !string.IsNullOrEmpty(msg.SenderId) &&
-                    tatCaNguoiDung.TryGetValue(msg.SenderId, out nguoiGui))
-                {
-                    tenNguoiGui = GetUserFullName(nguoiGui);
-                }
-            }
-
-            lblNameUser.Text = tenNguoiGui;
-
-            // ===== Label NỘI DUNG =====
-            Label lblText = new Label();
-            lblText.AutoSize = true;
-            lblText.MaximumSize = new Size(flbKhungChat.ClientSize.Width - 140, 0);
-            lblText.Font = new Font("Segoe UI", 10F);
-            lblText.ForeColor = Color.Black;
-            if (msg.Text != null)
-            {
-                lblText.Text = msg.Text;
-            }
-            else
-            {
-                lblText.Text = string.Empty;
-            }
-
-            // ===== Label THỜI GIAN =====
-            Label lblTime = new Label();
-            lblTime.AutoSize = true;
-            lblTime.Font = new Font("Segoe UI", 8F, FontStyle.Italic);
-            lblTime.ForeColor = Color.Gray;
-            lblTime.Text = FormatTimestamp(msg.Timestamp);
-
-            // Thêm vào bong bóng theo thứ tự: Tên -> Nội dung -> Thời gian
-            bongBong.Controls.Add(lblNameUser);
-            bongBong.Controls.Add(lblText);
-            bongBong.Controls.Add(lblTime);
-
-            // ===== Container để căn trái / phải =====
-            FlowLayoutPanel khungCan = new FlowLayoutPanel();
-            khungCan.AutoSize = false;
-            khungCan.WrapContents = false;
-            khungCan.Width = flbKhungChat.ClientSize.Width;
-            khungCan.Padding = new Padding(16, 0, 16, 0);
-            khungCan.Margin = new Padding(0, 0, 0, 0);
-
-            if (laTinCuaToi)
-            {
-                khungCan.FlowDirection = FlowDirection.RightToLeft;
-            }
-            else
-            {
-                khungCan.FlowDirection = FlowDirection.LeftToRight;
-            }
-
-            khungCan.Controls.Add(bongBong);
-            flbKhungChat.Controls.Add(khungCan);
+            pnlKhungChat.Controls.Add(bubble);
+            pnlKhungChat.Controls.SetChildIndex(bubble, 0); // Để cho thứ tự tin nhắn không bị ngược
         }
 
         /// <summary>

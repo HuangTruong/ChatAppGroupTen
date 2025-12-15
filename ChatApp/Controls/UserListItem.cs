@@ -89,5 +89,6 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
         }
 
         #endregion
+
     }
 }

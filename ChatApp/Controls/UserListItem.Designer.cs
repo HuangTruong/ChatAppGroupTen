@@ -30,62 +30,102 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UserListItem));
             this.pbAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
-            this.lblUserName = new System.Windows.Forms.Label();
             this.pbAction = new System.Windows.Forms.PictureBox();
+            this.flpUserName = new System.Windows.Forms.FlowLayoutPanel();
+            this.lblUserName = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.pnlFrame = new Guna.UI2.WinForms.Guna2Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAction)).BeginInit();
+            this.flpUserName.SuspendLayout();
+            this.pnlFrame.SuspendLayout();
             this.SuspendLayout();
             // 
             // pbAvatar
             // 
+            this.pbAvatar.BackColor = System.Drawing.Color.Transparent;
+            this.pbAvatar.Dock = System.Windows.Forms.DockStyle.Left;
             this.pbAvatar.ImageRotate = 0F;
-            this.pbAvatar.Location = new System.Drawing.Point(3, 3);
+            this.pbAvatar.Location = new System.Drawing.Point(5, 5);
+            this.pbAvatar.Margin = new System.Windows.Forms.Padding(4);
             this.pbAvatar.Name = "pbAvatar";
             this.pbAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.pbAvatar.Size = new System.Drawing.Size(64, 64);
+            this.pbAvatar.Size = new System.Drawing.Size(69, 69);
             this.pbAvatar.TabIndex = 0;
             this.pbAvatar.TabStop = false;
             // 
-            // lblUserName
-            // 
-            this.lblUserName.AutoSize = true;
-            this.lblUserName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblUserName.Location = new System.Drawing.Point(73, 31);
-            this.lblUserName.Name = "lblUserName";
-            this.lblUserName.Size = new System.Drawing.Size(51, 20);
-            this.lblUserName.TabIndex = 1;
-            this.lblUserName.Text = "label1";
-            // 
             // pbAction
             // 
+            this.pbAction.Dock = System.Windows.Forms.DockStyle.Right;
             this.pbAction.Image = ((System.Drawing.Image)(resources.GetObject("pbAction.Image")));
-            this.pbAction.Location = new System.Drawing.Point(201, 17);
+            this.pbAction.Location = new System.Drawing.Point(276, 5);
+            this.pbAction.Margin = new System.Windows.Forms.Padding(4);
             this.pbAction.Name = "pbAction";
-            this.pbAction.Size = new System.Drawing.Size(34, 34);
+            this.pbAction.Size = new System.Drawing.Size(57, 69);
             this.pbAction.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbAction.TabIndex = 2;
             this.pbAction.TabStop = false;
             // 
+            // flpUserName
+            // 
+            this.flpUserName.AutoSize = true;
+            this.flpUserName.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.flpUserName.Controls.Add(this.lblUserName);
+            this.flpUserName.Dock = System.Windows.Forms.DockStyle.Left;
+            this.flpUserName.Location = new System.Drawing.Point(74, 5);
+            this.flpUserName.Name = "flpUserName";
+            this.flpUserName.Padding = new System.Windows.Forms.Padding(10);
+            this.flpUserName.Size = new System.Drawing.Size(121, 69);
+            this.flpUserName.TabIndex = 3;
+            // 
+            // lblUserName
+            // 
+            this.lblUserName.BackColor = System.Drawing.Color.Transparent;
+            this.lblUserName.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblUserName.Location = new System.Drawing.Point(13, 13);
+            this.lblUserName.Name = "lblUserName";
+            this.lblUserName.Size = new System.Drawing.Size(95, 25);
+            this.lblUserName.TabIndex = 2;
+            this.lblUserName.Text = "{UserName}";
+            // 
+            // pnlFrame
+            // 
+            this.pnlFrame.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(39)))), ((int)(((byte)(164)))), ((int)(((byte)(242)))));
+            this.pnlFrame.Controls.Add(this.flpUserName);
+            this.pnlFrame.Controls.Add(this.pbAvatar);
+            this.pnlFrame.Controls.Add(this.pbAction);
+            this.pnlFrame.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlFrame.Location = new System.Drawing.Point(10, 10);
+            this.pnlFrame.Name = "pnlFrame";
+            this.pnlFrame.Padding = new System.Windows.Forms.Padding(5);
+            this.pnlFrame.Size = new System.Drawing.Size(338, 79);
+            this.pnlFrame.TabIndex = 4;
+            // 
             // UserListItem
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.pbAction);
-            this.Controls.Add(this.lblUserName);
-            this.Controls.Add(this.pbAvatar);
+            this.BackColor = System.Drawing.Color.White;
+            this.Controls.Add(this.pnlFrame);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "UserListItem";
-            this.Size = new System.Drawing.Size(238, 70);
+            this.Padding = new System.Windows.Forms.Padding(10, 10, 10, 0);
+            this.Size = new System.Drawing.Size(358, 89);
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAction)).EndInit();
+            this.flpUserName.ResumeLayout(false);
+            this.flpUserName.PerformLayout();
+            this.pnlFrame.ResumeLayout(false);
+            this.pnlFrame.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private Guna.UI2.WinForms.Guna2CirclePictureBox pbAvatar;
-        private System.Windows.Forms.Label lblUserName;
         public System.Windows.Forms.PictureBox pbAction;
+        private System.Windows.Forms.FlowLayoutPanel flpUserName;
+        private Guna.UI2.WinForms.Guna2HtmlLabel lblUserName;
+        private Guna.UI2.WinForms.Guna2Panel pnlFrame;
     }
 }
