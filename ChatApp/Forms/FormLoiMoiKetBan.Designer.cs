@@ -28,33 +28,50 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.flpView = new System.Windows.Forms.FlowLayoutPanel();
+            this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
+            this.pnlView = new Guna.UI2.WinForms.Guna2Panel();
+            this.pnlBackground.SuspendLayout();
             this.SuspendLayout();
             // 
-            // flpView
+            // pnlBackground
             // 
-            this.flpView.AutoScroll = true;
-            this.flpView.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flpView.Location = new System.Drawing.Point(12, 12);
-            this.flpView.Name = "flpView";
-            this.flpView.Size = new System.Drawing.Size(596, 426);
-            this.flpView.TabIndex = 0;
-            this.flpView.WrapContents = false;
+            this.pnlBackground.Controls.Add(this.pnlView);
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
+            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
+            this.pnlBackground.Name = "pnlBackground";
+            this.pnlBackground.Padding = new System.Windows.Forms.Padding(20);
+            this.pnlBackground.Size = new System.Drawing.Size(668, 520);
+            this.pnlBackground.TabIndex = 0;
+            // 
+            // pnlView
+            // 
+            this.pnlView.BackColor = System.Drawing.Color.White;
+            this.pnlView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlView.Location = new System.Drawing.Point(20, 20);
+            this.pnlView.Name = "pnlView";
+            this.pnlView.Size = new System.Drawing.Size(628, 480);
+            this.pnlView.TabIndex = 0;
             // 
             // FormLoiMoiKetBan
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 450);
-            this.Controls.Add(this.flpView);
+            this.ClientSize = new System.Drawing.Size(668, 520);
+            this.Controls.Add(this.pnlBackground);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormLoiMoiKetBan";
             this.Text = "FormLoiMoiKetBan";
+            this.pnlBackground.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.FlowLayoutPanel flpView;
+        private Guna.UI2.WinForms.Guna2GradientPanel pnlBackground;
+        private Guna.UI2.WinForms.Guna2Panel pnlView;
     }
 }

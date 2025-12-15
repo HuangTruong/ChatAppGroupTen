@@ -153,6 +153,16 @@ namespace ChatApp.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Moon {
+            get {
+                object obj = ResourceManager.GetObject("Moon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap NhanTin {
             get {
                 object obj = ResourceManager.GetObject("NhanTin", resourceCulture);
@@ -166,6 +176,16 @@ namespace ChatApp.Properties {
         internal static System.Drawing.Bitmap SendFile {
             get {
                 object obj = ResourceManager.GetObject("SendFile", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Sun {
+            get {
+                object obj = ResourceManager.GetObject("Sun", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

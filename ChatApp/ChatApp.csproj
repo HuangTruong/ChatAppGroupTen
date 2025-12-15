@@ -236,11 +236,23 @@
     <Compile Include="Controllers\FriendController.cs" />
     <Compile Include="Controllers\NhanTinController.cs" />
     <Compile Include="Controllers\QuenMatKhauController.cs" />
+    <Compile Include="Controls\Conversations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\Conversations.Designer.cs">
+      <DependentUpon>Conversations.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\FriendRequestItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\FriendRequestItem.Designer.cs">
       <DependentUpon>FriendRequestItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MessageBubbles.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MessageBubbles.Designer.cs">
+      <DependentUpon>MessageBubbles.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\UserListItem.cs">
       <SubType>UserControl</SubType>
@@ -274,6 +286,7 @@
     </Compile>
     <Compile Include="Helpers\KeySanitizer.cs" />
     <Compile Include="Models\Friends\FriendRequest.cs" />
+    <Compile Include="Models\Themes\ThemeSetting.cs" />
     <Compile Include="Models\Users\User.cs" />
     <Compile Include="Forms\NhanTin.cs">
       <SubType>Form</SubType>
@@ -318,8 +331,17 @@
     <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
+    <Compile Include="Services\Firebase\ThemeService.cs" />
+    <Compile Include="Services\UI\ThemeColor.cs" />
+    <Compile Include="Services\UI\ThemeManager.cs" />
+    <EmbeddedResource Include="Controls\Conversations.resx">
+      <DependentUpon>Conversations.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\FriendRequestItem.resx">
       <DependentUpon>FriendRequestItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MessageBubbles.resx">
+      <DependentUpon>MessageBubbles.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\UserListItem.resx">
       <DependentUpon>UserListItem.cs</DependentUpon>
@@ -429,6 +451,8 @@
     <Content Include="Resources\Emoji\thinking.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\icons8-sun-96.png" />
+    <None Include="Resources\icons8-crescent-moon-96.png" />
     <Content Include="Resources\plus.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

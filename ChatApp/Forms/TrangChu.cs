@@ -6,6 +6,7 @@ using FireSharp.Interfaces;
 
 using ChatApp.Models.Users;
 using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
 
 namespace ChatApp
 {
@@ -37,6 +38,11 @@ namespace ChatApp
         private readonly AuthService _authService;
 
         /// <summary>
+        /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
+        /// </summary>
+        private readonly ThemeService _themeService = new ThemeService();
+
+        /// <summary>
         /// Form nhắn tin (màn hình chat chính).
         /// </summary>
         private NhanTin _nhanTinForm;
@@ -63,6 +69,9 @@ namespace ChatApp
             _token = token;
 
             _authService = new AuthService();
+
+            // Chế độ ngày đêm
+            _themeService = new ThemeService();
         }
 
         #endregion
@@ -108,6 +117,12 @@ namespace ChatApp
             }
 
             // Nếu sau này bạn muốn: có thể load thêm thông tin user, avatar, status... ở đây
+            
+            // Load chế độ ngày đêm
+            bool isDark = await _themeService.GetThemeAsync(_localId);
+            ThemeManager.ApplyTheme(this, isDark);
+            if (isDark) picDayNight.Image = Properties.Resources.Moon;
+            else picDayNight.Image = Properties.Resources.Sun;
         }
 
         #endregion
@@ -200,6 +215,22 @@ namespace ChatApp
             this.Close();
         }
 
+        #endregion
+
+        #region ====== NIGHT MODE ======
+
+        /// <summary>
+        /// Sự kiện click icon DayNight:
+        /// - Cập nhật chế độ ngày đêm (Day/Night).
+        /// </summary>
+        private async void picDayNight_Click(object sender, EventArgs e)
+        {
+            bool newMode = !ThemeManager.IsDark;
+            ThemeManager.ApplyTheme(this, newMode);
+            await _themeService.SaveThemeAsync(_localId, newMode);
+            if (newMode) picDayNight.Image = Properties.Resources.Moon;
+            else picDayNight.Image = Properties.Resources.Sun;
+        }
         #endregion
     }
 }

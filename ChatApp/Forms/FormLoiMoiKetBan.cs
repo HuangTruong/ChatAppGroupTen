@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web.UI;
 using System.Windows.Forms;
 
 namespace ChatApp.Forms
@@ -41,7 +42,7 @@ namespace ChatApp.Forms
         {
             try
             {
-                flpView.Controls.Clear();
+                pnlView.Controls.Clear();
 
                 // 1. LẤY DANH SÁCH LỜI MỜI (trả về List<User> Profile của người gửi)
                 List<User> friendRequests = await _friendController.LoadFriendRequestsAsync();
@@ -60,12 +61,14 @@ namespace ChatApp.Forms
 
                     // Gán dữ liệu cơ bản (User Profile)
                     requestControl.SetUserData(localId: user.LocalId, fullName: user.FullName);
-                    requestControl.Width = flpView.ClientSize.Width;
 
                     // Cài đặt Sự kiện (Sự kiện nhấn nút Accept/Reject)
                     requestControl.ActionButtonClicked += RequestControl_HandleAction;
+                    
+                    requestControl.Dock = DockStyle.Top;
 
-                    flpView.Controls.Add(requestControl);
+                    pnlView.Controls.Add(requestControl);
+                    pnlView.Controls.SetChildIndex(requestControl, 0); // Để cho thứ tự tin nhắn không bị ngược
                 }
             }
             catch (Exception ex)
@@ -102,10 +105,10 @@ namespace ChatApp.Forms
                 }
 
                 // 2. XÓA USER CONTROL KHỎI FLOW LAYOUT PANEL sau khi xử lý thành công
-                flpView.Controls.Remove(clickedItem);
+                pnlView.Controls.Remove(clickedItem);
 
                 // 3. Kiểm tra và hiển thị Label rỗng nếu đây là lời mời cuối cùng
-                if (flpView.Controls.Count == 0)
+                if (pnlView.Controls.Count == 0)
                 {
                     DisplayEmptyMessage();
                 }
@@ -130,20 +133,21 @@ namespace ChatApp.Forms
         private void DisplayEmptyMessage()
         {
             // Luôn xóa controls cũ trước khi thêm thông báo rỗng
-            flpView.Controls.Clear();
+            pnlView.Controls.Clear();
 
             Label lblEmpty = new Label();
             lblEmpty.Text = "Bạn không có lời mời kết bạn nào.";
             // 💥 Quan trọng: Cần set Width bằng với FlowLayoutPanel để căn giữa được
-            lblEmpty.Width = flpView.ClientSize.Width;
+            lblEmpty.Width = pnlView.ClientSize.Width;
 
             lblEmpty.TextAlign = ContentAlignment.MiddleCenter;
             lblEmpty.ForeColor = Color.Gray;
             lblEmpty.Height = 50;
 
-            flpView.Controls.Add(lblEmpty);
+            pnlView.Controls.Add(lblEmpty);
         }
 
         #endregion
+
     }
 }

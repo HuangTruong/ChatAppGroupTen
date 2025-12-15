@@ -37,6 +37,7 @@ namespace ChatApp
             this.lblTenDangNhap = new System.Windows.Forms.Label();
             this.picAnhDaiDien = new Guna.UI2.WinForms.Guna2PictureBox();
             this.sepHeader = new Guna.UI2.WinForms.Guna2Separator();
+            this.picDayNight = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground.SuspendLayout();
             this.pnlBody.SuspendLayout();
             this.pnlCaiDat.SuspendLayout();
@@ -48,6 +49,7 @@ namespace ChatApp
             this.pnlHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlBackground
@@ -86,7 +88,7 @@ namespace ChatApp
             this.pnlBody.Name = "pnlBody";
             this.pnlBody.ShadowDecoration.BorderRadius = 20;
             this.pnlBody.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
-            this.pnlBody.ShadowDecoration.Depth = 12;
+            this.pnlBody.ShadowDecoration.Depth = 25;
             this.pnlBody.ShadowDecoration.Enabled = true;
             this.pnlBody.Size = new System.Drawing.Size(525, 316);
             this.pnlBody.TabIndex = 4;
@@ -200,6 +202,7 @@ namespace ChatApp
             // pnlHeader
             // 
             this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.pnlHeader.Controls.Add(this.picDayNight);
             this.pnlHeader.Controls.Add(this.lblTenApp);
             this.pnlHeader.Controls.Add(this.picLogo);
             this.pnlHeader.Controls.Add(this.lblTenDangNhap);
@@ -270,6 +273,18 @@ namespace ChatApp
             this.sepHeader.Size = new System.Drawing.Size(1181, 1);
             this.sepHeader.TabIndex = 8;
             // 
+            // picDayNight
+            // 
+            this.picDayNight.ImageRotate = 0F;
+            this.picDayNight.Location = new System.Drawing.Point(1017, 12);
+            this.picDayNight.Name = "picDayNight";
+            this.picDayNight.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picDayNight.Size = new System.Drawing.Size(64, 64);
+            this.picDayNight.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picDayNight.TabIndex = 9;
+            this.picDayNight.TabStop = false;
+            this.picDayNight.Click += new System.EventHandler(this.picDayNight_Click);
+            // 
             // TrangChu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -296,6 +311,7 @@ namespace ChatApp
             this.pnlHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -320,5 +336,6 @@ namespace ChatApp
         private System.Windows.Forms.Label lblTenDangNhap;
         private Guna.UI2.WinForms.Guna2PictureBox picAnhDaiDien;
         private Guna.UI2.WinForms.Guna2Separator sepHeader;
+        private Guna.UI2.WinForms.Guna2CirclePictureBox picDayNight;
     }
 }
