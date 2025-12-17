@@ -8,7 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FirebaseAppConfig = ChatApp.Services.Firebase.FirebaseConfig;
-
+using System.IO;
+using ChatApp.Services.FileHost;
 namespace ChatApp.Controllers
 {
     /// <summary>
@@ -40,6 +41,27 @@ namespace ChatApp.Controllers
         /// Có phải tin nhắn của user hiện tại hay không (phục vụ UI).
         /// </summary>
         public bool IsMine { get; set; }
+
+        /// <summary>
+        /// Dùng để phân biệt khi vẽ UI:
+        /// </summary>
+        /// - "text": vẽ như tin nhắn chữ
+        /// - "file": vẽ như bong bóng file (bấm để tải)
+        public string MessageType { get; set; } = "text";
+
+        /// Tên file để hiển thị cho người nhận (vd: report.zip)
+        public string FileName { get; set; }
+        
+        /// <summary>
+        /// Dung lượng bytes để show KB/MB trên UI
+        /// </summary>
+        public long FileSize { get; set; }
+
+        /// <summary>
+        /// Link tải file từ host trung gian
+        /// </summary>
+        public string FileUrl { get; set; }
+
     }
 
     /// <summary>
@@ -78,6 +100,14 @@ namespace ChatApp.Controllers
         /// </summary>
         private string idCuocTroChuyenDangNghe;
 
+        /// <summary>
+        /// UI gọi hàm này để lấy toàn bộ tin nhắn của cuộc chat hiện tại.
+        /// </summary>
+        public async Task<List<ChatMessage>> GetConversationAsync(string otherUserId)
+        {
+            string conversationId = BuildConversationId(idNguoiDungHienTai, otherUserId);
+            return await LoadConversationAsync(conversationId);
+        }
         #endregion
 
         #region ====== HÀM KHỞI TẠO ======
@@ -192,7 +222,6 @@ namespace ChatApp.Controllers
 
             return danhSachTinNhan;
         }
-
         #endregion
 
         #region ====== USERS API ======
@@ -262,6 +291,7 @@ namespace ChatApp.Controllers
             idCuocTroChuyenDangNghe = conversationId;
 
             string duongDan = "messages/" + conversationId;
+            XuLySuKienStream(conversationId, onMessagesChanged);
 
             try
             {
@@ -340,6 +370,45 @@ namespace ChatApp.Controllers
         }
 
         #endregion
+        #region ====== SEND FILE API ======
+        /// <summary>
+        /// Gửi file:
+        /// 1) Upload file lên host trung gian -> lấy URL tải
+        /// 2) Tạo ChatMessage dạng "file" (chỉ lưu metadata + URL)
+        /// 3) Push lên Firebase vào đúng node messages/{conversationId}
+        /// </summary>
+        public async Task SendFileMessageAsync(string toUserId, string filePath)
+        {
+            if (string.IsNullOrWhiteSpace(toUserId))
+                throw new Exception("Chưa chọn người để chat.");
+
+            FileInfo fi = new FileInfo(filePath);
+            if (!fi.Exists)
+                throw new Exception("File không tồn tại.");
+
+            // Upload trước để lấy link
+            FileAttachmentUploader uploader = new FileAttachmentUploader();
+            string urlTai = await uploader.UploadAsync(filePath);
+
+            // Push message "file" vào đúng cuộc trò chuyện
+            string conversationId = BuildConversationId(idNguoiDungHienTai, toUserId);
+            string duongDan = "messages/" + conversationId;
+
+            ChatMessage tinNhan = new ChatMessage();
+            tinNhan.SenderId = idNguoiDungHienTai;
+            tinNhan.ReceiverId = toUserId;
+            tinNhan.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            tinNhan.IsMine = true;
+
+            // Dữ liệu file: UI sẽ dựa vào MessageType để vẽ kiểu bong bóng file
+            tinNhan.MessageType = "file";
+            tinNhan.FileName = fi.Name;
+            tinNhan.FileSize = fi.Length;
+            tinNhan.FileUrl = urlTai;
+
+            await firebaseClient.PushAsync(duongDan, tinNhan);
+            #endregion
+        }
     }
 }
 /*
