@@ -301,6 +301,7 @@
     </Compile>
     <Compile Include="Services\Auth\EmailVerificationService.cs" />
     <Compile Include="Services\Email\SmtpEmailSender.cs" />
+    <Compile Include="Services\FileHost\FileAttachmentUploader.cs" />
     <Compile Include="Services\Firebase\AuthService.cs" />
     <Compile Include="Services\Firebase\FirebaseConfig.cs" />
     <Compile Include="Services\Firebase\FriendService.cs" />
