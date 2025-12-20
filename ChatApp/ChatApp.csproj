@@ -267,6 +267,12 @@
     <Compile Include="Forms\CaiDat.Designer.cs">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormEmoji.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormEmoji.Designer.cs">
+      <DependentUpon>FormEmoji.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormLoiMoiKetBan.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -358,6 +364,9 @@
     <EmbeddedResource Include="Forms\CaiDat.resx">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormEmoji.resx">
+      <DependentUpon>FormEmoji.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </EmbeddedResource>
@@ -436,7 +445,7 @@
     <Content Include="Resources\Emoji\cool.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Emoji\emoji %281%29.png">
+    <Content Include="Resources\Emoji\emoji_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Emoji\emoji.png">
@@ -445,13 +454,10 @@
     <Content Include="Resources\Emoji\love.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Emoji\party-blower.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Resources\Emoji\smile.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\Emoji\smiley %281%29.png">
+    <Content Include="Resources\Emoji\smiley_1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Emoji\smiley.png">
