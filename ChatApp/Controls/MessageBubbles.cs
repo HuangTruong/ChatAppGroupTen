@@ -2,19 +2,15 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
+using System.IO;
 
 namespace ChatApp.Controls
 {
-    /// <summary>
-    /// Control hiển thị một tin nhắn dạng bubble (chat message)
-    /// </summary>
     public partial class MessageBubbles : UserControl
     {
         #region ======= FIELDS =======
 
-        /// <summary>
-        /// Xác định tin nhắn có phải của người dùng hiện tại hay không
-        /// </summary>
         private bool IsMine;
 
         #endregion
@@ -30,57 +26,101 @@ namespace ChatApp.Controls
 
         #region ======= PUBLIC METHODS =======
 
-        /// <summary>
-        /// Gán dữ liệu cho bubble tin nhắn
-        /// </summary>
-        /// <param name="displayName">Tên người gửi</param>
-        /// <param name="message">Nội dung tin nhắn</param>
-        /// <param name="time">Thời gian gửi</param>
-        /// <param name="isMine">true nếu là tin của mình</param>
-        public void SetMessage(
-            string displayName,
-            string message,
-            string time,
-            bool isMine)
+        public void SetMessage(string displayName, string message, string time, bool isMine)
         {
             lblDisplayName.Text = displayName;
-            lblMessage.Text = message;
             lblTime.Text = time;
-
             IsMine = isMine;
 
-            // Căn vị trí trái / phải
+            // 1. Căn vị trí trái / phải
             ApplyLayout(isMine);
 
-            // Áp dụng theme hiện tại
+            // 2. Áp dụng màu sắc cho khung (Bubble)
             ApplyTheme(ThemeManager.IsDark);
+
+            // 3. Xử lý hiển thị nội dung (Chữ + Emoji)
+            flpMessageContent.Controls.Clear();
+            RenderContent(message);
         }
 
-        /// <summary>
-        /// Áp dụng màu sắc theo Light / Dark Mode
-        /// </summary>
+        #endregion
+
+        #region ======= RENDER LOGIC =======
+
+        private void RenderContent(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+
+            // Regex chuẩn để tách mà không mất dữ liệu
+            string pattern = @"(:[a-zA-Z0-9_]+:)";
+            string[] parts = Regex.Split(message, pattern);
+
+            foreach (var part in parts)
+            {
+                if (string.IsNullOrEmpty(part)) continue;
+
+                if (Regex.IsMatch(part, pattern))
+                {
+                    string emojiName = part.Trim(':');
+                    string path = Path.Combine(Application.StartupPath, "Resources", "Emoji", emojiName + ".png");
+
+                    if (File.Exists(path))
+                    {
+                        PictureBox pic = new PictureBox
+                        {
+                            Image = Image.FromFile(path),
+                            SizeMode = PictureBoxSizeMode.Zoom,
+                            Size = new Size(24, 24),
+                            Margin = new Padding(1, 1, 1, 0)
+                        };
+                        flpMessageContent.Controls.Add(pic);
+                    }
+                    else { AddTextControl(part); }
+                }
+                else
+                {
+                    // Đây là nơi xử lý văn bản thường
+                    AddTextControl(part);
+                }
+            }
+        }
+
+        private void AddTextControl(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            Label lbl = new Label
+            {
+                Text = text,
+                AutoSize = true, // Bắt buộc để hiện text dài
+                Font = new Font("Segoe UI", 10.5F),
+                BackColor = Color.Transparent,
+                Margin = new Padding(0, 3, 0, 0)
+            };
+
+            // Đảm bảo màu chữ luôn tương phản với nền
+            if (ThemeManager.IsDark)
+            {
+                lbl.ForeColor = IsMine ? Color.White : Color.FromArgb(229, 231, 235);
+            }
+            else
+            {
+                lbl.ForeColor = Color.FromArgb(15, 23, 42); // Màu đen đậm dễ nhìn
+            }
+
+            flpMessageContent.Controls.Add(lbl);
+        }
+
+        #endregion
+
+        #region ======= THEME & LAYOUT =======
+
         public void ApplyTheme(bool isDark)
         {
-            #region ===== Container =====
-
-            // Nền ngoài trong suốt
             pnlBackGround.BackColor = Color.Transparent;
-
-            #endregion
-
-            #region ===== Bubble Shape =====
-
-            // Bo góc và padding bubble
             pnlBubble.BorderRadius = 14;
-            pnlBubble.Padding = new Padding(4);
-
-            // Đổ bóng bubble
             pnlBubble.ShadowDecoration.Enabled = true;
             pnlBubble.ShadowDecoration.Depth = 4;
-
-            #endregion
-
-            #region ===== Dark Mode =====
 
             if (isDark)
             {
@@ -89,24 +129,15 @@ namespace ChatApp.Controls
 
                 if (IsMine)
                 {
-                    // 🌙 Dark – tin nhắn của mình
                     pnlBubble.FillColor = ColorTranslator.FromHtml("#1E3A8A");
-                    lblMessage.ForeColor = Color.White;
                     pnlBubble.ShadowDecoration.Color = ColorTranslator.FromHtml("#2563EB");
                 }
                 else
                 {
-                    // 🌙 Dark – tin nhắn người khác
                     pnlBubble.FillColor = ColorTranslator.FromHtml("#020617");
-                    lblMessage.ForeColor = ColorTranslator.FromHtml("#E5E7EB");
                     pnlBubble.ShadowDecoration.Color = ColorTranslator.FromHtml("#0F172A");
                 }
             }
-
-            #endregion
-
-            #region ===== Light Mode =====
-
             else
             {
                 lblDisplayName.ForeColor = ColorTranslator.FromHtml("#334155");
@@ -114,39 +145,24 @@ namespace ChatApp.Controls
 
                 if (IsMine)
                 {
-                    // ☀ Light – tin nhắn của mình
                     pnlBubble.FillColor = ColorTranslator.FromHtml("#DBEAFE");
-                    lblMessage.ForeColor = ColorTranslator.FromHtml("#0F172A");
                     pnlBubble.ShadowDecoration.Color = ColorTranslator.FromHtml("#93C5FD");
                 }
                 else
                 {
-                    // ☀ Light – tin nhắn người khác
                     pnlBubble.FillColor = ColorTranslator.FromHtml("#F8FAFC");
-                    lblMessage.ForeColor = ColorTranslator.FromHtml("#0F172A");
                     pnlBubble.ShadowDecoration.Color = ColorTranslator.FromHtml("#CBD5F5");
                 }
             }
-
-            #endregion
         }
 
-        #endregion
-
-        #region ======= PRIVATE METHODS =======
-
-        /// <summary>
-        /// Căn vị trí bubble trái hoặc phải theo người gửi
-        /// </summary>
         private void ApplyLayout(bool isMine)
         {
             if (isMine)
             {
-                // Tin của mình: căn phải
                 this.Dock = DockStyle.Right;
                 pnlBackGround.Dock = DockStyle.Right;
                 flpBubble.FlowDirection = FlowDirection.TopDown;
-
                 pnlAvatar.Dock = DockStyle.Right;
                 flpBubble.Dock = DockStyle.Right;
                 pnlBubble.Dock = DockStyle.Right;
@@ -155,9 +171,14 @@ namespace ChatApp.Controls
             }
             else
             {
-                // Tin người khác: căn trái
+                this.Dock = DockStyle.Left;
                 pnlBackGround.Dock = DockStyle.Left;
                 flpBubble.FlowDirection = FlowDirection.TopDown;
+                pnlAvatar.Dock = DockStyle.Left;
+                flpBubble.Dock = DockStyle.Left;
+                pnlBubble.Dock = DockStyle.Left;
+                lblDisplayName.Dock = DockStyle.Left;
+                lblTime.Dock = DockStyle.Left;
             }
         }
 
@@ -165,17 +186,10 @@ namespace ChatApp.Controls
 
         #region ======= LIFECYCLE =======
 
-        /// <summary>
-        /// Khi control được tạo handle → áp dụng theme hiện tại
-        /// </summary>
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-
-            if (!DesignMode)
-            {
-                ApplyTheme(ThemeManager.IsDark);
-            }
+            if (!DesignMode) ApplyTheme(ThemeManager.IsDark);
         }
 
         #endregion

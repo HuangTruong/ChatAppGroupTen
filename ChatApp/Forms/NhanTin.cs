@@ -8,6 +8,7 @@ using ChatApp.Services.Firebase;
 using ChatApp.Services.UI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -1443,5 +1444,31 @@ namespace ChatApp
         {
 
         }
+
+        #region ====== EMOJI ======
+
+        private void picEmoji_Click(object sender, EventArgs e)
+        {
+            FormEmoji frm = new FormEmoji();
+
+            // Nhận emoji từ FormEmoji
+            frm.OnEmojiSelected = (emojiCode) => {
+                // Thêm mã emoji vào văn bản hiện tại
+                txtNhapTinNhan.AppendText($" :{emojiCode}: ");
+
+                // Quan trọng: Trả focus về ô nhập liệu để người dùng gõ tiếp được ngay
+                txtNhapTinNhan.Focus();
+                txtNhapTinNhan.SelectionStart = txtNhapTinNhan.Text.Length;
+            };
+
+            // Tính toán vị trí hiển thị (Phía trên nút bấm)
+            Point pt = picEmoji.PointToScreen(Point.Empty);
+            frm.StartPosition = FormStartPosition.Manual;
+            frm.Location = new Point(pt.X - (frm.Width / 2) + (picEmoji.Width / 2), pt.Y - frm.Height - 10);
+
+            frm.Show();
+        }
+
+        #endregion
     }
 }
