@@ -62,21 +62,62 @@ namespace ChatApp.Controllers
         {
             try
             {
-                string base64 = await _authService.GetAvatarAsync(_localId);
-                if (string.IsNullOrEmpty(base64))
-                {
-                    return null;
-                }
+                string avatar = await _authService.GetAvatarAsync(_localId).ConfigureAwait(false);
+                return DecodeAvatarToImage(avatar);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
-                byte[] bytes = Convert.FromBase64String(base64);
+        private static Image DecodeAvatarToImage(string avatarValue)
+        {
+            if (string.IsNullOrWhiteSpace(avatarValue))
+            {
+                return null;
+            }
+
+            string v = avatarValue.Trim();
+
+            if (string.Equals(v, "null", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            v = v.Trim().Trim('"');
+
+            // Data URI: data:image/png;base64,...
+            int idx = v.IndexOf("base64,", StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
+            {
+                v = v.Substring(idx + "base64,".Length);
+            }
+
+            // Remove whitespace/newline
+            v = System.Text.RegularExpressions.Regex.Replace(v, "\\s+", "");
+
+            // base64-url normalize
+            v = v.Replace('-', '+').Replace('_', '/');
+            int mod = v.Length % 4;
+            if (mod != 0)
+            {
+                v = v.PadRight(v.Length + (4 - mod), '=');
+            }
+
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(v);
+
+                // Fix ảnh đen: clone ảnh khỏi stream trước khi trả về.
                 using (var ms = new MemoryStream(bytes))
+                using (var img = Image.FromStream(ms))
                 {
-                    return Image.FromStream(ms);
+                    return new Bitmap(img);
                 }
             }
             catch
             {
-                // Có thể log ra nếu cần, hiện tại trả null cho UI tự xử lý
                 return null;
             }
         }

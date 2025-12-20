@@ -56,7 +56,7 @@ namespace ChatApp
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.ShadowDecoration.BorderRadius = 16;
             this.pnlMain.ShadowDecoration.Enabled = true;
-            this.pnlMain.Size = new System.Drawing.Size(632, 326);
+            this.pnlMain.Size = new System.Drawing.Size(747, 388);
             this.pnlMain.TabIndex = 0;
             // 
             // picAvatar
@@ -64,7 +64,7 @@ namespace ChatApp
             this.picAvatar.BackColor = System.Drawing.Color.Transparent;
             this.picAvatar.FillColor = System.Drawing.Color.Gainsboro;
             this.picAvatar.ImageRotate = 0F;
-            this.picAvatar.Location = new System.Drawing.Point(64, 95);
+            this.picAvatar.Location = new System.Drawing.Point(335, 75);
             this.picAvatar.Name = "picAvatar";
             this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.picAvatar.Size = new System.Drawing.Size(84, 84);
@@ -78,9 +78,9 @@ namespace ChatApp
             this.btnDoiAvatar.BorderRadius = 10;
             this.btnDoiAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDoiAvatar.ForeColor = System.Drawing.Color.White;
-            this.btnDoiAvatar.Location = new System.Drawing.Point(45, 185);
+            this.btnDoiAvatar.Location = new System.Drawing.Point(304, 165);
             this.btnDoiAvatar.Name = "btnDoiAvatar";
-            this.btnDoiAvatar.Size = new System.Drawing.Size(122, 40);
+            this.btnDoiAvatar.Size = new System.Drawing.Size(143, 40);
             this.btnDoiAvatar.TabIndex = 1;
             this.btnDoiAvatar.Text = "Đổi avatar";
             this.btnDoiAvatar.Click += new System.EventHandler(this.btnDoiAvatar_Click);
@@ -89,7 +89,7 @@ namespace ChatApp
             // 
             this.lblTitle.AutoSize = true;
             this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTitle.Location = new System.Drawing.Point(162, 34);
+            this.lblTitle.Location = new System.Drawing.Point(241, 34);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(289, 38);
             this.lblTitle.TabIndex = 2;
@@ -101,13 +101,13 @@ namespace ChatApp
             this.txtTenDangNhap.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtTenDangNhap.DefaultText = "";
             this.txtTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtTenDangNhap.Location = new System.Drawing.Point(183, 121);
+            this.txtTenDangNhap.Location = new System.Drawing.Point(134, 230);
             this.txtTenDangNhap.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtTenDangNhap.Name = "txtTenDangNhap";
             this.txtTenDangNhap.PlaceholderText = "Nhập tên đăng nhập mới";
             this.txtTenDangNhap.ReadOnly = true;
             this.txtTenDangNhap.SelectedText = "";
-            this.txtTenDangNhap.Size = new System.Drawing.Size(236, 42);
+            this.txtTenDangNhap.Size = new System.Drawing.Size(269, 42);
             this.txtTenDangNhap.TabIndex = 2;
             // 
             // txtMatKhau
@@ -116,12 +116,12 @@ namespace ChatApp
             this.txtMatKhau.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtMatKhau.DefaultText = "";
             this.txtMatKhau.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtMatKhau.Location = new System.Drawing.Point(183, 183);
+            this.txtMatKhau.Location = new System.Drawing.Point(134, 280);
             this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMatKhau.Name = "txtMatKhau";
             this.txtMatKhau.PlaceholderText = "Nhập mật khẩu mới";
             this.txtMatKhau.SelectedText = "";
-            this.txtMatKhau.Size = new System.Drawing.Size(236, 42);
+            this.txtMatKhau.Size = new System.Drawing.Size(269, 42);
             this.txtMatKhau.TabIndex = 3;
             // 
             // btnDoiMatKhau
@@ -129,9 +129,9 @@ namespace ChatApp
             this.btnDoiMatKhau.BorderRadius = 10;
             this.btnDoiMatKhau.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDoiMatKhau.ForeColor = System.Drawing.Color.White;
-            this.btnDoiMatKhau.Location = new System.Drawing.Point(435, 182);
+            this.btnDoiMatKhau.Location = new System.Drawing.Point(409, 279);
             this.btnDoiMatKhau.Name = "btnDoiMatKhau";
-            this.btnDoiMatKhau.Size = new System.Drawing.Size(178, 43);
+            this.btnDoiMatKhau.Size = new System.Drawing.Size(218, 43);
             this.btnDoiMatKhau.TabIndex = 6;
             this.btnDoiMatKhau.Text = "Đổi mật khẩu";
             this.btnDoiMatKhau.Click += new System.EventHandler(this.btnDoiMatKhau_Click);
@@ -141,9 +141,9 @@ namespace ChatApp
             this.btnDoiTenDangNhap.BorderRadius = 10;
             this.btnDoiTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDoiTenDangNhap.ForeColor = System.Drawing.Color.White;
-            this.btnDoiTenDangNhap.Location = new System.Drawing.Point(435, 120);
+            this.btnDoiTenDangNhap.Location = new System.Drawing.Point(409, 229);
             this.btnDoiTenDangNhap.Name = "btnDoiTenDangNhap";
-            this.btnDoiTenDangNhap.Size = new System.Drawing.Size(178, 43);
+            this.btnDoiTenDangNhap.Size = new System.Drawing.Size(218, 43);
             this.btnDoiTenDangNhap.TabIndex = 7;
             this.btnDoiTenDangNhap.Text = "Đổi tên đăng nhập";
             this.btnDoiTenDangNhap.Click += new System.EventHandler(this.btnDoiTenDangNhap_Click);
@@ -153,9 +153,9 @@ namespace ChatApp
             this.btnDong.BorderRadius = 10;
             this.btnDong.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDong.ForeColor = System.Drawing.Color.White;
-            this.btnDong.Location = new System.Drawing.Point(249, 252);
+            this.btnDong.Location = new System.Drawing.Point(302, 328);
             this.btnDong.Name = "btnDong";
-            this.btnDong.Size = new System.Drawing.Size(118, 40);
+            this.btnDong.Size = new System.Drawing.Size(145, 40);
             this.btnDong.TabIndex = 8;
             this.btnDong.Text = "Đóng";
             this.btnDong.Click += new System.EventHandler(this.btnDong_Click);
@@ -165,7 +165,7 @@ namespace ChatApp
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
-            this.ClientSize = new System.Drawing.Size(664, 365);
+            this.ClientSize = new System.Drawing.Size(779, 422);
             this.Controls.Add(this.pnlMain);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "CatDat";

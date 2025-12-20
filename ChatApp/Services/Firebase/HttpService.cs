@@ -19,6 +19,29 @@ namespace ChatApp.Services.Firebase
         /// </summary>
         private readonly HttpClient _client = new HttpClient();
 
+
+
+        /// <summary>
+        /// Ném Exception nếu HTTP response không thành công (để không bị fail-silent).
+        /// </summary>
+        private static void EnsureSuccess(HttpResponseMessage res, string body)
+        {
+            if (res == null)
+            {
+                throw new Exception("HTTP response null.");
+            }
+
+            if (!res.IsSuccessStatusCode)
+            {
+                string msg = string.Format("HTTP {0} {1}: {2}",
+                    (int)res.StatusCode,
+                    res.ReasonPhrase,
+                    body);
+
+                throw new Exception(msg);
+            }
+        }
+
         #endregion
 
         #region ====== POST (JSON) ======
@@ -38,6 +61,8 @@ namespace ChatApp.Services.Firebase
             var res = await _client.PostAsync(url, http).ConfigureAwait(false);
             var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+
+            EnsureSuccess(res, body);
             return JsonConvert.DeserializeObject<T>(body);
         }
 
@@ -56,6 +81,8 @@ namespace ChatApp.Services.Firebase
             var res = await _client.GetAsync(url).ConfigureAwait(false);
             var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+
+            EnsureSuccess(res, body);
             return JsonConvert.DeserializeObject<T>(body);
         }
 
@@ -74,7 +101,9 @@ namespace ChatApp.Services.Firebase
             var json = JsonConvert.SerializeObject(data);
             var http = new StringContent(json, Encoding.UTF8, "application/json");
 
-            await _client.PutAsync(url, http).ConfigureAwait(false);
+            var res = await _client.PutAsync(url, http).ConfigureAwait(false);
+            var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+            EnsureSuccess(res, body);
         }
 
         #endregion

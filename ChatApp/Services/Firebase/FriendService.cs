@@ -3,10 +3,7 @@ using ChatApp.Models.Friends;
 using ChatApp.Models.Users;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace ChatApp.Services.Firebase
 {
@@ -71,7 +68,6 @@ namespace ChatApp.Services.Firebase
         public async Task<Dictionary<string, bool>> GetFriendListAsync(string currentLocalId)
         {
             string safeId = KeySanitizer.SafeKey(currentLocalId);
-            // Lưu ý: Tên node PHẢI khớp với tên bạn đang dùng khi ACCEPT (ví dụ: friends)
             string url = Db($"friends/{safeId}");
 
             // Bạn bè được lưu dưới dạng Dictionary<FriendId, true>
@@ -163,35 +159,29 @@ namespace ChatApp.Services.Firebase
         /// 2. XÓA lời mời ở cả 2 node request (incoming và outgoing).
         /// </summary>
         /// 
+        /// <summary>
+        /// Chấp nhận lời mời kết bạn:
+        /// 1) Tạo friends 2 chiều tại:
+        ///    - friends/{current}/{sender} = true
+        ///    - friends/{sender}/{current} = true
+        /// 2) Xóa request ở cả 2 node:
+        ///    - friendRequests/{current}/{sender}
+        ///    - outgoingRequests/{sender}/{current}
+        /// </summary>
         public async Task AcceptFriendRequestAsync(string currentLocalId, string senderId)
         {
             string safeCurrentId = KeySanitizer.SafeKey(currentLocalId);
             string safeSenderId = KeySanitizer.SafeKey(senderId);
 
-            var friendLink = true; // Giá trị để đánh dấu liên kết bạn bè
+            // Ghi tại leaf để KHÔNG ghi đè toàn bộ danh sách friends
+            await _http.PutAsync(Db("friends/" + safeCurrentId + "/" + safeSenderId), true);
+            await _http.PutAsync(Db("friends/" + safeSenderId + "/" + safeCurrentId), true);
 
-            // 1. Ghi vào node friends (Liên kết 2 chiều)
-            // A. Current User -> Sender
-            var userToSenderPayload = new Dictionary<string, object>
-            {
-                { safeSenderId, friendLink }
-            };
-            await _http.PutAsync(Db($"friends/{safeCurrentId}"), userToSenderPayload);
-
-            // B. Sender -> Current User
-            var senderToUserPayload = new Dictionary<string, object>
-            {
-                { safeCurrentId, friendLink }
-            };
-            await _http.PutAsync(Db($"friends/{safeSenderId}"), senderToUserPayload);
-
-            // 2. XÓA status request (dùng DELETEAsync)
-            // A. Incoming request (tại Current User): /friendRequests/{currentLocalId}/{senderId}
-            await _http.DeleteAsync(Db($"friendRequests/{safeCurrentId}/{safeSenderId}"));
-
-            // B. Outgoing request (tại Sender): /outgoingRequests/{senderId}/{currentLocalId}
-            await _http.DeleteAsync(Db($"outgoingRequests/{safeSenderId}/{safeCurrentId}"));
+            // Xóa request 2 chiều
+            await _http.DeleteAsync(Db("friendRequests/" + safeCurrentId + "/" + safeSenderId));
+            await _http.DeleteAsync(Db("outgoingRequests/" + safeSenderId + "/" + safeCurrentId));
         }
+
 
         /// <summary>
         /// Từ chối lời mời kết bạn: XÓA lời mời ở cả 2 node request (incoming và outgoing).

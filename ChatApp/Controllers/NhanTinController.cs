@@ -1,256 +1,611 @@
-﻿using ChatApp.Models.Users;
+﻿using ChatApp.Helpers;
+using ChatApp.Models.Users;
+using ChatApp.Models.Messages;
+using ChatApp.Services.FileHost;
 using FireSharp;
 using FireSharp.Config;
 using FireSharp.EventStreaming;
 using FireSharp.Interfaces;
 using FireSharp.Response;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using FirebaseAppConfig = ChatApp.Services.Firebase.FirebaseConfig;
 using System.IO;
-using ChatApp.Services.FileHost;
+using System.Threading;
+using System.Threading.Tasks;
+
+using FirebaseAppConfig = ChatApp.Services.Firebase.FirebaseConfig;
+
 namespace ChatApp.Controllers
 {
-    /// <summary>
-    /// Mô tả 1 tin nhắn trong cuộc trò chuyện.
-    /// </summary>
-    public class ChatMessage
-    {
-        /// <summary>
-        /// localId người gửi.
-        /// </summary>
-        public string SenderId { get; set; }
-
-        /// <summary>
-        /// localId người nhận.
-        /// </summary>
-        public string ReceiverId { get; set; }
-
-        /// <summary>
-        /// Nội dung tin nhắn (text).
-        /// </summary>
-        public string Text { get; set; }
-
-        /// <summary>
-        /// Thời điểm gửi (Unix time milliseconds).
-        /// </summary>
-        public long Timestamp { get; set; }
-
-        /// <summary>
-        /// Có phải tin nhắn của user hiện tại hay không (phục vụ UI).
-        /// </summary>
-        public bool IsMine { get; set; }
-
-        /// <summary>
-        /// Dùng để phân biệt khi vẽ UI:
-        /// </summary>
-        /// - "text": vẽ như tin nhắn chữ
-        /// - "file": vẽ như bong bóng file (bấm để tải)
-        public string MessageType { get; set; } = "text";
-
-        /// Tên file để hiển thị cho người nhận (vd: report.zip)
-        public string FileName { get; set; }
-        
-        /// <summary>
-        /// Dung lượng bytes để show KB/MB trên UI
-        /// </summary>
-        public long FileSize { get; set; }
-
-        /// <summary>
-        /// Link tải file từ host trung gian
-        /// </summary>
-        public string FileUrl { get; set; }
-
-    }
-
-    /// <summary>
-    /// Controller cho form Nhắn tin:
-    /// - Kết nối Firebase Realtime Database qua FireSharp.
-    /// - Lấy danh sách user.
-    /// - Gửi tin nhắn.
-    /// - Lắng nghe realtime tin nhắn.
-    /// </summary>
     public class NhanTinController : IDisposable
     {
-        #region ====== BIẾN THÀNH VIÊN ======
+        #region ====== FIELDS ======
 
-        /// <summary>
-        /// localId của user hiện tại.
-        /// </summary>
-        private readonly string idNguoiDungHienTai;
+        private readonly string _currentUserId;
+        private readonly string _token;
 
-        /// <summary>
-        /// Token đăng nhập (để dành, nếu sau này cần).
-        /// </summary>
-        private readonly string tokenDangNhap;
+        private readonly IFirebaseClient _firebase;
 
-        /// <summary>
-        /// Client của FireSharp để gọi lên Firebase.
-        /// </summary>
-        private readonly IFirebaseClient firebaseClient;
+        private EventStreamResponse _stream;
+        private string _listeningConversationId;
 
-        /// <summary>
-        /// Stream hiện tại đang lắng nghe OnAsync.
-        /// </summary>
-        private EventStreamResponse luongSuKienHienTai;
+        // Track message đã biết để tránh duplicate
+        private readonly object _knownLock = new object();
+        private readonly HashSet<string> _knownMessageIds = new HashSet<string>(StringComparer.Ordinal);
 
-        /// <summary>
-        /// Id cuộc trò chuyện đang được lắng nghe.
-        /// </summary>
-        private string idCuocTroChuyenDangNghe;
+        // Debounce reload full chỉ khi thật sự cần (changed/remove/snapshot)
+        private readonly object _reloadLock = new object();
+        private Timer _fullReloadTimer;
+        private CancellationTokenSource _fullReloadCts;
+        private readonly int _fullReloadDebounceMs = 300;
 
-        /// <summary>
-        /// UI gọi hàm này để lấy toàn bộ tin nhắn của cuộc chat hiện tại.
-        /// </summary>
-        public async Task<List<ChatMessage>> GetConversationAsync(string otherUserId)
-        {
-            string conversationId = BuildConversationId(idNguoiDungHienTai, otherUserId);
-            return await LoadConversationAsync(conversationId);
-        }
         #endregion
 
-        #region ====== HÀM KHỞI TẠO ======
+        #region ====== CTOR ======
 
-        /// <summary>
-        /// Khởi tạo controller với localId và token hiện tại.
-        /// </summary>
         public NhanTinController(string currentUserId, string token)
         {
-            idNguoiDungHienTai = currentUserId;
-            tokenDangNhap = token;
+            _currentUserId = currentUserId;
+            _token = token;
 
-            IFirebaseConfig cauHinh = new FirebaseConfig();
-            cauHinh.BasePath = FirebaseAppConfig.DatabaseUrl;
+            IFirebaseConfig cfg = new FirebaseConfig();
+            cfg.BasePath = FirebaseAppConfig.DatabaseUrl;
+            cfg.AuthSecret = string.Empty;
 
-            cauHinh.AuthSecret = string.Empty;
-
-            firebaseClient = new FirebaseClient(cauHinh);
+            _firebase = new FirebaseClient(cfg);
         }
 
         #endregion
 
-        #region ====== HÀM PHỤ TRỢ ======
+        #region ====== HELPERS ======
 
         /// <summary>
-        /// Tạo conversationId ổn định cho 2 user:
-        /// ghép 2 localId theo thứ tự từ điển.
+        /// Tạo conversationId ổn định cho 2 user (theo thứ tự từ điển).
         /// </summary>
         private string BuildConversationId(string userId1, string userId2)
         {
-            int soSanh = string.CompareOrdinal(userId1, userId2);
-            if (soSanh < 0)
-            {
-                return userId1 + "_" + userId2;
-            }
-
+            int cmp = string.CompareOrdinal(userId1, userId2);
+            if (cmp < 0) return userId1 + "_" + userId2;
             return userId2 + "_" + userId1;
         }
 
-        /// <summary>
-        /// So sánh 2 tin nhắn theo thời gian gửi.
-        /// </summary>
-        private int SoSanhTinNhanTheoThoiGian(ChatMessage tin1, ChatMessage tin2)
+        private static int CompareByTime(ChatMessage a, ChatMessage b)
         {
-            long thoiGian1 = 0;
-            long thoiGian2 = 0;
+            long ta = (a != null) ? a.Timestamp : 0;
+            long tb = (b != null) ? b.Timestamp : 0;
 
-            if (tin1 != null)
-            {
-                thoiGian1 = tin1.Timestamp;
-            }
-
-            if (tin2 != null)
-            {
-                thoiGian2 = tin2.Timestamp;
-            }
-
-            if (thoiGian1 < thoiGian2)
-            {
-                return -1;
-            }
-
-            if (thoiGian1 > thoiGian2)
-            {
-                return 1;
-            }
-
+            if (ta < tb) return -1;
+            if (ta > tb) return 1;
             return 0;
         }
 
-        /// <summary>
-        /// Đọc toàn bộ tin nhắn của 1 cuộc trò chuyện, sắp xếp theo thời gian
-        /// và đánh dấu IsMine cho từng tin nhắn.
-        /// </summary>
-        private async Task<List<ChatMessage>> LoadConversationAsync(string conversationId)
+        private ChatMessage DeserializeMessage(string json)
         {
-            string duongDan = "messages/" + conversationId;
+            if (string.IsNullOrWhiteSpace(json)) return null;
 
-            FirebaseResponse phanHoi = await firebaseClient.GetAsync(duongDan);
-
-            Dictionary<string, ChatMessage> duLieu =
-                phanHoi.ResultAs<Dictionary<string, ChatMessage>>();
-
-            List<ChatMessage> danhSachTinNhan = new List<ChatMessage>();
-
-            if (duLieu != null)
+            try
             {
-                foreach (KeyValuePair<string, ChatMessage> cap in duLieu)
-                {
-                    ChatMessage tin = cap.Value;
-                    if (tin == null)
-                    {
-                        continue;
-                    }
-
-                    // Đánh dấu tin của mình
-                    if (string.Equals(tin.SenderId, idNguoiDungHienTai, StringComparison.Ordinal))
-                    {
-                        tin.IsMine = true;
-                    }
-                    else
-                    {
-                        tin.IsMine = false;
-                    }
-
-                    danhSachTinNhan.Add(tin);
-                }
-
-                // Sắp xếp theo thời gian
-                danhSachTinNhan.Sort(SoSanhTinNhanTheoThoiGian);
+                return JsonConvert.DeserializeObject<ChatMessage>(json);
             }
-
-            return danhSachTinNhan;
+            catch
+            {
+                return null;
+            }
         }
+
+        private Dictionary<string, ChatMessage> DeserializeMessageMap(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return null;
+
+            try
+            {
+                return JsonConvert.DeserializeObject<Dictionary<string, ChatMessage>>(json);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void ResetKnownIds(List<ChatMessage> list)
+        {
+            lock (_knownLock)
+            {
+                _knownMessageIds.Clear();
+                if (list == null) return;
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    ChatMessage m = list[i];
+                    if (m == null) continue;
+
+                    if (!string.IsNullOrEmpty(m.MessageId))
+                    {
+                        _knownMessageIds.Add(m.MessageId);
+                    }
+                }
+            }
+        }
+
+        private bool MarkKnownIfNew(string messageId)
+        {
+            if (string.IsNullOrEmpty(messageId)) return false;
+
+            lock (_knownLock)
+            {
+                if (_knownMessageIds.Contains(messageId)) return false;
+                _knownMessageIds.Add(messageId);
+                return true;
+            }
+        }
+
         #endregion
 
-        #region ====== USERS API ======
+        #region ====== CONVERSATION (LOAD) ======
 
-        /// <summary>
-        /// Lấy toàn bộ user từ node "users" trong Realtime Database.
-        /// </summary>
+        public async Task<List<ChatMessage>> GetConversationAsync(string otherUserId)
+        {
+            string conversationId = BuildConversationId(_currentUserId, otherUserId);
+            return await LoadConversationAsync(conversationId);
+        }
+
+        private async Task<List<ChatMessage>> LoadConversationAsync(string conversationId)
+        {
+            string path = "messages/" + conversationId;
+
+            FirebaseResponse resp = await _firebase.GetAsync(path);
+            Dictionary<string, ChatMessage> raw = resp.ResultAs<Dictionary<string, ChatMessage>>();
+
+            List<ChatMessage> list = new List<ChatMessage>();
+
+            if (raw != null)
+            {
+                foreach (KeyValuePair<string, ChatMessage> kv in raw)
+                {
+                    ChatMessage m = kv.Value;
+                    if (m == null) continue;
+
+                    m.MessageId = kv.Key;
+                    m.IsMine = string.Equals(m.SenderId, _currentUserId, StringComparison.Ordinal);
+
+                    if (string.IsNullOrWhiteSpace(m.MessageType))
+                    {
+                        m.MessageType = "text";
+                    }
+
+                    list.Add(m);
+                }
+
+                list.Sort(CompareByTime);
+            }
+
+            return list;
+        }
+
+        #endregion
+
+        #region ====== USERS & FRIENDS ======
+
         public async Task<Dictionary<string, User>> GetAllUsersAsync()
         {
-            FirebaseResponse phanHoi = await firebaseClient.GetAsync("friends");
+            FirebaseResponse resp = await _firebase.GetAsync("users");
+            Dictionary<string, User> data = resp.ResultAs<Dictionary<string, User>>();
 
-            Dictionary<string, User> duLieu =
-                phanHoi.ResultAs<Dictionary<string, User>>();
+            if (data == null) return new Dictionary<string, User>();
 
-            if (duLieu == null)
+            foreach (KeyValuePair<string, User> kv in data)
+            {
+                if (kv.Value != null)
+                {
+                    kv.Value.LocalId = kv.Key;
+                }
+            }
+
+            return data;
+        }
+
+        public async Task<Dictionary<string, User>> GetFriendUsersAsync(string currentLocalId)
+        {
+            string safeMe = KeySanitizer.SafeKey(currentLocalId);
+
+            FirebaseResponse respFriends = await _firebase.GetAsync("friends/" + safeMe);
+            Dictionary<string, bool> friendIds = respFriends.ResultAs<Dictionary<string, bool>>();
+
+            if (friendIds == null || friendIds.Count == 0)
             {
                 return new Dictionary<string, User>();
             }
 
-            return duLieu;
+            if (friendIds.Count > 50)
+            {
+                Dictionary<string, User> allUsers = await GetAllUsersAsync();
+                Dictionary<string, User> joined = new Dictionary<string, User>();
+
+                foreach (KeyValuePair<string, bool> kv in friendIds)
+                {
+                    string friendId = kv.Key;
+                    User u;
+
+                    if (allUsers.TryGetValue(friendId, out u) && u != null)
+                    {
+                        u.LocalId = friendId;
+                        joined[friendId] = u;
+                    }
+                }
+
+                return joined;
+            }
+
+            Dictionary<string, User> result = new Dictionary<string, User>();
+            object sync = new object();
+
+            SemaphoreSlim sem = new SemaphoreSlim(6);
+            List<Task> tasks = new List<Task>();
+
+            foreach (KeyValuePair<string, bool> kv in friendIds)
+            {
+                string friendId = kv.Key;
+
+                tasks.Add(Task.Run(async () =>
+                {
+                    await sem.WaitAsync().ConfigureAwait(false);
+                    try
+                    {
+                        FirebaseResponse respUser = await _firebase.GetAsync("users/" + friendId).ConfigureAwait(false);
+                        User u = respUser.ResultAs<User>();
+
+                        if (u != null)
+                        {
+                            u.LocalId = friendId;
+                            lock (sync)
+                            {
+                                result[friendId] = u;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+                    finally
+                    {
+                        try { sem.Release(); } catch { }
+                    }
+                }));
+            }
+
+            try { await Task.WhenAll(tasks).ConfigureAwait(false); } catch { }
+
+            return result;
         }
 
         #endregion
 
-        #region ====== MESSAGES API ======
+        #region ====== REALTIME LISTEN (INCREMENTAL) ======
 
         /// <summary>
-        /// Gửi 1 tin nhắn text tới user khác.
+        /// Listen incremental:
+        /// - Load initial 1 lần
+        /// - Stream "added": append tin mới
+        /// - Nếu snapshot/changed/remove => debounce reload full
         /// </summary>
+        public async void StartListenConversation(
+            string otherUserId,
+            Action<List<ChatMessage>> onInitialLoaded,
+            Action<ChatMessage> onMessageAdded,
+            Action<List<ChatMessage>> onReset)
+        {
+            StopListen();
+
+            if (onInitialLoaded == null || onMessageAdded == null)
+            {
+                return;
+            }
+
+            string conversationId = BuildConversationId(_currentUserId, otherUserId);
+            _listeningConversationId = conversationId;
+
+            // Load initial 1 lần
+            List<ChatMessage> initial;
+            try
+            {
+                initial = await LoadConversationAsync(conversationId);
+            }
+            catch
+            {
+                initial = new List<ChatMessage>();
+            }
+
+            ResetKnownIds(initial);
+
+            try { onInitialLoaded(initial); } catch { }
+
+            string path = "messages/" + conversationId;
+
+            try
+            {
+                _stream = await _firebase.OnAsync(
+                path,
+                added: (s, e, c) => { HandleAddedEvent(conversationId, e, onMessageAdded, onReset); },
+                changed: (s, e, c) => { HandleChangedEvent(conversationId, e, onReset); },
+                removed: (s, e, c) => { HandleRemovedEvent(conversationId, e, onReset); }
+            );
+
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        private void HandleAddedEvent(
+    string conversationId,
+    ValueAddedEventArgs e,
+    Action<ChatMessage> onMessageAdded,
+    Action<List<ChatMessage>> onReset)
+        {
+            ProcessStreamEvent(
+                conversationId,
+                (e != null) ? e.Path : null,
+                (e != null) ? e.Data : null,
+                "added",
+                onMessageAdded,
+                onReset);
+        }
+
+        private void HandleChangedEvent(
+            string conversationId,
+            ValueChangedEventArgs e,
+            Action<List<ChatMessage>> onReset)
+        {
+            ProcessStreamEvent(
+                conversationId,
+                (e != null) ? e.Path : null,
+                (e != null) ? e.Data : null,
+                "changed",
+                null,
+                onReset);
+        }
+
+        private void HandleRemovedEvent(
+            string conversationId,
+            ValueRemovedEventArgs e,
+            Action<List<ChatMessage>> onReset)
+        {
+            ProcessStreamEvent(
+                conversationId,
+                (e != null) ? e.Path : null,
+                 null,
+                "removed",
+                null,
+                onReset);
+        }
+
+        private void ProcessStreamEvent(
+            string conversationId,
+            string path,
+            string data,
+            string kind, // "added" | "changed" | "removed"
+            Action<ChatMessage> onMessageAdded,
+            Action<List<ChatMessage>> onReset)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+
+                    string p = path ?? string.Empty;
+                    string d = data ?? string.Empty;
+
+                    // Snapshot toàn bộ node
+                    if (p == "/")
+                    {
+                        if (string.Equals(d, "null", StringComparison.OrdinalIgnoreCase))
+                        {
+                            if (onReset != null)
+                            {
+                                try { onReset(new List<ChatMessage>()); } catch { }
+                            }
+                            return;
+                        }
+
+                        Dictionary<string, ChatMessage> map = DeserializeMessageMap(d);
+                        if (map != null)
+                        {
+                            List<ChatMessage> list = new List<ChatMessage>();
+
+                            foreach (KeyValuePair<string, ChatMessage> kv in map)
+                            {
+                                if (kv.Value == null) continue;
+
+                                kv.Value.MessageId = kv.Key;
+                                kv.Value.IsMine = string.Equals(kv.Value.SenderId, _currentUserId, StringComparison.Ordinal);
+
+                                if (string.IsNullOrWhiteSpace(kv.Value.MessageType))
+                                {
+                                    kv.Value.MessageType = "text";
+                                }
+
+                                list.Add(kv.Value);
+                            }
+
+                            list.Sort(CompareByTime);
+                            ResetKnownIds(list);
+
+                            if (onReset != null)
+                            {
+                                try { onReset(list); } catch { }
+                            }
+                            return;
+                        }
+
+                        DebounceFullReload(conversationId, onReset);
+                        return;
+                    }
+
+                    // Path có thể dạng "/-Nabc" hoặc "/-Nabc/field"
+                    string trimmed = p.Trim('/');
+                    if (string.IsNullOrEmpty(trimmed)) return;
+
+                    // Nếu event đi sâu vào field => reload full (debounce)
+                    if (trimmed.IndexOf('/') >= 0)
+                    {
+                        DebounceFullReload(conversationId, onReset);
+                        return;
+                    }
+
+                    string msgId = trimmed;
+
+                    // Removed hoặc data null
+                    if (string.Equals(kind, "removed", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(d, "null", StringComparison.OrdinalIgnoreCase))
+                    {
+                        DebounceFullReload(conversationId, onReset);
+                        return;
+                    }
+
+                    // changed thường có thể trả scalar/partial => nếu parse fail thì reload
+                    ChatMessage m = DeserializeMessage(d);
+                    if (m == null)
+                    {
+                        DebounceFullReload(conversationId, onReset);
+                        return;
+                    }
+
+                    m.MessageId = msgId;
+                    m.IsMine = string.Equals(m.SenderId, _currentUserId, StringComparison.Ordinal);
+
+                    if (string.IsNullOrWhiteSpace(m.MessageType))
+                    {
+                        m.MessageType = "text";
+                    }
+
+                    // Incremental chỉ append cho "added"
+                    if (string.Equals(kind, "added", StringComparison.OrdinalIgnoreCase))
+                    {
+                        bool isNew = MarkKnownIfNew(msgId);
+                        if (isNew)
+                        {
+                            if (onMessageAdded != null)
+                            {
+                                try { onMessageAdded(m); } catch { }
+                            }
+                        }
+                        return;
+                    }
+
+                    // changed => reload full (debounce)
+                    DebounceFullReload(conversationId, onReset);
+                }
+                catch
+                {
+                    // ignore
+                }
+
+                await Task.CompletedTask;
+            });
+        }
+
+
+        private void DebounceFullReload(string conversationId, Action<List<ChatMessage>> onReset)
+        {
+            if (onReset == null) return;
+
+            if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            lock (_reloadLock)
+            {
+                if (_fullReloadCts != null)
+                {
+                    try { _fullReloadCts.Cancel(); } catch { }
+                    try { _fullReloadCts.Dispose(); } catch { }
+                    _fullReloadCts = null;
+                }
+
+                _fullReloadCts = new CancellationTokenSource();
+
+                if (_fullReloadTimer != null)
+                {
+                    try { _fullReloadTimer.Dispose(); } catch { }
+                    _fullReloadTimer = null;
+                }
+
+                CancellationToken ct = _fullReloadCts.Token;
+
+                _fullReloadTimer = new Timer(
+                    async _ =>
+                    {
+                        try
+                        {
+                            if (ct.IsCancellationRequested) return;
+
+                            if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal))
+                            {
+                                return;
+                            }
+
+                            List<ChatMessage> full = await LoadConversationAsync(conversationId);
+                            if (ct.IsCancellationRequested) return;
+
+                            ResetKnownIds(full);
+
+                            try { onReset(full); } catch { }
+                        }
+                        catch
+                        {
+                            // ignore
+                        }
+                    },
+                    null,
+                    _fullReloadDebounceMs,
+                    Timeout.Infinite);
+            }
+        }
+
+        public void StopListen()
+        {
+            _listeningConversationId = null;
+
+            lock (_reloadLock)
+            {
+                if (_fullReloadTimer != null)
+                {
+                    try { _fullReloadTimer.Dispose(); } catch { }
+                    _fullReloadTimer = null;
+                }
+
+                if (_fullReloadCts != null)
+                {
+                    try { _fullReloadCts.Cancel(); } catch { }
+                    try { _fullReloadCts.Dispose(); } catch { }
+                    _fullReloadCts = null;
+                }
+            }
+
+            lock (_knownLock)
+            {
+                _knownMessageIds.Clear();
+            }
+
+            if (_stream != null)
+            {
+                try { _stream.Dispose(); } catch { }
+                _stream = null;
+            }
+        }
+
+        #endregion
+
+        #region ====== SEND MESSAGE ======
+
         public async Task SendMessageAsync(string toUserId, string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -258,106 +613,55 @@ namespace ChatApp.Controllers
                 return;
             }
 
-            string conversationId = BuildConversationId(idNguoiDungHienTai, toUserId);
-            string duongDan = "messages/" + conversationId;
+            string conversationId = BuildConversationId(_currentUserId, toUserId);
+            string path = "messages/" + conversationId;
 
-            ChatMessage tinNhan = new ChatMessage();
-            tinNhan.SenderId = idNguoiDungHienTai;
-            tinNhan.ReceiverId = toUserId;
-            tinNhan.Text = text;
-            tinNhan.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            tinNhan.IsMine = true;
+            ChatMessage msg = new ChatMessage();
+            msg.SenderId = _currentUserId;
+            msg.ReceiverId = toUserId;
+            msg.Text = text;
+            msg.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            msg.IsMine = true;
+            msg.MessageType = "text";
 
-            await firebaseClient.PushAsync(duongDan, tinNhan);
+            await _firebase.PushAsync(path, msg);
         }
 
-        /// <summary>
-        /// Bắt đầu lắng nghe realtime một cuộc trò chuyện với otherUserId.
-        /// Khi dữ liệu trong "messages/{conversationId}" thay đổi sẽ gọi callback.
-        /// </summary>
-        public async void StartListenConversation(
-            string otherUserId,
-            Action<List<ChatMessage>> onMessagesChanged)
+        #endregion
+
+        #region ====== SEND FILE ======
+
+        public async Task SendFileMessageAsync(string toUserId, string filePath)
         {
-            // Dừng stream cũ nếu có
-            StopListen();
-
-            if (onMessagesChanged == null)
+            if (string.IsNullOrWhiteSpace(toUserId))
             {
-                return;
+                throw new Exception("Chưa chọn người để chat.");
             }
 
-            string conversationId = BuildConversationId(idNguoiDungHienTai, otherUserId);
-            idCuocTroChuyenDangNghe = conversationId;
-
-            string duongDan = "messages/" + conversationId;
-            XuLySuKienStream(conversationId, onMessagesChanged);
-
-            try
+            FileInfo fi = new FileInfo(filePath);
+            if (!fi.Exists)
             {
-                luongSuKienHienTai = await firebaseClient.OnAsync(
-                    duongDan,
-                    added: (gui, suKienThem, nguCanh) =>
-                    {
-                        XuLySuKienStream(conversationId, onMessagesChanged);
-                    },
-                    changed: (gui, suKienDoi, nguCanh) =>
-                    {
-                        XuLySuKienStream(conversationId, onMessagesChanged);
-                    },
-                    removed: (gui, suKienXoa, nguCanh) =>
-                    {
-                        XuLySuKienStream(conversationId, onMessagesChanged);
-                    });
-            }
-            catch
-            {
-                // Có lỗi thì thôi, không cho ứng dụng crash.
-            }
-        }
-
-        /// <summary>
-        /// Khi stream báo thêm / đổi / xóa:
-        /// load lại danh sách tin nhắn và gọi callback.
-        /// </summary>
-        private void XuLySuKienStream(
-            string conversationId,
-            Action<List<ChatMessage>> callback)
-        {
-            if (!string.Equals(idCuocTroChuyenDangNghe, conversationId, StringComparison.Ordinal))
-            {
-                return;
+                throw new Exception("File không tồn tại.");
             }
 
-            Task.Run(
-                async () =>
-                {
-                    try
-                    {
-                        List<ChatMessage> danhSachTinNhan =
-                            await LoadConversationAsync(conversationId);
+            FileAttachmentUploader uploader = new FileAttachmentUploader();
+            string urlTai = await uploader.UploadAsync(filePath);
 
-                        callback(danhSachTinNhan);
-                    }
-                    catch
-                    {
-                        // Bỏ qua lỗi để không crash background thread.
-                    }
-                });
-        }
+            string conversationId = BuildConversationId(_currentUserId, toUserId);
+            string path = "messages/" + conversationId;
 
-        /// <summary>
-        /// Dừng lắng nghe cuộc trò chuyện hiện tại.
-        /// </summary>
-        public void StopListen()
-        {
-            idCuocTroChuyenDangNghe = null;
+            ChatMessage msg = new ChatMessage();
+            msg.SenderId = _currentUserId;
+            msg.ReceiverId = toUserId;
+            msg.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            msg.IsMine = true;
 
-            if (luongSuKienHienTai != null)
-            {
-                luongSuKienHienTai.Dispose();
-                luongSuKienHienTai = null;
-            }
+            msg.MessageType = "file";
+            msg.FileName = fi.Name;
+            msg.FileSize = fi.Length;
+            msg.FileUrl = urlTai;
+
+            await _firebase.PushAsync(path, msg);
         }
 
         #endregion
@@ -370,94 +674,5 @@ namespace ChatApp.Controllers
         }
 
         #endregion
-        #region ====== SEND FILE API ======
-        /// <summary>
-        /// Gửi file:
-        /// 1) Upload file lên host trung gian -> lấy URL tải
-        /// 2) Tạo ChatMessage dạng "file" (chỉ lưu metadata + URL)
-        /// 3) Push lên Firebase vào đúng node messages/{conversationId}
-        /// </summary>
-        public async Task SendFileMessageAsync(string toUserId, string filePath)
-        {
-            if (string.IsNullOrWhiteSpace(toUserId))
-                throw new Exception("Chưa chọn người để chat.");
-
-            FileInfo fi = new FileInfo(filePath);
-            if (!fi.Exists)
-                throw new Exception("File không tồn tại.");
-
-            // Upload trước để lấy link
-            FileAttachmentUploader uploader = new FileAttachmentUploader();
-            string urlTai = await uploader.UploadAsync(filePath);
-
-            // Push message "file" vào đúng cuộc trò chuyện
-            string conversationId = BuildConversationId(idNguoiDungHienTai, toUserId);
-            string duongDan = "messages/" + conversationId;
-
-            ChatMessage tinNhan = new ChatMessage();
-            tinNhan.SenderId = idNguoiDungHienTai;
-            tinNhan.ReceiverId = toUserId;
-            tinNhan.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            tinNhan.IsMine = true;
-
-            // Dữ liệu file: UI sẽ dựa vào MessageType để vẽ kiểu bong bóng file
-            tinNhan.MessageType = "file";
-            tinNhan.FileName = fi.Name;
-            tinNhan.FileSize = fi.Length;
-            tinNhan.FileUrl = urlTai;
-
-            await firebaseClient.PushAsync(duongDan, tinNhan);
-            #endregion
-        }
     }
 }
-/*
-Ý TƯỞNG CHÍNH CỦA NhanTinController
-
-- Lớp này chỉ lo phần "logic nói chuyện với Firebase", không dính UI.
-- Mỗi cuộc trò chuyện giữa 2 user được lưu tại node:
-    messages/{conversationId}
-
-1. Cách tạo conversationId
-   - Để cả 2 phía cùng truy cập đúng 1 chỗ:
-       conversationId = localId nhỏ hơn + "_" + localId lớn hơn (so sánh theo thứ tự từ điển).
-   - Nhờ vậy:
-       + User A và user B, dù ai tạo trước cũng dùng chung 1 conversationId.
-       + Node trong Firebase luôn ổn định: "messages/A_B" hoặc "messages/B_C", ...
-
-2. Lưu và đọc tin nhắn
-   - Mỗi tin nhắn là 1 ChatMessage: SenderId, ReceiverId, Text, Timestamp, IsMine.
-   - Gửi tin (SendMessageAsync):
-       + Tính conversationId từ (idNguoiDungHienTai, idNguoiNhan).
-       + Push 1 ChatMessage mới vào "messages/{conversationId}".
-       + Timestamp dùng Unix time (ms) để dễ sort theo thời gian.
-   - Đọc tin (LoadConversationAsync):
-       + Get toàn bộ node "messages/{conversationId}".
-       + Đưa về List<ChatMessage>, đánh dấu IsMine = true nếu SenderId == user hiện tại.
-       + Sắp xếp danh sách theo Timestamp tăng dần rồi trả về cho UI.
-
-3. Cơ chế realtime (OnAsync)
-   - StartListenConversation(otherUserId, callback):
-       + Tính conversationId dựa trên user hiện tại và otherUserId.
-       + Gọi OnAsync trên "messages/{conversationId}" với 3 event:
-           * added   : khi có tin nhắn mới.
-           * changed : khi tin nhắn bị sửa.
-           * removed : khi tin nhắn bị xóa.
-       + Cả 3 event đều gọi XuLySuKienStream():
-           * Kiểm tra có đúng cuộc trò chuyện đang mở không.
-           * Nếu đúng thì Load lại toàn bộ danh sách tin nhắn.
-           * Gọi callback(danhSachTinNhan) để UI vẽ lại.
-   - StopListen():
-       + Dừng stream hiện tại (Dispose EventStreamResponse).
-       + Dùng khi:
-           * Đổi sang cuộc trò chuyện khác.
-           * Đóng form.
-
-4. Mục tiêu
-   - Tách sạch phần giao tiếp Firebase ra khỏi Form.
-   - Form chỉ cần:
-       + Gọi GetAllUsersAsync để lấy user.
-       + Gọi SendMessageAsync để gửi.
-       + Gọi StartListenConversation để đăng ký nghe realtime.
-   - Toàn bộ "realtime" (OnAsync, xử lý event, reload dữ liệu, callback) đều nằm trong controller này.
-*/
