@@ -235,6 +235,7 @@
     <Compile Include="Controllers\DangNhapController.cs" />
     <Compile Include="Controllers\FriendController.cs" />
     <Compile Include="Controllers\NhanTinController.cs" />
+    <Compile Include="Controllers\NhanTinNhomController.cs" />
     <Compile Include="Controllers\QuenMatKhauController.cs" />
     <Compile Include="Controls\Conversations.cs">
       <SubType>UserControl</SubType>
@@ -272,6 +273,9 @@
     <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TaoNhomForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\TimKiemBanBe.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -286,6 +290,8 @@
     </Compile>
     <Compile Include="Helpers\KeySanitizer.cs" />
     <Compile Include="Models\Friends\FriendRequest.cs" />
+    <Compile Include="Models\Groups\GroupInfo.cs" />
+    <Compile Include="Models\Messages\ChatMessage.cs" />
     <Compile Include="Models\Themes\ThemeSetting.cs" />
     <Compile Include="Models\Users\User.cs" />
     <Compile Include="Forms\NhanTin.cs">
@@ -305,6 +311,8 @@
     <Compile Include="Services\Firebase\AuthService.cs" />
     <Compile Include="Services\Firebase\FirebaseConfig.cs" />
     <Compile Include="Services\Firebase\FriendService.cs" />
+    <Compile Include="Services\Firebase\GroupMessageService.cs" />
+    <Compile Include="Services\Firebase\GroupService.cs" />
     <Compile Include="Services\Firebase\HttpService.cs" />
     <Compile Include="Forms\DangKy.cs">
       <SubType>Form</SubType>
