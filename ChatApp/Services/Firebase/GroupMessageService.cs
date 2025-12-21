@@ -28,13 +28,16 @@ namespace ChatApp.Services.Firebase
             public long Timestamp { get; set; }
 
             /// <summary>
-            /// "text" hoặc "file".
+            /// "text" / "file" / "image".
             /// </summary>
             public string Type { get; set; }
 
             public string FileName { get; set; }
             public long FileSize { get; set; }
             public string FileUrl { get; set; }
+
+            public string ImageMimeType { get; set; }
+            public string ImageBase64 { get; set; }
         }
 
         private class FirebasePostResult
@@ -163,6 +166,55 @@ namespace ChatApp.Services.Firebase
             data.FileName = fileName ?? string.Empty;
             data.FileSize = fileSize;
             data.FileUrl = fileUrl;
+
+            FirebasePostResult res = await _http.PostAsync<FirebasePostResult>(
+                Db("groupMessages/" + gid, token), data).ConfigureAwait(false);
+
+            return res != null ? res.name : null;
+        }
+
+
+        /// <summary>
+        /// Gửi tin nhắn ảnh (base64) vào groupMessages/{groupId}.
+        /// Lưu ý: base64 sẽ làm data lớn hơn, chỉ nên dùng cho ảnh dung lượng nhỏ/vừa.
+        /// </summary>
+        public async Task<string> SendImageAsync(
+            string groupId,
+            string senderLocalId,
+            string fileName,
+            long fileSize,
+            string mimeType,
+            string imageBase64,
+            long timestamp,
+            string token = null)
+        {
+            string gid = KeySanitizer.SafeKey(groupId);
+            string sid = KeySanitizer.SafeKey(senderLocalId);
+
+            if (string.IsNullOrWhiteSpace(gid))
+            {
+                throw new ArgumentException("groupId rỗng.");
+            }
+
+            if (string.IsNullOrWhiteSpace(sid))
+            {
+                throw new ArgumentException("senderLocalId rỗng.");
+            }
+
+            if (string.IsNullOrWhiteSpace(imageBase64))
+            {
+                throw new ArgumentException("imageBase64 rỗng.");
+            }
+
+            GroupMessageData data = new GroupMessageData();
+            data.SenderId = sid;
+            data.Content = string.Empty;
+            data.Timestamp = timestamp;
+            data.Type = "image";
+            data.FileName = fileName ?? string.Empty;
+            data.FileSize = fileSize;
+            data.ImageMimeType = string.IsNullOrWhiteSpace(mimeType) ? "image/*" : mimeType;
+            data.ImageBase64 = imageBase64;
 
             FirebasePostResult res = await _http.PostAsync<FirebasePostResult>(
                 Db("groupMessages/" + gid, token), data).ConfigureAwait(false);

@@ -6,7 +6,7 @@ namespace ChatApp.Models.Messages
     /// Mô tả 1 tin nhắn trong cuộc trò chuyện (1-1 hoặc nhóm).
     /// Lưu ý:
     /// - MessageId: push key Firebase.
-    /// - MessageType: "text" hoặc "file".
+    /// - MessageType: "text" / "file" / "image".
     /// </summary>
     public class ChatMessage
     {
@@ -65,6 +65,21 @@ namespace ChatApp.Models.Messages
         /// Link tải file (host trung gian).
         /// </summary>
         public string FileUrl { get; set; }
+
+
+        #region ====== IMAGE MESSAGE ======
+
+        /// <summary>
+        /// Base64 của ảnh (chỉ dùng khi MessageType="image").
+        /// </summary>
+        public string ImageBase64 { get; set; }
+
+        /// <summary>
+        /// MIME type của ảnh (vd: image/png, image/jpeg).
+        /// </summary>
+        public string ImageMimeType { get; set; }
+
+        #endregion
 
         #endregion
 

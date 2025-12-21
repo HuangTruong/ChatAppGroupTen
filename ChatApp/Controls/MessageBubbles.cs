@@ -13,6 +13,12 @@ namespace ChatApp.Controls
 
         private bool IsMine;
 
+        // ===== ẢNH: GIỚI HẠN HIỂN THỊ (tránh ảnh to làm vỡ layout) =====
+        private const int IMG_MAX_W = 320;
+        private const int IMG_MAX_H = 240;
+
+        // Giới hạn bề ngang chữ để nó tự xuống dòng
+        private const int TEXT_MAX_W = 280;
         #endregion
 
         #region ======= CONSTRUCTOR =======
@@ -41,6 +47,62 @@ namespace ChatApp.Controls
             // 3. Xử lý hiển thị nội dung (Chữ + Emoji)
             flpMessageContent.Controls.Clear();
             RenderContent(message);
+
+            // 4. Fix: Bubble cao bao nhiêu thì UserControl cao theo (khỏi bị cắt)
+            FitBubbleHeight();
+        }
+            /// <summary>
+            /// Hiển thị tin nhắn ảnh (thumbnail + caption).
+            /// </summary>
+        public void SetImageMessage(string displayName, Image thumbnail, string caption, string time, bool isMine)
+        {
+            lblDisplayName.Text = displayName;
+            lblTime.Text = time;
+            IsMine = isMine;
+
+            ApplyLayout(isMine);
+            ApplyTheme(ThemeManager.IsDark);
+
+            flpMessageContent.Controls.Clear();
+            flpMessageContent.Padding = new Padding(6);
+
+            PictureBox pic = new PictureBox();
+            pic.SizeMode = PictureBoxSizeMode.Zoom; // Zoom = fit nguyên ảnh, không crop
+            pic.Margin = new Padding(0, 2, 0, 2);
+            pic.Image = thumbnail;
+
+            // Ảnh fit vào khung maxW/maxH, giữ đúng tỷ lệ
+            pic.Size = GetFitSize(thumbnail, IMG_MAX_W, IMG_MAX_H);
+
+            //form ngoài gắn click mở full
+            pic.Cursor = Cursors.Hand;
+            pic.TabStop = false;
+
+            flpMessageContent.Controls.Add(pic);
+
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                Label lbl = new Label();
+                lbl.Text = caption;
+                lbl.AutoSize = true;
+                lbl.MaximumSize = new Size(TEXT_MAX_W, 0);
+                lbl.Font = new Font("Segoe UI", 9.5F);
+                lbl.BackColor = Color.Transparent;
+                lbl.Margin = new Padding(0, 4, 0, 0);
+
+                if (ThemeManager.IsDark)
+                {
+                    lbl.ForeColor = IsMine ? Color.White : Color.FromArgb(229, 231, 235);
+                }
+                else
+                {
+                    lbl.ForeColor = Color.FromArgb(15, 23, 42);
+                }
+
+                flpMessageContent.Controls.Add(lbl);
+            }
+
+            FitBubbleHeight();
         }
 
         #endregion
@@ -109,6 +171,65 @@ namespace ChatApp.Controls
             }
 
             flpMessageContent.Controls.Add(lbl);
+        }
+
+        #endregion
+
+        #region ======= IMAGE HELPER =======
+
+        /// <summary>
+        /// Tính size "fit" theo khung maxW x maxH, giữ tỉ lệ ảnh.
+        /// - Ảnh to: thu nhỏ cho vừa
+        /// - Ảnh nhỏ: giữ nguyên (không upscale)
+        /// </summary>
+        private static Size GetFitSize(Image img, int maxW, int maxH)
+        {
+            if (img == null || img.Width <= 0 || img.Height <= 0)
+            {
+                return new Size(240, 160);
+            }
+
+            double scaleW = (double)maxW / img.Width;
+            double scaleH = (double)maxH / img.Height;
+
+            // Fit vào khung => lấy scale nhỏ hơn (không crop)
+            double scale = Math.Min(scaleW, scaleH);
+
+            // Không upscale (ảnh nhỏ giữ nguyên)
+            if (scale > 1.0) scale = 1.0;
+            if (scale <= 0) scale = 1.0;
+
+            int w = Math.Max(1, (int)Math.Round(img.Width * scale));
+            int h = Math.Max(1, (int)Math.Round(img.Height * scale));
+            return new Size(w, h);
+        }
+
+        /// <summary>
+        /// Khi nội dung (ảnh/text) cao hơn -> bị cắt.
+        /// => Lấy PreferredSize của pnlBackGround rồi set Height tương ứng.
+        /// </summary>
+        private void FitBubbleHeight()
+        {
+            try
+            {
+                // ép layout tính lại size
+                flpMessageContent.PerformLayout();
+                pnlBubble.PerformLayout();
+                flpBubble.PerformLayout();
+                pnlBackGround.PerformLayout();
+
+                int targetH = pnlBackGround.PreferredSize.Height;
+                if (targetH <= 0) targetH = pnlBackGround.Height;
+
+                // chỉ cần tăng height; width giữ nguyên để khỏi phá layout hiện tại
+                if (targetH > this.Height)
+                {
+                    this.Height = targetH;
+                }
+            }
+            catch
+            {
+            }
         }
 
         #endregion
