@@ -245,7 +245,7 @@ namespace ChatApp
             this.lblTenDangNhap.AutoSize = true;
             this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold);
             this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
-            this.lblTenDangNhap.Location = new System.Drawing.Point(880, 40);
+            this.lblTenDangNhap.Location = new System.Drawing.Point(513, 40);
             this.lblTenDangNhap.Name = "lblTenDangNhap";
             this.lblTenDangNhap.Size = new System.Drawing.Size(0, 23);
             this.lblTenDangNhap.TabIndex = 1;

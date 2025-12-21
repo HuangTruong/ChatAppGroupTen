@@ -59,6 +59,7 @@
             this.btnQuayLaiDangNhap.Size = new System.Drawing.Size(134, 45);
             this.btnQuayLaiDangNhap.TabIndex = 7;
             this.btnQuayLaiDangNhap.Text = "Quay Lại";
+            this.btnQuayLaiDangNhap.Click += new System.EventHandler(this.btnQuayLaiDangNhap_Click);
             // 
             // txtEmail
             // 
