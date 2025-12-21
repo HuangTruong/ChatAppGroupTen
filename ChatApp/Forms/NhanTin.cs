@@ -9,6 +9,7 @@ using ChatApp.Services.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -631,26 +632,41 @@ namespace ChatApp
                     }
 
                     bool laTinFile = string.Equals(msg.MessageType, "file", StringComparison.OrdinalIgnoreCase);
-
-                    string message;
-                    if (laTinFile)
-                    {
-                        string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                        message = ten + " (" + FormatBytes(msg.FileSize) + ")";
-                    }
-                    else
-                    {
-                        message = msg.Text ?? string.Empty;
-                    }
+                    bool laTinAnh = string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase);
 
                     string time = FormatTimestamp(msg.Timestamp);
 
-                    bubble.SetMessage(newName, message, time, false);
-
-                    if (laTinFile)
+                    if (laTinAnh)
                     {
+                        Image thumb = TaoThumbnailTuMessage(msg);
+                        // Ảnh trong chat: không hiện tên file (UI gọn hơn)
+                        string caption = string.Empty;
+
+                        bubble.SetImageMessage(newName, thumb, caption, time, false);
+
                         bubble.Cursor = Cursors.Hand;
-                        GanClickDeTaiFile(bubble);
+                        GanClickDeXemAnh(bubble);
+                    }
+                    else
+                    {
+                        string message;
+                        if (laTinFile)
+                        {
+                            string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
+                            message = ten + " (" + FormatBytes(msg.FileSize) + ")";
+                        }
+                        else
+                        {
+                            message = msg.Text ?? string.Empty;
+                        }
+
+                        bubble.SetMessage(newName, message, time, false);
+
+                        if (laTinFile)
+                        {
+                            bubble.Cursor = Cursors.Hand;
+                            GanClickDeTaiFile(bubble);
+                        }
                     }
                 }
             }
@@ -983,17 +999,7 @@ namespace ChatApp
             }
 
             bool laTinFile = string.Equals(msg.MessageType, "file", StringComparison.OrdinalIgnoreCase);
-
-            string message;
-            if (laTinFile)
-            {
-                string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                message = ten + " (" + FormatBytes(msg.FileSize) + ")";
-            }
-            else
-            {
-                message = msg.Text ?? string.Empty;
-            }
+            bool laTinAnh = string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase);
 
             string time = FormatTimestamp(msg.Timestamp);
 
@@ -1001,17 +1007,42 @@ namespace ChatApp
             bubble.Margin = new Padding(3, 3, 3, 3);
 
             bubble.Tag = msg;
-            bubble.SetMessage(displayName, message, time, isMine);
 
-            // ====== SEND FILE: click để tải ======
-            if (laTinFile)
+            if (laTinAnh)
             {
-                bubble.Tag = msg;
+                Image thumb = TaoThumbnailTuMessage(msg);
+                // Ảnh trong chat: không hiện tên file (UI gọn hơn)
+                string caption = string.Empty;
+
+                bubble.SetImageMessage(displayName, thumb, caption, time, isMine);
+
                 bubble.Cursor = Cursors.Hand;
-                GanClickDeTaiFile(bubble);
+                GanClickDeXemAnh(bubble);
+            }
+            else
+            {
+                string message;
+                if (laTinFile)
+                {
+                    string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
+                    message = ten + " (" + FormatBytes(msg.FileSize) + ")";
+                }
+                else
+                {
+                    message = msg.Text ?? string.Empty;
+                }
+
+                bubble.SetMessage(displayName, message, time, isMine);
+
+                if (laTinFile)
+                {
+                    bubble.Cursor = Cursors.Hand;
+                    GanClickDeTaiFile(bubble);
+                }
             }
 
             _chatContainer.Controls.Add(bubble);
+
         }
 
         private static string FormatTimestamp(long timestamp)
@@ -1283,7 +1314,7 @@ namespace ChatApp
 
                     if (dangChatNhom)
                     {
-                        ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupFileMessageAsync(idNguoiDangChat, ofd.FileName);
+                        ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupAttachmentMessageAsync(idNguoiDangChat, ofd.FileName);
                         if (sent != null)
                         {
                             QueueAppendMessage(sent, idNguoiDangChat);
@@ -1291,7 +1322,7 @@ namespace ChatApp
                     }
                     else
                     {
-                        await boDieuKhienNhanTin.SendFileMessageAsync(idNguoiDangChat, ofd.FileName);
+                        await boDieuKhienNhanTin.SendAttachmentMessageAsync(idNguoiDangChat, ofd.FileName);
                     }
 
                 }
@@ -1421,6 +1452,108 @@ namespace ChatApp
                 dangTaiFile = false;
             }
         }
+
+
+
+        #region ====== ẢNH: CLICK ĐỂ XEM FULL + DOWNLOAD ======
+
+        private void GanClickDeXemAnh(Control root)
+        {
+            if (root == null) return;
+
+            root.Click -= BubbleImage_Click;
+            root.Click += BubbleImage_Click;
+
+            foreach (Control child in root.Controls)
+            {
+                GanClickDeXemAnh(child);
+            }
+        }
+
+        private Image TaoThumbnailTuMessage(ChatMessage msg)
+        {
+            if (msg == null) return null;
+            if (string.IsNullOrWhiteSpace(msg.ImageBase64)) return null;
+
+            try
+            {
+                byte[] bytes = Convert.FromBase64String(msg.ImageBase64);
+                // Thumbnail trong chat
+                return TaoThumbnailTuBytes(bytes, 320, 220);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static Image TaoThumbnailTuBytes(byte[] bytes, int maxW, int maxH)
+        {
+            if (bytes == null || bytes.Length == 0) return null;
+
+            using (MemoryStream ms = new MemoryStream(bytes))
+            using (Image img = Image.FromStream(ms))
+            {
+                int w = img.Width;
+                int h = img.Height;
+                if (w <= 0 || h <= 0) return null;
+
+                double scale = Math.Min((double)maxW / w, (double)maxH / h);
+                if (scale > 1) scale = 1;
+
+                int tw = Math.Max(1, (int)Math.Round(w * scale));
+                int th = Math.Max(1, (int)Math.Round(h * scale));
+
+                Bitmap bmp = new Bitmap(tw, th);
+                using (Graphics g = Graphics.FromImage(bmp))
+                {
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.SmoothingMode = SmoothingMode.HighQuality;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    g.DrawImage(img, 0, 0, tw, th);
+                }
+                return bmp;
+            }
+        }
+
+        private async void BubbleImage_Click(object sender, EventArgs e)
+        {
+            await Task.Yield();
+
+            ChatMessage msg = LayChatMessageTuTag(sender as Control);
+            if (msg == null) return;
+
+            if (!string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(msg.ImageBase64))
+            {
+                MessageBox.Show("Tin nhắn ảnh bị thiếu dữ liệu (ImageBase64).");
+                return;
+            }
+
+            byte[] bytes;
+            try
+            {
+                bytes = Convert.FromBase64String(msg.ImageBase64);
+            }
+            catch
+            {
+                MessageBox.Show("Ảnh bị lỗi/không đọc được (base64 sai).");
+                return;
+            }
+
+            string fileName = string.IsNullOrWhiteSpace(msg.FileName) ? "image" : msg.FileName;
+
+            using (ImageViewerForm viewer = new ImageViewerForm(bytes, fileName, msg.ImageMimeType))
+            {
+                viewer.ShowDialog(this);
+            }
+        }
+
+        #endregion
 
         #endregion
 

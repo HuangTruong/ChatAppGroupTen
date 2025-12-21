@@ -2,6 +2,7 @@
 using ChatApp.Models.Users;
 using ChatApp.Models.Messages;
 using ChatApp.Services.FileHost;
+using ChatApp.Services.Attachments;
 using FireSharp;
 using FireSharp.Config;
 using FireSharp.EventStreaming;
@@ -630,8 +631,12 @@ namespace ChatApp.Controllers
         #endregion
 
         #region ====== SEND FILE ======
-
-        public async Task SendFileMessageAsync(string toUserId, string filePath)
+        /// <summary>
+        /// Gửi file/ảnh chung một luồng:
+        /// - Nếu là ảnh: không upload Catbox, gửi trực tiếp base64 vào chat.
+        /// - Nếu là file thường: upload Catbox.
+        /// </summary>
+        public async Task SendAttachmentMessageAsync(string toUserId, string filePath)
         {
             if (string.IsNullOrWhiteSpace(toUserId))
             {
@@ -644,8 +649,7 @@ namespace ChatApp.Controllers
                 throw new Exception("File không tồn tại.");
             }
 
-            FileAttachmentUploader uploader = new FileAttachmentUploader();
-            string urlTai = await uploader.UploadAsync(filePath);
+            bool laAnh = AttachmentClassifier.IsImageFile(filePath, out string mime);
 
             string conversationId = BuildConversationId(_currentUserId, toUserId);
             string path = "messages/" + conversationId;
@@ -656,13 +660,38 @@ namespace ChatApp.Controllers
             msg.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             msg.IsMine = true;
 
-            msg.MessageType = "file";
-            msg.FileName = fi.Name;
-            msg.FileSize = fi.Length;
-            msg.FileUrl = urlTai;
+            if (laAnh)
+            {
+                byte[] bytes = File.ReadAllBytes(filePath);
 
-            await _firebase.PushAsync(path, msg);
+                msg.MessageType = "image";
+                msg.FileName = fi.Name;
+                msg.FileSize = fi.Length;
+                msg.ImageMimeType = string.IsNullOrWhiteSpace(mime) ? AttachmentClassifier.GetMimeTypeByExtension(filePath) : mime;
+                msg.ImageBase64 = Convert.ToBase64String(bytes);
+            }
+            else
+            {
+                FileAttachmentUploader uploader = new FileAttachmentUploader();
+                string urlTai = await uploader.UploadAsync(filePath).ConfigureAwait(false);
+
+                msg.MessageType = "file";
+                msg.FileName = fi.Name;
+                msg.FileSize = fi.Length;
+                msg.FileUrl = urlTai;
+            }
+
+            await _firebase.PushAsync(path, msg).ConfigureAwait(false);
         }
+
+
+
+        public Task SendFileMessageAsync(string toUserId, string filePath)
+        {
+            // Giữ tương thích chỗ cũ đang gọi SendFileMessageAsync
+            return SendAttachmentMessageAsync(toUserId, filePath);
+        }
+
 
         #endregion
 
