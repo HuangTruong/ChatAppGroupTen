@@ -37,8 +37,8 @@
             // 
             this.pnlBackGround.Controls.Add(this.pnlView);
             this.pnlBackGround.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackGround.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackGround.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackGround.FillColor = System.Drawing.Color.Transparent;
+            this.pnlBackGround.FillColor2 = System.Drawing.Color.Transparent;
             this.pnlBackGround.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             this.pnlBackGround.Location = new System.Drawing.Point(0, 0);
             this.pnlBackGround.Name = "pnlBackGround";
@@ -48,8 +48,10 @@
             // 
             // pnlView
             // 
-            this.pnlView.BackColor = System.Drawing.Color.White;
+            this.pnlView.BackColor = System.Drawing.Color.Transparent;
+            this.pnlView.BorderRadius = 10;
             this.pnlView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlView.FillColor = System.Drawing.Color.Transparent;
             this.pnlView.Location = new System.Drawing.Point(20, 20);
             this.pnlView.Name = "pnlView";
             this.pnlView.Size = new System.Drawing.Size(588, 514);
@@ -59,9 +61,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(628, 554);
             this.Controls.Add(this.pnlBackGround);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TimKiemBanBe";
             this.Text = "TimKiemBanBe";
             this.pnlBackGround.ResumeLayout(false);

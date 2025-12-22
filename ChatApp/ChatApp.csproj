@@ -282,6 +282,12 @@
     <Compile Include="Forms\ImageViewerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\TaoNhom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TaoNhom.Designer.cs">
+      <DependentUpon>TaoNhom.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TaoNhomForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -376,6 +382,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TaoNhom.resx">
+      <DependentUpon>TaoNhom.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TimKiemBanBe.resx">
       <DependentUpon>TimKiemBanBe.cs</DependentUpon>
@@ -472,6 +481,11 @@
     </Content>
     <None Include="Resources\icons8-sun-96.png" />
     <None Include="Resources\icons8-crescent-moon-96.png" />
+    <None Include="Resources\icons8-happy-96.png" />
+    <None Include="Resources\icons8-add-file-96.png" />
+    <None Include="Resources\icons8-tick-96.png" />
+    <None Include="Resources\icons8-cross-96.png" />
+    <None Include="Resources\icons8-add-96.png" />
     <Content Include="Resources\plus.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

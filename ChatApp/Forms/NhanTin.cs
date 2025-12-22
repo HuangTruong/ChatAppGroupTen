@@ -41,8 +41,6 @@ namespace ChatApp
         /// </summary>
         private readonly NhanTinController boDieuKhienNhanTin;
 
-
-
         /// <summary>
         /// Controller xử lý logic nhắn tin nhóm.
         /// </summary>
@@ -138,16 +136,6 @@ namespace ChatApp
                 }
             }
             catch { }
-            // Tối ưu UI: giảm nhấp nháy
-            EnableDoubleBuffer(flpDanhSachChat);
-            EnableDoubleBuffer(pnlKhungChat);
-
-            flpDanhSachChat.WrapContents = false;
-            flpDanhSachChat.FlowDirection = FlowDirection.TopDown;
-            flpDanhSachChat.AutoScroll = true;
-
-            flpDanhSachChat.SizeChanged -= FlpDanhSachChat_SizeChanged;
-            flpDanhSachChat.SizeChanged += FlpDanhSachChat_SizeChanged;
 
             // Setup chat container bên trong pnlKhungChat
             SetupChatContainer();
@@ -195,8 +183,6 @@ namespace ChatApp
                 _chatContainer.WrapContents = false;
                 _chatContainer.FlowDirection = FlowDirection.TopDown;
                 _chatContainer.Padding = new Padding(6, 6, 6, 6);
-
-                EnableDoubleBuffer(_chatContainer);
 
                 pnlKhungChat.Controls.Add(_chatContainer);
 
@@ -274,6 +260,16 @@ namespace ChatApp
             // Load chế độ ngày đêm
             bool isDark = await _themeService.GetThemeAsync(idDangNhap);
             ThemeManager.ApplyTheme(this, isDark);
+
+            // Load trạng thái người dùng offline, online
+            if (await _authService.GetStatusAsync(idDangNhap) == "online")
+            {
+                lblTrangThai.Text = "Online";
+            }
+            else
+            {
+                lblTrangThai.Text = "Offline";
+            }
         }
 
         private void NhanTin_FormClosed(object sender, FormClosedEventArgs e)
@@ -305,8 +301,8 @@ namespace ChatApp
         /// </summary>
         private async Task LoadUsersAsync()
         {
-            flpDanhSachChat.SuspendLayout();
-            flpDanhSachChat.Controls.Clear();
+            pnlDanhSachChat.SuspendLayout();
+            pnlDanhSachChat.Controls.Clear();
 
             try
             {
@@ -344,8 +340,7 @@ namespace ChatApp
             }
             finally
             {
-                flpDanhSachChat.ResumeLayout();
-                ResizeFriendListItems();
+                pnlDanhSachChat.ResumeLayout();
             }
         }
 
@@ -366,82 +361,14 @@ namespace ChatApp
             Conversations conversations = new Conversations();
             conversations.Cursor = Cursors.Hand;
 
-            conversations.Margin = new Padding(6, 4, 6, 4);
-            conversations.Height = 64;
-            conversations.AutoSize = true;
-            conversations.Width = CalcFriendItemWidth(conversations);
-
             conversations.SetInfo(GetUserFullName(user), GetUserSubtitle(user, userId));
             conversations.Tag = userId;
 
             conversations.ItemClicked -= UserItem_Click;
             conversations.ItemClicked += UserItem_Click;
 
-            flpDanhSachChat.Controls.Add(conversations);
-        }
-
-        private void FlpDanhSachChat_SizeChanged(object sender, EventArgs e)
-        {
-            ResizeFriendListItems();
-        }
-
-        private int CalcFriendItemWidth(Control item)
-        {
-            int scroll = (flpDanhSachChat.VerticalScroll != null && flpDanhSachChat.VerticalScroll.Visible)
-                ? SystemInformation.VerticalScrollBarWidth
-                : 0;
-
-            int margin = (item != null) ? item.Margin.Horizontal : 0;
-
-            int w = flpDanhSachChat.ClientSize.Width - margin - scroll - 2;
-            if (w < 80) w = 80;
-            return w;
-        }
-
-        private void ResizeFriendListItems()
-        {
-            if (flpDanhSachChat == null) return;
-
-            flpDanhSachChat.SuspendLayout();
-            try
-            {
-                int scroll = (flpDanhSachChat.VerticalScroll != null && flpDanhSachChat.VerticalScroll.Visible)
-                    ? SystemInformation.VerticalScrollBarWidth
-                    : 0;
-
-                foreach (Control c in flpDanhSachChat.Controls)
-                {
-                    if (c == null) continue;
-                    int w = flpDanhSachChat.ClientSize.Width - c.Margin.Horizontal - scroll - 2;
-                    if (w < 80) w = 80;
-                    c.Width = w;
-                }
-            }
-            finally
-            {
-                flpDanhSachChat.ResumeLayout();
-            }
-        }
-
-        private static void EnableDoubleBuffer(Control control)
-        {
-            if (control == null) return;
-
-            try
-            {
-                PropertyInfo pi = typeof(Control).GetProperty(
-                    "DoubleBuffered",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-
-                if (pi != null)
-                {
-                    pi.SetValue(control, true, null);
-                }
-            }
-            catch
-            {
-                // ignore
-            }
+            conversations.Dock = DockStyle.Top;    
+            pnlDanhSachChat.Controls.Add(conversations);
         }
 
         private static string GetUserFullName(User user)
@@ -1063,7 +990,53 @@ namespace ChatApp
         #endregion
 
         #region ====== GỬI TIN NHẮN ======
+        private async void btnGui_Click(object sender, EventArgs e)
+        {
+            string noiDungTin = (txtNhapTinNhan.Text ?? string.Empty).Trim();
 
+            if (string.IsNullOrEmpty(noiDungTin))
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(idNguoiDangChat))
+            {
+                MessageBox.Show(
+                    "Vui lòng chọn người hoặc nhóm cần nhắn tin ở danh sách bên trái.",
+                    "Thông báo",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            txtNhapTinNhan.Clear();
+
+            try
+            {
+                if (dangChatNhom)
+                {
+                    ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupMessageAsync(idNguoiDangChat, noiDungTin);
+                    if (sent != null)
+                    {
+                        QueueAppendMessage(sent, idNguoiDangChat);
+                    }
+                }
+                else
+                {
+                    await boDieuKhienNhanTin.SendMessageAsync(idNguoiDangChat, noiDungTin);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Lỗi gửi tin nhắn: " + ex.Message,
+                    "Lỗi",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
 
         #region ====== NHÓM CHAT ======
 
@@ -1116,7 +1089,7 @@ namespace ChatApp
             }
 
             item.SetInfo(title, subtitle);
-            flpDanhSachChat.Controls.Add(item);
+            pnlDanhSachChat.Controls.Add(item);
         }
 
         /// <summary>
@@ -1187,7 +1160,7 @@ namespace ChatApp
                     return;
                 }
 
-                using (TaoNhomForm f = new TaoNhomForm(tatCaNguoiDung))
+                using (TaoNhom f = new TaoNhom(tatCaNguoiDung,idDangNhap,tokenDangNhap))
                 {
                     if (f.ShowDialog() != DialogResult.OK)
                     {
@@ -1213,54 +1186,6 @@ namespace ChatApp
             {
                 MessageBox.Show("Tạo nhóm thất bại: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        #endregion
-
-        private async void btnGui_Click(object sender, EventArgs e)
-        {
-            string noiDungTin = (txtNhapTinNhan.Text ?? string.Empty).Trim();
-
-            if (string.IsNullOrEmpty(noiDungTin))
-            {
-                return;
-            }
-
-            if (string.IsNullOrEmpty(idNguoiDangChat))
-            {
-                MessageBox.Show(
-                    "Vui lòng chọn người hoặc nhóm cần nhắn tin ở danh sách bên trái.",
-                    "Thông báo",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-                return;
-            }
-
-            txtNhapTinNhan.Clear();
-
-            try
-            {
-                if (dangChatNhom)
-                {
-                    ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupMessageAsync(idNguoiDangChat, noiDungTin);
-                    if (sent != null)
-                    {
-                        QueueAppendMessage(sent, idNguoiDangChat);
-                    }
-                }
-                else
-                {
-                    await boDieuKhienNhanTin.SendMessageAsync(idNguoiDangChat, noiDungTin);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    "Lỗi gửi tin nhắn: " + ex.Message,
-                    "Lỗi",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
             }
         }
 
@@ -1573,11 +1498,6 @@ namespace ChatApp
 
         #endregion
 
-        private void lblTrangThai_Click(object sender, EventArgs e)
-        {
-
-        }
-
         #region ====== EMOJI ======
 
         private void picEmoji_Click(object sender, EventArgs e)
@@ -1603,5 +1523,14 @@ namespace ChatApp
         }
 
         #endregion
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            var f = new NhanTin(idDangNhap,tokenDangNhap);
+            f.TopMost = true;
+            f.Show();
+            this.Close();
+        }
     }
 }

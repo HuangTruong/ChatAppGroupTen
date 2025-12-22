@@ -37,8 +37,8 @@
             // 
             this.pnlBackground.Controls.Add(this.pnlView);
             this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.FillColor = System.Drawing.Color.Transparent;
+            this.pnlBackground.FillColor2 = System.Drawing.Color.Transparent;
             this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             this.pnlBackground.Location = new System.Drawing.Point(0, 0);
             this.pnlBackground.Name = "pnlBackground";
@@ -48,8 +48,10 @@
             // 
             // pnlView
             // 
-            this.pnlView.BackColor = System.Drawing.Color.White;
+            this.pnlView.BackColor = System.Drawing.Color.Transparent;
+            this.pnlView.BorderRadius = 10;
             this.pnlView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlView.FillColor = System.Drawing.Color.Transparent;
             this.pnlView.Location = new System.Drawing.Point(20, 20);
             this.pnlView.Name = "pnlView";
             this.pnlView.Size = new System.Drawing.Size(628, 480);
@@ -59,6 +61,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(668, 520);
             this.Controls.Add(this.pnlBackground);
             this.Margin = new System.Windows.Forms.Padding(4);

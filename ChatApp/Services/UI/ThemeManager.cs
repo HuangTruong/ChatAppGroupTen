@@ -102,6 +102,36 @@ namespace ChatApp.Services.UI
 
             #endregion
 
+            #region ===== CheckBox =====
+            if (ctrl is Guna2CheckBox gCb)
+            {
+                gCb.AutoSize = true;
+
+                if (isDark)
+                {
+                    // ===== DARK MODE =====
+                    gCb.ForeColor = Dark.TextPrimary;
+
+                    gCb.CheckedState.BorderColor = Dark.ButtonPrimary;
+                    gCb.CheckedState.FillColor = Dark.ButtonPrimary;
+
+                    gCb.UncheckedState.BorderColor = Dark.Border;
+                    gCb.UncheckedState.FillColor = Color.Transparent;
+                }
+                else
+                {
+                    // ===== LIGHT MODE =====
+                    gCb.ForeColor = Light.TextPrimary;
+
+                    gCb.CheckedState.BorderColor = Shared.Primary;
+                    gCb.CheckedState.FillColor = Shared.Primary;
+
+                    gCb.UncheckedState.BorderColor = Light.Border;
+                    gCb.UncheckedState.FillColor = Color.Transparent;
+                }
+            }
+            #endregion
+
             #region ===== Button =====
 
             if (ctrl is Guna2Button gBtn)

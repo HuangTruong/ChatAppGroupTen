@@ -129,9 +129,6 @@ namespace ChatApp
             // Load avatar người dùng (Firebase)
             await LoadMyAvatarAsync();
 
-            // Load lời chào user
-            await LoadGreetingAsync();
-
             bool isDark = await _themeService.GetThemeAsync(_localId);
             ThemeManager.ApplyTheme(this, isDark);
             if (isDark) picDayNight.Image = Properties.Resources.Moon;
@@ -369,58 +366,6 @@ namespace ChatApp
                 }
                 catch { }
             }
-        }
-        #endregion
-
-        #region ====== WELCOME USER ======
-        /// <summary>
-        /// Load tên user hiện tại và hiển thị lời chào.
-        /// Nếu chưa lấy được tên -> hiển thị mặc định: "Xin chào user".
-        /// </summary>
-        private async Task LoadGreetingAsync()
-        {
-            string name = null;
-
-            try
-            {
-                // Lấy profile user từ Realtime Database: /users/{localId}
-                User me = await _authService.GetUserByIdAsync(_localId).ConfigureAwait(false);
-
-                // Ưu tiên DisplayName, fallback FullName nếu bạn có dùng
-                name = me?.DisplayName;
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    name = me?.FullName;
-                }
-            }
-            catch
-            {
-                // ignore
-            }
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = "user";
-            }
-
-            SetLabelTextSafe(lblTenDangNhap, "Xin chào " + name);
-        }
-
-        /// <summary>
-        /// Set text label an toàn cross-thread (do LoadGreetingAsync có await).
-        /// </summary>
-        private void SetLabelTextSafe(Label lbl, string text)
-        {
-            if (lbl == null) return;
-
-            if (lbl.InvokeRequired)
-            {
-                try { lbl.BeginInvoke(new Action(() => lbl.Text = text)); }
-                catch { }
-                return;
-            }
-
-            lbl.Text = text;
         }
         #endregion
     }

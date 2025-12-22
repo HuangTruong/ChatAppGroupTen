@@ -1,6 +1,8 @@
 ﻿using ChatApp.Controllers;
 using ChatApp.Controls;
 using ChatApp.Models.Users;
+using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -18,6 +20,11 @@ namespace ChatApp.Forms
         private readonly FriendController _friendController;
         private readonly string _currentLocalId;
         private readonly string _currentToken;
+
+        /// <summary>
+        /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
+        /// </summary>
+        private readonly ThemeService _themeService = new ThemeService();
 
         #endregion
 
@@ -70,6 +77,10 @@ namespace ChatApp.Forms
                     pnlView.Controls.Add(requestControl);
                     pnlView.Controls.SetChildIndex(requestControl, 0); // Để cho thứ tự tin nhắn không bị ngược
                 }
+
+                // Load chế độ ngày đêm
+                bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
+                ThemeManager.ApplyTheme(this, isDark);
             }
             catch (Exception ex)
             {

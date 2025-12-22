@@ -34,7 +34,6 @@ namespace ChatApp.Controls
             lblDisplayName.Click += OnConversationsClick;
             pnlBackground.Click += OnConversationsClick;
             picAvatar.Click += OnConversationsClick;
-            flpText.Click += OnConversationsClick;
         }
 
         #endregion

@@ -332,6 +332,24 @@ namespace ChatApp.Services.Firebase
             }).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Lấy trạng thái (online/offline/custom) của người dùng.
+        /// </summary>
+        /// <param name="localId">UID người dùng.</param>
+        /// <returns>Chuỗi status hoặc null nếu chưa có.</returns>
+        public async Task<string> GetStatusAsync(string localId)
+        {
+            if (string.IsNullOrWhiteSpace(localId))
+                return null;
+
+            string key = KeySanitizer.SafeKey(localId);
+
+            // Lấy trực tiếp field Status
+            return await _http.GetAsync<string>(
+                Db($"status/{key}/Status")
+            ).ConfigureAwait(false);
+        }
+
         #endregion
 
         #region ====== PASSWORD RESET (SEND EMAIL) ======
