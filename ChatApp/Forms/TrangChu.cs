@@ -52,6 +52,12 @@ namespace ChatApp
         /// </summary>
         private bool _isOpeningNhanTin = false;
 
+
+        /// <summary>
+        /// Presence cập nhật status.
+        /// </summary>
+        private bool _presenceClosing = false;
+
         #endregion
 
         #region ====== KHỞI TẠO FORM ======
@@ -64,6 +70,7 @@ namespace ChatApp
         public TrangChu(string localId, string token)
         {
             InitializeComponent();
+            this.FormClosing += TrangChu_FormClosing;
 
             _localId = localId;
             _token = token;
@@ -121,6 +128,9 @@ namespace ChatApp
             // Load chế độ ngày đêm
             // Load avatar người dùng (Firebase)
             await LoadMyAvatarAsync();
+
+            // Load lời chào user
+            await LoadGreetingAsync();
 
             bool isDark = await _themeService.GetThemeAsync(_localId);
             ThemeManager.ApplyTheme(this, isDark);
@@ -310,6 +320,107 @@ namespace ChatApp
             await _themeService.SaveThemeAsync(_localId, newMode);
             if (newMode) picDayNight.Image = Properties.Resources.Moon;
             else picDayNight.Image = Properties.Resources.Sun;
+        }
+        #endregion
+
+        #region ====== PRESENCE UPDATE STATUS ======
+        /// <summary>
+        /// Khi đóng TrangChu: cập nhật status = "offline"
+        /// và ĐỢI request hoàn tất (có timeout) trước khi cho app đóng.
+        /// </summary>
+        private async void TrangChu_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Tránh chạy 2 lần
+            if (_presenceClosing) return;
+
+            bool canCancel = (e.CloseReason != CloseReason.WindowsShutDown)
+                             && (e.CloseReason != CloseReason.TaskManagerClosing);
+
+            _presenceClosing = true;
+
+            if (canCancel)
+            {
+                // Chặn đóng lại để đợi update offline
+                e.Cancel = true;
+            }
+
+            try
+            {
+                // Best-effort: update offline, nhưng có timeout để khỏi treo app
+                var updateTask = _authService.UpdateStatusAsync(_localId, "offline");
+                var timeoutTask = System.Threading.Tasks.Task.Delay(1200); // TIMEOUT 1.2s
+
+                await System.Threading.Tasks.Task.WhenAny(updateTask, timeoutTask);
+            }
+            catch
+            {
+                // ignore (đừng crash chỉ vì presence)
+            }
+
+            if (canCancel)
+            {
+                try
+                {
+                    // Bỏ event để tránh loop
+                    this.FormClosing -= TrangChu_FormClosing;
+
+                    // Cho đóng thật
+                    this.Close();
+                }
+                catch { }
+            }
+        }
+        #endregion
+
+        #region ====== WELCOME USER ======
+        /// <summary>
+        /// Load tên user hiện tại và hiển thị lời chào.
+        /// Nếu chưa lấy được tên -> hiển thị mặc định: "Xin chào user".
+        /// </summary>
+        private async Task LoadGreetingAsync()
+        {
+            string name = null;
+
+            try
+            {
+                // Lấy profile user từ Realtime Database: /users/{localId}
+                User me = await _authService.GetUserByIdAsync(_localId).ConfigureAwait(false);
+
+                // Ưu tiên DisplayName, fallback FullName nếu bạn có dùng
+                name = me?.DisplayName;
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    name = me?.FullName;
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = "user";
+            }
+
+            SetLabelTextSafe(lblTenDangNhap, "Xin chào " + name);
+        }
+
+        /// <summary>
+        /// Set text label an toàn cross-thread (do LoadGreetingAsync có await).
+        /// </summary>
+        private void SetLabelTextSafe(Label lbl, string text)
+        {
+            if (lbl == null) return;
+
+            if (lbl.InvokeRequired)
+            {
+                try { lbl.BeginInvoke(new Action(() => lbl.Text = text)); }
+                catch { }
+                return;
+            }
+
+            lbl.Text = text;
         }
         #endregion
     }
