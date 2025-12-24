@@ -62,6 +62,12 @@ namespace ChatApp.Controllers
         private readonly HashSet<string> _knownMessageIds = new HashSet<string>(StringComparer.Ordinal);
 
         // Debounce reload full chỉ khi thật sự cần (changed/remove/snapshot)
+        private readonly object _reloadLock = new object();
+        private Timer _reloadDebounceTimer;
+
+        private bool _ignoreFirstSnapshot;
+        private Action<List<ChatMessage>> _onReset;
+
 
         #endregion
 
@@ -366,6 +372,9 @@ namespace ChatApp.Controllers
             string conversationId = BuildConversationId(_currentUserId, otherUserId);
             _listeningConversationId = conversationId;
 
+
+            _onReset = onReset;
+            _ignoreFirstSnapshot = true;
             // 1) Load initial 1 lần
             List<ChatMessage> initial;
             try { initial = await LoadConversationAsync(conversationId).ConfigureAwait(false); }
@@ -383,8 +392,8 @@ namespace ChatApp.Controllers
                 _stream = await _firebase.OnAsync(
                     path,
                     added: (s, e, c) => { OnAddedEvent(conversationId, e, onMessageAdded); },
-                    changed: (s, e, c) => { },
-                    removed: (s, e, c) => { }
+                    changed: (s, e, c) => { OnChangedEvent(conversationId, e); },
+                    removed: (s, e, c) => { OnRemovedEvent(conversationId, e); }
                 ).ConfigureAwait(false);
             }
             catch
@@ -415,6 +424,12 @@ namespace ChatApp.Controllers
         /// <summary>
         /// Chỉ nhận tin mới (added) và chống duplicate bằng knownIds.
         /// </summary>
+        /// <summary>
+        /// Nhận event "added" từ stream.
+        /// - "/" (snapshot)    : ignore lần đầu (vì đã load initial), lần sau reset.
+        /// - "/-N..." (message) : deserialize và append nếu chưa seen.
+        /// - "/-N.../field"    : schedule reload full (debounce) để không miss patch.
+        /// </summary>
         private void OnAddedEvent(string conversationId, ValueAddedEventArgs e, Action<ChatMessage> onMessageAdded)
         {
             try
@@ -425,19 +440,41 @@ namespace ChatApp.Controllers
                 string p = e.Path ?? string.Empty;
                 string d = e.Data ?? string.Empty;
 
-                // FireSharp thường bắn snapshot "/" lúc mới subscribe -> bỏ qua (vì đã load initial).
-                if (p == "/") return;
+                // Snapshot toàn node
+                if (p == "/")
+                {
+                    if (_ignoreFirstSnapshot)
+                    {
+                        _ignoreFirstSnapshot = false;
+                        return;
+                    }
+
+                    HandleSnapshotReset(conversationId, d);
+                    return;
+                }
 
                 string trimmed = p.Trim('/');
                 if (string.IsNullOrEmpty(trimmed)) return;
 
-                // "/-Nxxx/field" => bỏ qua cho đơn giản
-                if (trimmed.IndexOf('/') >= 0) return;
+                // Patch sâu: /messageId/field
+                if (trimmed.IndexOf('/') >= 0)
+                {
+                    ScheduleReload(conversationId);
+                    return;
+                }
 
-                if (string.Equals(d, "null", StringComparison.OrdinalIgnoreCase)) return;
+                if (string.Equals(d, "null", StringComparison.OrdinalIgnoreCase))
+                {
+                    ScheduleReload(conversationId);
+                    return;
+                }
 
                 ChatMessage m = DeserializeMessage(d);
-                if (m == null) return;
+                if (m == null)
+                {
+                    ScheduleReload(conversationId);
+                    return;
+                }
 
                 NormalizeMessage(m, trimmed);
 
@@ -452,17 +489,125 @@ namespace ChatApp.Controllers
             }
         }
 
+        private void OnChangedEvent(string conversationId, ValueChangedEventArgs e)
+        {
+            try
+            {
+                if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal)) return;
+                if (e == null) return;
 
-        /// <summary>
-        /// Dừng stream và clear trạng thái.
-        /// </summary>
+                string p = e.Path ?? string.Empty;
+                string d = e.Data ?? string.Empty;
+
+                if (p == "/")
+                {
+                    if (_ignoreFirstSnapshot)
+                    {
+                        _ignoreFirstSnapshot = false;
+                        return;
+                    }
+
+                    HandleSnapshotReset(conversationId, d);
+                    return;
+                }
+
+                ScheduleReload(conversationId);
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        private void OnRemovedEvent(string conversationId, ValueRemovedEventArgs e)
+        {
+            if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal)) return;
+            ScheduleReload(conversationId);
+        }
+
+        private void HandleSnapshotReset(string conversationId, string json)
+        {
+            if (_onReset == null) return;
+            if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal)) return;
+
+            if (string.IsNullOrWhiteSpace(json) || string.Equals(json, "null", StringComparison.OrdinalIgnoreCase))
+            {
+                List<ChatMessage> empty = new List<ChatMessage>();
+                ResetKnownIds(empty);
+                try { _onReset(empty); } catch { }
+                return;
+            }
+
+            Dictionary<string, ChatMessage> map = DeserializeMessageMap(json);
+            if (map == null)
+            {
+                ScheduleReload(conversationId);
+                return;
+            }
+
+            List<ChatMessage> list = new List<ChatMessage>();
+            foreach (KeyValuePair<string, ChatMessage> kv in map)
+            {
+                if (kv.Value == null) continue;
+                NormalizeMessage(kv.Value, kv.Key);
+                list.Add(kv.Value);
+            }
+
+            list.Sort(CompareByTime);
+            ResetKnownIds(list);
+            try { _onReset(list); } catch { }
+        }
+
+        private void ScheduleReload(string conversationId)
+        {
+            if (_onReset == null) return;
+            if (string.IsNullOrEmpty(conversationId)) return;
+            if (!string.Equals(_listeningConversationId, conversationId, StringComparison.Ordinal)) return;
+
+            lock (_reloadLock)
+            {
+                if (_reloadDebounceTimer == null)
+                {
+                    _reloadDebounceTimer = new Timer(ReloadTimerTick, null, Timeout.Infinite, Timeout.Infinite);
+                }
+
+                _reloadDebounceTimer.Change(250, Timeout.Infinite);
+            }
+        }
+
+        private async void ReloadTimerTick(object state)
+        {
+            string cid = _listeningConversationId;
+            Action<List<ChatMessage>> cb = _onReset;
+
+            if (string.IsNullOrEmpty(cid) || cb == null) return;
+
+            List<ChatMessage> full;
+            try { full = await LoadConversationAsync(cid).ConfigureAwait(false); }
+            catch { full = new List<ChatMessage>(); }
+
+            ResetKnownIds(full);
+            try { cb(full); } catch { }
+        }
+
         public void StopListen()
         {
             _listeningConversationId = null;
+            _onReset = null;
+            _ignoreFirstSnapshot = false;
 
             lock (_knownLock)
             {
                 _knownMessageIds.Clear();
+            }
+
+            lock (_reloadLock)
+            {
+                if (_reloadDebounceTimer != null)
+                {
+                    try { _reloadDebounceTimer.Dispose(); } catch { }
+                    _reloadDebounceTimer = null;
+                }
             }
 
             if (_stream != null)

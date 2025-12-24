@@ -8,20 +8,27 @@ using System.Windows.Forms;
 namespace ChatApp.Services.UI
 {
     /// <summary>
-    /// Vẽ tin nhắn trực tiếp lên pnlKhungChat (Panel) KHÔNG dùng FlowLayoutPanel.
-    /// - RenderInitial: load lịch sử 1 lần
-    /// - QueueAppend: append realtime (batch bằng Timer)
-    /// - Dùng "row panel" để bubble (dock trái/phải) không bị chồng layout
+    /// ChatRenderer: Vẽ tin nhắn trực tiếp lên Panel (pnlKhungChat).
+    ///
+    /// Ý tưởng chính:
+    /// - Panel sẽ chứa nhiều "row panel" xếp dọc.
+    /// - Mỗi row panel chứa 1 bubble (MessageBubbles hoặc control tương tự).
+    /// - Bubble được canh trái/phải theo IsMine và KHÔNG dùng Dock để tránh lỗi WinForms (height=0/chồng layout).
+    ///
+    /// Luồng chính:
+    /// - RenderInitial(): vẽ toàn bộ lịch sử 1 lần khi mở hội thoại.
+    /// - QueueAppend(): nhận tin mới realtime -> đưa vào hàng đợi _pending.
+    /// - Timer (Flush): gom nhiều tin và vẽ 1 lần để UI mượt hơn.
     /// </summary>
     public sealed class ChatRenderer : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== BIẾN THÀNH VIÊN ======
 
         private readonly Panel _hostPanel;
 
         /// <summary>
-        /// Factory tạo Control bubble từ ChatMessage (ví dụ: MessageBubbles).
-        /// ChatRenderer sẽ tự add bubble vào UI theo layout dọc.
+        /// Hàm tạo bubble Control từ ChatMessage (ví dụ: MessageBubbles).
+        /// ChatRenderer chỉ gọi factory và tự add + layout theo dạng list dọc.
         /// </summary>
         private readonly Func<ChatMessage, Control> _bubbleFactory;
 
@@ -39,7 +46,7 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== PROPERTIES ======
+        #region ====== THUỘC TÍNH ======
 
         /// <summary>
         /// Giới hạn số tin giữ trên UI (để tránh nặng dần).
@@ -48,7 +55,7 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== CTOR / DISPOSE ======
+        #region ====== KHỞI TẠO / GIẢI PHÓNG ======
 
         public ChatRenderer(Panel hostPanel, Func<ChatMessage, Control> bubbleFactory)
         {
@@ -96,10 +103,10 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== PUBLIC API ======
+        #region ====== API CÔNG KHAI ======
 
         /// <summary>
-        /// Xóa sạch UI chat.
+        /// Xóa toàn bộ UI chat + reset trạng thái nội bộ.
         /// </summary>
         public void Clear()
         {
@@ -117,9 +124,12 @@ namespace ChatApp.Services.UI
                 try
                 {
                     _hostPanel.SuspendLayout();
+
                     _hostPanel.Controls.Clear();
-                    // Reset scroll về đầu để tránh trường hợp AutoScrollPosition cũ làm control mới bị "lệch" khỏi vùng nhìn.
+
+                    // Reset scroll để tránh "lệch" vùng nhìn sau khi clear
                     try { _hostPanel.AutoScrollPosition = new Point(0, 0); } catch { }
+
                     ResetLayoutCursor();
                 }
                 finally
@@ -130,7 +140,7 @@ namespace ChatApp.Services.UI
         }
 
         /// <summary>
-        /// Render toàn bộ lịch sử (khi mới mở hội thoại).
+        /// Vẽ toàn bộ lịch sử (khi mới mở hội thoại).
         /// </summary>
         public void RenderInitial(IList<ChatMessage> messages, string ownerKey)
         {
@@ -144,7 +154,7 @@ namespace ChatApp.Services.UI
                     _drawnIds.Clear();
                 }
 
-                _flushTimer.Stop();
+                try { _flushTimer.Stop(); } catch { }
 
                 _hostPanel.SuspendLayout();
                 try
@@ -184,7 +194,7 @@ namespace ChatApp.Services.UI
         }
 
         /// <summary>
-        /// Append tin mới lên UI (được batch bằng Timer).
+        /// Append tin mới lên UI (thực tế: đưa vào queue, rồi Timer sẽ vẽ theo batch).
         /// </summary>
         public void QueueAppend(ChatMessage msg, string ownerKey)
         {
@@ -192,16 +202,16 @@ namespace ChatApp.Services.UI
 
             RunOnUi(delegate
             {
-                // Nếu vừa Clear() và chưa RenderInitial(), _ownerKey đang null.
-                // SessionController đã lọc đúng ownerKey rồi, nên ở đây có thể "nhận" append đầu tiên
-                // để không bị mất tin nhắn khi listener bắn onMessageAdded trước onInitialLoaded.
+                // Nếu chưa có _ownerKey (vừa Clear và chưa RenderInitial),
+                // ta nhận ownerKey đầu tiên để không mất tin nhắn.
                 if (string.IsNullOrEmpty(_ownerKey))
                 {
                     _ownerKey = ownerKey;
                 }
                 else
                 {
-                    if (!string.Equals(_ownerKey, ownerKey, StringComparison.Ordinal))
+                    bool sameOwner = string.Equals(_ownerKey, ownerKey, StringComparison.Ordinal);
+                    if (!sameOwner)
                     {
                         return;
                     }
@@ -211,9 +221,13 @@ namespace ChatApp.Services.UI
 
                 lock (_lockObj)
                 {
-                    if (!string.IsNullOrEmpty(id) && _drawnIds.Contains(id))
+                    if (!string.IsNullOrEmpty(id))
                     {
-                        return;
+                        bool existed = _drawnIds.Contains(id);
+                        if (existed)
+                        {
+                            return;
+                        }
                     }
 
                     _pending.Add(msg);
@@ -233,12 +247,11 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== TIMER FLUSH ======
+        #region ====== TIMER: VẼ THEO BATCH ======
 
         private void FlushTimer_Tick(object sender, EventArgs e)
         {
-            List<ChatMessage> batch;
-            bool shouldScroll;
+            List<ChatMessage> batch = null;
 
             lock (_lockObj)
             {
@@ -253,7 +266,7 @@ namespace ChatApp.Services.UI
                 _pending.Clear();
             }
 
-            shouldScroll = IsNearBottom();
+            bool shouldScroll = IsNearBottom();
 
             _hostPanel.SuspendLayout();
             try
@@ -278,20 +291,25 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== LAYOUT CORE ======
+        #region ====== LAYOUT: THÊM 1 DÒNG TIN NHẮN ======
 
         private void AddOneMessageRow(ChatMessage msg)
         {
             if (msg == null) return;
 
             Control bubble = null;
-            try { bubble = _bubbleFactory(msg); }
-            catch { bubble = null; }
+            try
+            {
+                bubble = _bubbleFactory(msg);
+            }
+            catch
+            {
+                bubble = null;
+            }
 
             if (bubble == null) return;
 
-            // Row panel dùng layout thủ công: Panel.AutoSize + Dock(Left/Right) thường gây height=0.
-            // => Ta đặt row.Height theo bubble.Height và tự canh trái/phải.
+            // Row panel chứa bubble để tránh việc bubble Dock trái/phải làm chồng layout.
             Panel row = new Panel();
             row.BackColor = Color.Transparent;
             row.AutoSize = false;
@@ -299,30 +317,29 @@ namespace ChatApp.Services.UI
             row.Padding = new Padding(_padding, 2, _padding, 2);
             row.Tag = msg;
 
-            // Override Dock của bubble (MessageBubbles hay set Dock Left/Right để dùng với FlowLayoutPanel).
-            // Với Panel + row, ta tự canh vị trí để bubble không bị co height về 0.
+            // Tránh bubble tự Dock (cách cũ thường Dock Left/Right với FlowLayoutPanel)
             try { bubble.Dock = DockStyle.None; } catch { }
             bubble.Margin = new Padding(0);
 
+            // Đặt row theo "con trỏ" layout hiện tại
             row.Left = 0;
             row.Top = _nextTop;
             row.Width = _hostPanel.ClientSize.Width;
             row.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
-            // Add bubble trước để có size hợp lệ
+            // Add bubble vào row trước để bubble có kích thước
             row.Controls.Add(bubble);
 
-            // Set vị trí bubble theo IsMine
             bool isMine = false;
             try { isMine = msg.IsMine; } catch { isMine = false; }
 
-            // Đặt Top theo padding
+            // Canh top theo padding của row
             bubble.Top = row.Padding.Top;
 
             if (isMine)
             {
                 bubble.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-                bubble.Left = Math.Max(row.Padding.Left, row.ClientSize.Width - row.Padding.Right - bubble.Width);
+                bubble.Left = CalcRightAlignedLeft(row, bubble);
             }
             else
             {
@@ -330,47 +347,49 @@ namespace ChatApp.Services.UI
                 bubble.Left = row.Padding.Left;
             }
 
-            // Set height theo bubble hiện tại
-            int h = bubble.Height + row.Padding.Vertical;
-            if (h < 10) h = 10;
-            row.Height = h;
+            // Chiều cao row phụ thuộc chiều cao bubble
+            int rowHeight = bubble.Height + row.Padding.Vertical;
+            if (rowHeight < 10) rowHeight = 10;
+            row.Height = rowHeight;
 
-            // Nếu bubble đổi height (load thumbnail / update name), resize row + reflow
+            // Nếu bubble đổi height (load thumbnail / update name) => resize row + reflow
             bubble.SizeChanged += delegate
             {
                 RunOnUi(delegate
                 {
                     try
                     {
-                        if (row.IsDisposed || bubble.IsDisposed) return;
+                        if (row.IsDisposed) return;
+                        if (bubble.IsDisposed) return;
 
-                        int nh = bubble.Height + row.Padding.Vertical;
-                        if (nh < 10) nh = 10;
-                        if (row.Height != nh)
+                        int newRowHeight = bubble.Height + row.Padding.Vertical;
+                        if (newRowHeight < 10) newRowHeight = 10;
+
+                        if (row.Height != newRowHeight)
                         {
-                            row.Height = nh;
+                            row.Height = newRowHeight;
                             ReflowAll();
                         }
 
-                        // Re-align when row width changes
                         if (isMine)
                         {
-                            bubble.Left = Math.Max(row.Padding.Left, row.ClientSize.Width - row.Padding.Right - bubble.Width);
+                            bubble.Left = CalcRightAlignedLeft(row, bubble);
                         }
                     }
                     catch { }
                 });
             };
 
-            // Re-align khi row resize (đổi size form)
+            // Khi row đổi width (do resize form) => canh lại bubble nếu là tin của mình
             row.Resize += delegate
             {
                 try
                 {
                     if (bubble.IsDisposed) return;
+
                     if (isMine)
                     {
-                        bubble.Left = Math.Max(row.Padding.Left, row.ClientSize.Width - row.Padding.Right - bubble.Width);
+                        bubble.Left = CalcRightAlignedLeft(row, bubble);
                     }
                 }
                 catch { }
@@ -379,6 +398,13 @@ namespace ChatApp.Services.UI
             _hostPanel.Controls.Add(row);
 
             _nextTop = row.Bottom + _spacing;
+        }
+
+        private int CalcRightAlignedLeft(Panel row, Control bubble)
+        {
+            int left = row.ClientSize.Width - row.Padding.Right - bubble.Width;
+            if (left < row.Padding.Left) left = row.Padding.Left;
+            return left;
         }
 
         private void ResetLayoutCursor()
@@ -426,9 +452,13 @@ namespace ChatApp.Services.UI
                         Control row = _hostPanel.Controls[0];
                         _hostPanel.Controls.RemoveAt(0);
 
-                        ChatMessage m = row != null ? (row.Tag as ChatMessage) : null;
-                        string id = SafeMessageId(m);
+                        ChatMessage m = null;
+                        if (row != null)
+                        {
+                            m = row.Tag as ChatMessage;
+                        }
 
+                        string id = SafeMessageId(m);
                         if (!string.IsNullOrEmpty(id))
                         {
                             lock (_lockObj)
@@ -437,10 +467,10 @@ namespace ChatApp.Services.UI
                             }
                         }
 
-                        try { row.Dispose(); } catch { }
+                        try { if (row != null) row.Dispose(); } catch { }
                     }
 
-                    // Sau khi remove -> reflow để không bị hở khoảng trống
+                    // Xóa bớt => sắp xếp lại cho không bị hở khoảng trống
                     ReflowAll();
                 }
                 finally
@@ -453,7 +483,7 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== SCROLL HELPERS ======
+        #region ====== SCROLL: HỖ TRỢ CUỘN ======
 
         private bool IsNearBottom()
         {
@@ -467,7 +497,13 @@ namespace ChatApp.Services.UI
                 int large = _hostPanel.VerticalScroll.LargeChange;
                 int max = _hostPanel.VerticalScroll.Maximum;
 
-                return (value + large) >= (max - 40);
+                // còn cách đáy <= 40px thì coi như "gần đáy"
+                if ((value + large) >= (max - 40))
+                {
+                    return true;
+                }
+
+                return false;
             }
             catch
             {
@@ -479,7 +515,12 @@ namespace ChatApp.Services.UI
         {
             try
             {
-                if (!force && !IsNearBottom()) return;
+                if (!force)
+                {
+                    bool nearBottom = IsNearBottom();
+                    if (!nearBottom) return;
+                }
+
                 if (_hostPanel.Controls.Count == 0) return;
 
                 Control last = _hostPanel.Controls[_hostPanel.Controls.Count - 1];
@@ -493,11 +534,11 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== EVENTS ======
+        #region ====== SỰ KIỆN ======
 
         private void HostPanel_Resize(object sender, EventArgs e)
         {
-            // Khi resize panel, cần reflow lại width của row
+            // Resize panel => reflow lại vị trí + width các row
             RunOnUi(delegate
             {
                 try
@@ -514,7 +555,7 @@ namespace ChatApp.Services.UI
 
         #endregion
 
-        #region ====== UTILS ======
+        #region ====== HÀM TIỆN ÍCH ======
 
         private void RunOnUi(Action action)
         {
@@ -537,8 +578,16 @@ namespace ChatApp.Services.UI
 
         private static string SafeMessageId(ChatMessage msg)
         {
-            try { return msg != null ? (msg.MessageId ?? string.Empty) : string.Empty; }
-            catch { return string.Empty; }
+            try
+            {
+                if (msg == null) return string.Empty;
+                if (msg.MessageId == null) return string.Empty;
+                return msg.MessageId;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         private static void EnableDoubleBuffered(Control control)

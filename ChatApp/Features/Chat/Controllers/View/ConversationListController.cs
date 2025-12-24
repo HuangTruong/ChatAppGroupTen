@@ -11,51 +11,56 @@ using System.Windows.Forms;
 namespace ChatApp.Controllers
 {
     /// <summary>
-    /// Controller quản lý hiển thị danh sách cuộc trò chuyện (friends + groups)
-    /// lên Panel (pnlDanhSachChat) theo dạng mỗi item 1 dòng.
+    /// Controller hiển thị danh sách hội thoại ở cột trái:
+    /// - Gồm: Nhóm (Groups) + Bạn bè (Friends)
+    /// - Render thành list dọc trên Panel (tự tính Location/Width, KHÔNG dùng Dock để tránh lỗi layout WinForms)
+    /// - Hỗ trợ ReloadAsync(): tải dữ liệu + sắp xếp + vẽ lại UI
+    /// - Mỗi item gắn Tag:
+    ///   + Nhóm: "GROUP:{groupId}"
+    ///   + Bạn: "{userId}"
     /// </summary>
     public class ConversationListController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== HẰNG SỐ GIAO DIỆN ======
+
+        private const int ITEM_HEIGHT = 76;
+        private const int ITEM_GAP = 6;
+        private const int MIN_ITEM_WIDTH = 100;
+
+        #endregion
+
+        #region ====== BIẾN THÀNH VIÊN ======
 
         private readonly Panel _panel;
         private readonly Func<Task<Dictionary<string, User>>> _loadFriendsAsync;
         private readonly Func<Task<Dictionary<string, GroupInfo>>> _loadGroupsAsync;
         private readonly EventHandler _onItemClicked;
 
-        private bool _isHookedResize;
+        private bool _disposed;
 
         #endregion
 
-        #region ====== PROPERTIES ======
+        #region ====== THUỘC TÍNH CÔNG KHAI ======
 
         /// <summary>
-        /// Prefix tag để phân biệt item nhóm trong danh sách.
+        /// Prefix để phân biệt nhóm trong Tag (vd: "GROUP:")
         /// </summary>
         public string GroupTagPrefix { get; set; }
 
         /// <summary>
-        /// Danh sách bạn bè đã load (key = userId/safeId).
+        /// Cache bạn bè (key = userId).
         /// </summary>
         public Dictionary<string, User> Friends { get; private set; }
 
         /// <summary>
-        /// Danh sách nhóm đã load (key = groupId).
+        /// Cache nhóm (key = groupId).
         /// </summary>
         public Dictionary<string, GroupInfo> Groups { get; private set; }
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
-        /// <summary>
-        /// Khởi tạo controller cho danh sách conversation.
-        /// </summary>
-        /// <param name="panel">Panel dùng để chứa item Conversations (pnlDanhSachChat)</param>
-        /// <param name="loadFriendsAsync">Hàm load friend users</param>
-        /// <param name="loadGroupsAsync">Hàm load groups</param>
-        /// <param name="onItemClicked">Handler click item (UserItem_Click)</param>
-        /// <param name="groupTagPrefix">Prefix tag nhóm, ví dụ "GROUP:"</param>
         public ConversationListController(
             Panel panel,
             Func<Task<Dictionary<string, User>>> loadFriendsAsync,
@@ -63,6 +68,8 @@ namespace ChatApp.Controllers
             EventHandler onItemClicked,
             string groupTagPrefix)
         {
+            if (panel == null) throw new ArgumentNullException(nameof(panel));
+
             _panel = panel;
             _loadFriendsAsync = loadFriendsAsync;
             _loadGroupsAsync = loadGroupsAsync;
@@ -73,262 +80,272 @@ namespace ChatApp.Controllers
             Friends = new Dictionary<string, User>(StringComparer.Ordinal);
             Groups = new Dictionary<string, GroupInfo>(StringComparer.Ordinal);
 
-            HookPanelResize();
+            _panel.AutoScroll = true;
+
+            _panel.Resize -= Panel_Resize;
+            _panel.Resize += Panel_Resize;
         }
 
         #endregion
 
-        #region ====== PUBLIC API ======
+        #region ====== API CHÍNH: TẢI LẠI & VẼ LẠI ======
 
-        /// <summary>
-        /// Reload toàn bộ danh sách: Groups trước, Friends sau.
-        /// (Đảm bảo mọi thao tác UI đều chạy trên UI thread)
-        /// </summary>
         public async Task ReloadAsync()
         {
-            EnsurePanelValid();
+            EnsureNotDisposed();
 
-            // 1) Load data ở background thread (KHÔNG đụng UI)
-            await LoadGroupsInternalAsync().ConfigureAwait(false);
-            await LoadFriendsInternalAsync().ConfigureAwait(false);
+            await Task.WhenAll(
+                SafeLoadFriendsAsync(),
+                SafeLoadGroupsAsync()
+            ).ConfigureAwait(false);
 
-            // 2) Render UI trên UI thread
+            List<ListItem> items = BuildItems();
+
             await RunOnUiThreadAsync(delegate
             {
-                EnsurePanelValid();
-
-                _panel.AutoScroll = true;
-
-                _panel.SuspendLayout();
-                try
-                {
-                    _panel.Controls.Clear();
-
-                    AddGroupItemsToPanel_UI();
-                    AddFriendItemsToPanel_UI();
-                }
-                finally
-                {
-                    _panel.ResumeLayout(true);
-                }
+                Render_UI(items);
             }).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Lấy User theo userId đã cache.
-        /// </summary>
-        public bool TryGetFriend(string userId, out User user)
-        {
-            user = null;
-            if (string.IsNullOrWhiteSpace(userId)) return false;
-            return Friends != null && Friends.TryGetValue(userId, out user);
-        }
-
-        /// <summary>
-        /// Lấy Group theo groupId đã cache.
-        /// </summary>
-        public bool TryGetGroup(string groupId, out GroupInfo group)
-        {
-            group = null;
-            if (string.IsNullOrWhiteSpace(groupId)) return false;
-            return Groups != null && Groups.TryGetValue(groupId, out group);
-        }
-
         #endregion
 
-        #region ====== INTERNAL LOAD ======
+        #region ====== TẢI DỮ LIỆU AN TOÀN (TRY/CATCH) ======
+
+        private async Task SafeLoadFriendsAsync()
+        {
+            try { await LoadFriendsInternalAsync().ConfigureAwait(false); }
+            catch { Friends = new Dictionary<string, User>(StringComparer.Ordinal); }
+        }
+
+        private async Task SafeLoadGroupsAsync()
+        {
+            try { await LoadGroupsInternalAsync().ConfigureAwait(false); }
+            catch { Groups = new Dictionary<string, GroupInfo>(StringComparer.Ordinal); }
+        }
 
         private async Task LoadFriendsInternalAsync()
         {
             Friends = new Dictionary<string, User>(StringComparer.Ordinal);
-
             if (_loadFriendsAsync == null) return;
 
-            Dictionary<string, User> data = await _loadFriendsAsync().ConfigureAwait(false);
+            var data = await _loadFriendsAsync().ConfigureAwait(false);
             if (data == null) return;
 
-            foreach (KeyValuePair<string, User> kv in data)
+            foreach (var kv in data)
             {
                 if (string.IsNullOrWhiteSpace(kv.Key)) continue;
-
-                User u = kv.Value;
-                if (u != null) u.LocalId = kv.Key;
-
-                Friends[kv.Key] = u;
+                if (kv.Value != null) kv.Value.LocalId = kv.Key;
+                Friends[kv.Key] = kv.Value;
             }
         }
 
         private async Task LoadGroupsInternalAsync()
         {
             Groups = new Dictionary<string, GroupInfo>(StringComparer.Ordinal);
-
             if (_loadGroupsAsync == null) return;
 
-            Dictionary<string, GroupInfo> data = await _loadGroupsAsync().ConfigureAwait(false);
+            var data = await _loadGroupsAsync().ConfigureAwait(false);
             if (data == null) return;
 
-            foreach (KeyValuePair<string, GroupInfo> kv in data)
+            foreach (var kv in data)
             {
-                if (string.IsNullOrWhiteSpace(kv.Key)) continue;
-                if (kv.Value == null) continue;
-
+                if (string.IsNullOrWhiteSpace(kv.Key) || kv.Value == null) continue;
                 Groups[kv.Key] = kv.Value;
             }
         }
 
         #endregion
 
-        #region ====== BUILD ITEMS (UI THREAD ONLY) ======
+        #region ====== TẠO DANH SÁCH ITEM ĐỂ RENDER ======
 
-        /// <summary>
-        /// CHỈ gọi trên UI thread.
-        /// </summary>
-        private void AddGroupItemsToPanel_UI()
+        private sealed class ListItem
         {
-            if (Groups == null || Groups.Count == 0) return;
+            public int Kind; // 0 = group, 1 = friend
+            public string Tag;
+            public string Title;
+            public string AvatarId;
+            public long SortKey;
+        }
 
-            // Sort group theo LastMessageAt giảm dần
-            List<GroupInfo> list = Groups.Values.ToList();
-            list.Sort(delegate (GroupInfo a, GroupInfo b)
+        private List<ListItem> BuildItems()
+        {
+            var result = new List<ListItem>();
+
+            // Groups (ưu tiên lên trước theo LastMessageAt giảm dần)
+            if (Groups != null)
             {
-                long ta = a != null ? a.LastMessageAt : 0;
-                long tb = b != null ? b.LastMessageAt : 0;
-                return tb.CompareTo(ta);
-            });
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                GroupInfo g = list[i];
-                if (g == null) continue;
-
-                Conversations item = CreateBaseItem_UI();
-                item.Tag = GroupTagPrefix + g.GroupId;
-
-                string title = string.IsNullOrWhiteSpace(g.Name) ? ("Nhóm " + g.GroupId) : g.Name;
-
-                string subtitle = g.LastMessage;
-                if (string.IsNullOrWhiteSpace(subtitle))
+                foreach (var kv in Groups)
                 {
-                    subtitle = g.MemberCount > 0 ? (g.MemberCount + " thành viên") : "Nhóm chat";
+                    var g = kv.Value;
+                    if (g == null) continue;
+
+                    result.Add(new ListItem
+                    {
+                        Kind = 0,
+                        Tag = GroupTagPrefix + kv.Key,
+                        Title = string.IsNullOrWhiteSpace(g.Name) ? "Nhóm" : g.Name,
+                        AvatarId = kv.Key,
+                        SortKey = g.LastMessageAt
+                    });
                 }
-
-                item.SetInfo(title, subtitle);
-
-                AddToTop_UI(item);
             }
-        }
 
-        /// <summary>
-        /// CHỈ gọi trên UI thread.
-        /// </summary>
-        private void AddFriendItemsToPanel_UI()
-        {
-            if (Friends == null || Friends.Count == 0) return;
-
-            foreach (KeyValuePair<string, User> kv in Friends)
+            // Friends (xếp theo tên A-Z)
+            if (Friends != null)
             {
-                string userId = kv.Key;
-                User user = kv.Value;
+                foreach (var kv in Friends)
+                {
+                    var u = kv.Value;
+                    if (u == null) continue;
 
-                Conversations item = CreateBaseItem_UI();
-                item.Tag = userId;
-
-                item.SetInfo(GetUserFullName(user), GetUserSubtitle(user, userId));
-
-                AddToTop_UI(item);
-            }
-        }
-
-        /// <summary>
-        /// Tạo item Conversations (CHỈ UI thread).
-        /// </summary>
-        private Conversations CreateBaseItem_UI()
-        {
-            Conversations item = new Conversations();
-
-            // Click event (đảm bảo không bị gắn nhiều lần)
-            if (_onItemClicked != null)
-            {
-                item.ItemClicked -= _onItemClicked;
-                item.ItemClicked += _onItemClicked;
+                    result.Add(new ListItem
+                    {
+                        Kind = 1,
+                        Tag = kv.Key,
+                        Title = GetUserFullName(u),
+                        AvatarId = kv.Key,
+                        SortKey = 0
+                    });
+                }
             }
 
-            // Quan trọng: Panel + Dock Top => mỗi item 1 dòng (vertical stack)
-            item.Dock = DockStyle.Top;
+            var groups = result.Where(x => x.Kind == 0).OrderByDescending(x => x.SortKey).ToList();
+            var friends = result.Where(x => x.Kind == 1)
+                                .OrderBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase)
+                                .ToList();
 
-            // Nếu Panel có Padding, để margin 0 cho đẹp
-            item.Margin = new Padding(0);
-
-            // Để panel tự stretch ngang
-            item.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
-            item.Width = GetPanelClientWidth();
-
-            item.Cursor = Cursors.Hand;
-
-            return item;
-        }
-
-        /// <summary>
-        /// Add item vào Panel theo đúng thứ tự hiển thị top-to-bottom.
-        /// Lưu ý: Dock Top + Controls.Add sẽ xếp ngược, nên phải BringToFront.
-        /// (CHỈ UI thread)
-        /// </summary>
-        private void AddToTop_UI(Control c)
-        {
-            _panel.Controls.Add(c);
-            c.BringToFront();
+            var ordered = new List<ListItem>();
+            ordered.AddRange(groups);
+            ordered.AddRange(friends);
+            return ordered;
         }
 
         #endregion
 
-        #region ====== UI THREAD HELPERS ======
+        #region ====== VẼ UI (RENDER) ======
 
-        /// <summary>
-        /// Chạy action trên UI thread của _panel. Nếu đang ở background thread sẽ BeginInvoke.
-        /// </summary>
+        private void Render_UI(List<ListItem> items)
+        {
+            if (_panel == null || _panel.IsDisposed || !_panel.IsHandleCreated)
+                return;
+
+            _panel.SuspendLayout();
+            try
+            {
+                ClearPanel_UI();
+
+                if (items == null || items.Count == 0)
+                {
+                    _panel.AutoScrollMinSize = Size.Empty;
+                    return;
+                }
+
+                int y = 0;
+                int w = CalcItemWidth();
+
+                foreach (var m in items)
+                {
+                    var item = new Conversations
+                    {
+                        Tag = m.Tag,
+                        AutoSize = false,
+                        Width = w,
+                        Height = ITEM_HEIGHT,
+                        Location = new Point(0, y),
+                        Margin = new Padding(0),
+                        Cursor = Cursors.Hand
+                    };
+
+                    if (_onItemClicked != null)
+                    {
+                        item.ItemClicked -= _onItemClicked;
+                        item.ItemClicked += _onItemClicked;
+                    }
+
+                    item.SetInfo(m.Title ?? string.Empty, m.AvatarId ?? string.Empty);
+
+                    _panel.Controls.Add(item);
+                    y += ITEM_HEIGHT + ITEM_GAP;
+                }
+
+                _panel.AutoScrollMinSize = new Size(0, Math.Max(0, y));
+            }
+            finally
+            {
+                _panel.ResumeLayout(true);
+            }
+        }
+
+        private void ClearPanel_UI()
+        {
+            for (int i = _panel.Controls.Count - 1; i >= 0; i--)
+            {
+                try { _panel.Controls[i].Dispose(); } catch { }
+            }
+            _panel.Controls.Clear();
+        }
+
+        #endregion
+
+        #region ====== TÍNH KÍCH THƯỚC & XỬ LÝ RESIZE ======
+
+        private int CalcItemWidth()
+        {
+            if (_panel == null || _panel.IsDisposed || !_panel.IsHandleCreated)
+                return MIN_ITEM_WIDTH;
+
+            int w = _panel.ClientSize.Width;
+            if (w <= 0) w = _panel.Width;
+
+            w -= SystemInformation.VerticalScrollBarWidth;
+            if (w < MIN_ITEM_WIDTH) w = MIN_ITEM_WIDTH;
+
+            return w;
+        }
+
+        private void Panel_Resize(object sender, EventArgs e)
+        {
+            if (_disposed) return;
+            if (_panel == null || _panel.IsDisposed || !_panel.IsHandleCreated) return;
+
+            RunOnUiThread(delegate
+            {
+                int w = CalcItemWidth();
+                foreach (Control c in _panel.Controls)
+                {
+                    if (c == null || c.IsDisposed) continue;
+                    c.Width = w;
+                    c.Left = 0;
+                }
+            });
+        }
+
+        #endregion
+
+        #region ====== HỖ TRỢ CHẠY TRÊN UI THREAD ======
+
         private void RunOnUiThread(Action action)
         {
-            if (action == null) return;
-            if (_panel == null) return;
-            if (_panel.IsDisposed) return;
+            if (action == null || _panel == null || _panel.IsDisposed) return;
 
             if (_panel.InvokeRequired)
             {
-                try
-                {
-                    _panel.BeginInvoke((MethodInvoker)delegate
-                    {
-                        try { action(); } catch { /* ignore */ }
-                    });
-                }
-                catch
-                {
-                    // ignore
-                }
+                try { _panel.BeginInvoke((MethodInvoker)(() => { try { action(); } catch { } })); }
+                catch { }
                 return;
             }
 
             action();
         }
 
-        /// <summary>
-        /// Chạy action trên UI thread và trả về Task để await.
-        /// </summary>
         private Task RunOnUiThreadAsync(Action action)
         {
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object>();
 
             RunOnUiThread(delegate
             {
-                try
-                {
-                    action();
-                    tcs.SetResult(null);
-                }
-                catch (Exception ex)
-                {
-                    tcs.SetException(ex);
-                }
+                try { action(); tcs.SetResult(null); }
+                catch (Exception ex) { tcs.SetException(ex); }
             });
 
             return tcs.Task;
@@ -336,117 +353,36 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== HELPERS ======
+        #region ====== HÀM TIỆN ÍCH ======
 
-        private void EnsurePanelValid()
+        private void EnsureNotDisposed()
         {
-            if (_panel == null)
-            {
-                throw new InvalidOperationException("ConversationListController: panel is null.");
-            }
-        }
-
-        private int GetPanelClientWidth()
-        {
-            int w = _panel.ClientSize.Width;
-            if (w <= 0) w = _panel.Width;
-            if (w <= 0) w = 320;
-            return w;
+            if (_disposed) throw new ObjectDisposedException(nameof(ConversationListController));
         }
 
         private static string GetUserFullName(User user)
         {
             if (user == null) return "Người dùng";
-
-            string ten = user.FullName;
-
-            if (string.IsNullOrWhiteSpace(ten))
+            if (!string.IsNullOrWhiteSpace(user.FullName)) return user.FullName.Trim();
+            if (!string.IsNullOrWhiteSpace(user.DisplayName)) return user.DisplayName.Trim();
+            if (!string.IsNullOrWhiteSpace(user.Email))
             {
-                ten = user.DisplayName;
+                int at = user.Email.IndexOf('@');
+                return at > 0 ? user.Email.Substring(0, at) : user.Email;
             }
-
-            if (string.IsNullOrWhiteSpace(ten) && !string.IsNullOrWhiteSpace(user.Email))
-            {
-                string email = user.Email.Trim();
-                int at = email.IndexOf('@');
-                ten = (at > 0) ? email.Substring(0, at) : email;
-            }
-
-            if (string.IsNullOrWhiteSpace(ten)) return "Người dùng";
-
-            return ten.Trim();
-        }
-
-        private static string GetUserSubtitle(User user, string userId)
-        {
-            if (user != null && !string.IsNullOrWhiteSpace(user.Email))
-            {
-                return user.Email.Trim();
-            }
-            return string.IsNullOrWhiteSpace(userId) ? string.Empty : userId;
-        }
-
-        private void HookPanelResize()
-        {
-            if (_panel == null) return;
-            if (_isHookedResize) return;
-
-            _panel.SizeChanged += Panel_SizeChanged;
-            _isHookedResize = true;
-        }
-
-        private void Panel_SizeChanged(object sender, EventArgs e)
-        {
-            // Nếu event bị gọi từ thread khác (hiếm nhưng có thể), marshal về UI thread
-            if (_panel != null && _panel.InvokeRequired)
-            {
-                try
-                {
-                    _panel.BeginInvoke((MethodInvoker)delegate
-                    {
-                        try { Panel_SizeChanged(sender, e); } catch { /* ignore */ }
-                    });
-                }
-                catch
-                {
-                    // ignore
-                }
-                return;
-            }
-
-            try
-            {
-                int w = GetPanelClientWidth();
-                foreach (Control c in _panel.Controls)
-                {
-                    if (c == null) continue;
-                    c.Width = w; // Dock Top đã đủ, nhưng set thêm để chắc chắn
-                }
-            }
-            catch
-            {
-                // ignore
-            }
+            return "Người dùng";
         }
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {
-            try
-            {
-                if (_panel != null && _isHookedResize)
-                {
-                    _panel.SizeChanged -= Panel_SizeChanged;
-                    _isHookedResize = false;
-                }
-            }
-            catch
-            {
-                // ignore
-            }
+            if (_disposed) return;
+            _disposed = true;
+
+            try { if (_panel != null) _panel.Resize -= Panel_Resize; } catch { }
         }
 
         #endregion

@@ -15,7 +15,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class FileDownloadController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly SemaphoreSlim _gate = new SemaphoreSlim(1, 1);
 
@@ -23,7 +23,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DOWNLOAD ======
+        #region ====== TẢI FILE ======
 
         public async Task DownloadFromMessageAsync(ChatMessage msg, IWin32Window owner)
         {
@@ -86,7 +86,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== HTTP CLIENT ======
+        #region ====== KHỞI TẠO HTTP CLIENT ======
 
         private static HttpClient CreateHttpClient()
         {
@@ -104,7 +104,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {

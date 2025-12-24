@@ -11,6 +11,8 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ImageViewerController
     {
+        #region ====== HÀM CÔNG KHAI ======
+
         public async Task ShowFromMessageAsync(ChatMessage msg, IWin32Window owner)
         {
             // Cho UI thread nhường 1 tick để click "ăn" trước
@@ -47,5 +49,7 @@ namespace ChatApp.Controllers
                 viewer.ShowDialog(owner);
             }
         }
+
+        #endregion
     }
 }

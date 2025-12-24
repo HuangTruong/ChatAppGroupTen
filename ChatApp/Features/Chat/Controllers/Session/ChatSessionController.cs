@@ -20,7 +20,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ChatSessionController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly string _currentUserId;
         private readonly string _token;
@@ -46,7 +46,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public ChatSessionController(
             string currentUserId,
@@ -88,7 +88,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CONVERSATION ITEM CLICK ======
+        #region ====== SỰ KIỆN CLICK ITEM HỘI THOẠI ======
 
         public void OnConversationItemClicked(object sender, EventArgs e, string groupTagPrefix, ConversationListController listController)
         {
@@ -110,7 +110,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== OPEN DIRECT ======
+        #region ====== MỞ CHAT 1-1 ======
 
         public void OpenDirectConversation(string otherUserId, ConversationListController listController)
         {
@@ -159,7 +159,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== OPEN GROUP ======
+        #region ====== MỞ CHAT NHÓM ======
 
         public void OpenGroupConversation(string groupId, ConversationListController listController)
         {
@@ -212,7 +212,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== RENDER SAFE ======
+        #region ====== RENDER AN TOÀN THEO SESSION ======
 
         private void RenderInitialIfMatch(IList<ChatMessage> messages, string ownerKey)
         {
@@ -224,12 +224,14 @@ namespace ChatApp.Controllers
         {
             if (msg == null) return;
             if (!string.Equals(_currentChatId, ownerKey, StringComparison.Ordinal)) return;
+
+            // Realtime chuẩn: CHỈ append khi listener bắn event
             _chatView.QueueAppend(msg, ownerKey);
         }
 
         #endregion
 
-        #region ====== STATUS ======
+        #region ====== CẬP NHẬT TRẠNG THÁI ======
 
         private async Task UpdateStatusAsync(string otherUserId)
         {
@@ -251,8 +253,13 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== SEND TEXT / FILE ======
+        #region ====== GỬI TIN NHẮN / FILE ======
 
+        /// <summary>
+        /// Realtime chuẩn:
+        /// - KHÔNG append local trước khi gửi.
+        /// - UI sẽ được cập nhật bởi listener (onMessageAdded) khi Firebase ghi xong.
+        /// </summary>
         public async Task SendTextAsync(string text)
         {
             string noiDung = (text ?? string.Empty).Trim();
@@ -265,34 +272,16 @@ namespace ChatApp.Controllers
                 return;
             }
 
-            string tempId = "local_" + Guid.NewGuid().ToString("N");
-
-            ChatMessage local = new ChatMessage();
-            local.MessageId = tempId;
-            local.SenderId = _currentUserId;
-            local.ReceiverId = _currentChatId;
-            local.Text = noiDung;
-            local.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            local.IsMine = true;
-            local.MessageType = "text";
-
-            // append ngay (không đợi mạng)
-            _chatView.QueueAppend(local, _currentChatId);
-
             try
             {
                 if (_isGroupChat)
                 {
-                    // nhóm: server trả về ChatMessage có MessageId thật
-                    ChatMessage sent = await _groupController
-                        .SendGroupMessageAsync(_currentChatId, noiDung)
-                        .ConfigureAwait(true);
-
-
+                    // Nhóm: gửi lên Firebase, listener sẽ bắn event để append
+                    await _groupController.SendGroupMessageAsync(_currentChatId, noiDung).ConfigureAwait(true);
                 }
                 else
                 {
-
+                    // 1-1: gửi lên Firebase, listener sẽ bắn event để append
                     await _dmController.SendMessageAsync(_currentChatId, noiDung).ConfigureAwait(true);
                 }
             }
@@ -300,12 +289,8 @@ namespace ChatApp.Controllers
             {
                 MessageBox.Show(_uiOwner, "Lỗi gửi tin nhắn: " + ex.Message, "Lỗi",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                // (Tuỳ chọn) Bạn có thể append thêm 1 message "gửi thất bại" hoặc đổi style bubble,
-                // nhưng hiện ChatMessage chưa có field trạng thái nên mình không tự ý thêm.
             }
         }
-
 
         public async Task PickAndSendAttachmentAsync(IWin32Window owner)
         {
@@ -327,8 +312,9 @@ namespace ChatApp.Controllers
                 {
                     if (_isGroupChat)
                     {
-                        ChatMessage sent = await _groupController.SendGroupAttachmentMessageAsync(_currentChatId, ofd.FileName).ConfigureAwait(true);
-                        if (sent != null) _chatView.QueueAppend(sent, _currentChatId);
+                        // Realtime "chuẩn": chỉ gửi lên Firebase, KHÔNG append local.
+                        // Mọi client (kể cả người gửi) sẽ nhận lại qua listener -> UI append 1 lần, không trùng.
+                        await _groupController.SendGroupAttachmentMessageAsync(_currentChatId, ofd.FileName).ConfigureAwait(true);
                     }
                     else
                     {
@@ -345,7 +331,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== UI HELPERS ======
+        #region ====== HỖ TRỢ CẬP NHẬT UI ======
 
         private void SetTitleSafe(string title)
         {
@@ -384,7 +370,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {

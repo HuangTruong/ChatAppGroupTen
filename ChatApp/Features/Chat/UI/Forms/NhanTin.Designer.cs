@@ -43,9 +43,9 @@
             this.btnTaoNhom = new Guna.UI2.WinForms.Guna2Button();
             this.btnSearchFriends = new Guna.UI2.WinForms.Guna2Button();
             this.btnRequest = new Guna.UI2.WinForms.Guna2Button();
-            this.btnRefresh = new Guna.UI2.WinForms.Guna2Button();
             this.lblTenNguoiDung = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
+            this.lblThongTin = new Guna.UI2.WinForms.Guna2HtmlLabel();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.pnlInput.SuspendLayout();
@@ -223,7 +223,7 @@
             this.lblTrangThai.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
             this.lblTrangThai.Size = new System.Drawing.Size(537, 30);
             this.lblTrangThai.TabIndex = 3;
-            this.lblTrangThai.Text = "Trạng Thái Người Dùng";
+            this.lblTrangThai.Text = "Trạng Thái";
             // 
             // lblTenDangNhapGiua
             // 
@@ -280,11 +280,11 @@
             // flpPhai
             // 
             this.flpPhai.BackColor = System.Drawing.Color.White;
+            this.flpPhai.Controls.Add(this.lblThongTin);
+            this.flpPhai.Controls.Add(this.lblTenNguoiDung);
             this.flpPhai.Controls.Add(this.btnTaoNhom);
             this.flpPhai.Controls.Add(this.btnSearchFriends);
             this.flpPhai.Controls.Add(this.btnRequest);
-            this.flpPhai.Controls.Add(this.btnRefresh);
-            this.flpPhai.Controls.Add(this.lblTenNguoiDung);
             this.flpPhai.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpPhai.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flpPhai.Location = new System.Drawing.Point(5, 5);
@@ -302,7 +302,7 @@
             this.btnTaoNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnTaoNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTaoNhom.ForeColor = System.Drawing.Color.White;
-            this.btnTaoNhom.Location = new System.Drawing.Point(23, 30);
+            this.btnTaoNhom.Location = new System.Drawing.Point(23, 78);
             this.btnTaoNhom.Margin = new System.Windows.Forms.Padding(23, 30, 3, 20);
             this.btnTaoNhom.Name = "btnTaoNhom";
             this.btnTaoNhom.Size = new System.Drawing.Size(180, 46);
@@ -318,7 +318,7 @@
             this.btnSearchFriends.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnSearchFriends.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnSearchFriends.ForeColor = System.Drawing.Color.White;
-            this.btnSearchFriends.Location = new System.Drawing.Point(23, 96);
+            this.btnSearchFriends.Location = new System.Drawing.Point(23, 144);
             this.btnSearchFriends.Margin = new System.Windows.Forms.Padding(23, 0, 3, 20);
             this.btnSearchFriends.Name = "btnSearchFriends";
             this.btnSearchFriends.Size = new System.Drawing.Size(180, 46);
@@ -335,7 +335,7 @@
             this.btnRequest.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnRequest.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnRequest.ForeColor = System.Drawing.Color.White;
-            this.btnRequest.Location = new System.Drawing.Point(23, 162);
+            this.btnRequest.Location = new System.Drawing.Point(23, 210);
             this.btnRequest.Margin = new System.Windows.Forms.Padding(23, 0, 3, 20);
             this.btnRequest.Name = "btnRequest";
             this.btnRequest.Size = new System.Drawing.Size(180, 46);
@@ -343,27 +343,10 @@
             this.btnRequest.Text = "Lời Mời";
             this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
             // 
-            // btnRefresh
-            // 
-            this.btnRefresh.BorderRadius = 20;
-            this.btnRefresh.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnRefresh.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnRefresh.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnRefresh.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnRefresh.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
-            this.btnRefresh.ForeColor = System.Drawing.Color.White;
-            this.btnRefresh.Location = new System.Drawing.Point(23, 228);
-            this.btnRefresh.Margin = new System.Windows.Forms.Padding(23, 0, 3, 20);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(180, 46);
-            this.btnRefresh.TabIndex = 9;
-            this.btnRefresh.Text = "Tải Lại Trang";
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            // 
             // lblTenNguoiDung
             // 
             this.lblTenNguoiDung.BackColor = System.Drawing.Color.Transparent;
-            this.lblTenNguoiDung.Location = new System.Drawing.Point(3, 297);
+            this.lblTenNguoiDung.Location = new System.Drawing.Point(3, 27);
             this.lblTenNguoiDung.Name = "lblTenNguoiDung";
             this.lblTenNguoiDung.Size = new System.Drawing.Size(96, 18);
             this.lblTenNguoiDung.TabIndex = 0;
@@ -384,6 +367,15 @@
             this.pnlBackground.Padding = new System.Windows.Forms.Padding(12);
             this.pnlBackground.Size = new System.Drawing.Size(1181, 654);
             this.pnlBackground.TabIndex = 1;
+            // 
+            // lblThongTin
+            // 
+            this.lblThongTin.BackColor = System.Drawing.Color.Transparent;
+            this.lblThongTin.Location = new System.Drawing.Point(3, 3);
+            this.lblThongTin.Name = "lblThongTin";
+            this.lblThongTin.Size = new System.Drawing.Size(166, 18);
+            this.lblThongTin.TabIndex = 9;
+            this.lblThongTin.Text = "THÔNG TIN NGƯỜI DÙNG";
             // 
             // NhanTin
             // 
@@ -434,7 +426,7 @@
         private Guna.UI2.WinForms.Guna2Panel pnlDanhSachChat;
         private Guna.UI2.WinForms.Guna2Panel pnlButtons;
         private Guna.UI2.WinForms.Guna2Button btnGui;
-        private Guna.UI2.WinForms.Guna2Button btnRefresh;
         private Guna.UI2.WinForms.Guna2HtmlLabel lblTenNguoiDung;
+        private Guna.UI2.WinForms.Guna2HtmlLabel lblThongTin;
     }
 }

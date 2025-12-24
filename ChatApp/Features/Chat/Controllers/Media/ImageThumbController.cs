@@ -17,7 +17,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ImageThumbController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly object _lock = new object();
         private readonly Dictionary<string, Image> _cache = new Dictionary<string, Image>(StringComparer.Ordinal);
@@ -30,7 +30,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public ImageThumbController()
         {
@@ -39,7 +39,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== PUBLIC API ======
+        #region ====== HÀM CÔNG KHAI ======
 
         public Image GetOrCreatePlaceholder()
         {
@@ -163,7 +163,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CACHE ======
+        #region ====== BỘ NHỚ ĐỆM (CACHE) ======
 
         private void AddToCache(string key, Image img)
         {
@@ -195,7 +195,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== THUMBNAIL ======
+        #region ====== TẠO THUMBNAIL ======
 
         private static Image SafeCreateThumb(string base64, int maxW, int maxH)
         {
@@ -246,7 +246,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {

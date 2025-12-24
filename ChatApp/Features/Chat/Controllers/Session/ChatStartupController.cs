@@ -14,7 +14,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ChatStartupController
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly string _currentUserId;
         private readonly ThemeService _themeService;
@@ -26,7 +26,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public ChatStartupController(
             string currentUserId,
@@ -47,7 +47,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== INIT ======
+        #region ====== KHỞI TẠO BAN ĐẦU ======
 
         public async Task InitializeAsync()
         {
