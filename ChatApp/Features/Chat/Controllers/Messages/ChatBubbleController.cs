@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,7 +21,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ChatBubbleController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly string _currentUserId;
         private readonly Control _uiOwner;
@@ -44,7 +46,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public ChatBubbleController(
             string currentUserId,
@@ -71,7 +73,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== BIND ======
+        #region ====== GẮN CONTAINER / ROOT RENDER ======
 
         /// <summary>
         /// (Cách cũ) Bind container FlowLayoutPanel.
@@ -103,30 +105,101 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== AVATAR PLACEHOLDER ======
+        #region ====== AVATAR MẶC ĐỊNH ======
 
         public Image GetAvatarPlaceholder()
         {
+            // KHÔNG dùng placeholder vẽ nữa.
+            // Nếu không có avatar trên Firebase => dùng ảnh mặc định default_avatar.png trong Resources.
             if (_avatarPlaceholder != null) return _avatarPlaceholder;
 
-            Bitmap bmp = new Bitmap(64, 64);
-            using (Graphics g = Graphics.FromImage(bmp))
+            _avatarPlaceholder = LoadDefaultAvatar();
+            return _avatarPlaceholder;
+        }
+
+        private static Image LoadDefaultAvatar()
+        {
+            // 1) Ưu tiên: Properties.Resources (nếu bạn Add ảnh vào Resources.resx)
+            Image embedded = TryLoadFromEmbeddedResources();
+            if (embedded != null) return embedded;
+
+            // 2) Fallback: file Resources/default_avatar.png (cần Copy to Output Directory)
+            try
             {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.Clear(Color.LightGray);
-                using (Pen p = new Pen(Color.Gray))
+                string path = Path.Combine(Application.StartupPath, "Resources", "default_avatar.png");
+                if (!File.Exists(path)) return null;
+
+                byte[] bytes = File.ReadAllBytes(path);
+                using (MemoryStream ms = new MemoryStream(bytes))
+                using (Image tmp = Image.FromStream(ms))
                 {
-                    g.DrawEllipse(p, 2, 2, 60, 60);
+                    return (Image)tmp.Clone();
                 }
             }
+            catch
+            {
+                return null;
+            }
+        }
 
-            _avatarPlaceholder = bmp;
-            return _avatarPlaceholder;
+        private static Image TryLoadFromEmbeddedResources()
+        {
+            try
+            {
+                Assembly asm = typeof(ChatBubbleController).Assembly;
+                Type resType = null;
+
+                Type[] types = asm.GetTypes();
+                for (int i = 0; i < types.Length; i++)
+                {
+                    Type t = types[i];
+                    if (t == null) continue;
+
+                    string full = t.FullName;
+                    if (string.IsNullOrEmpty(full)) continue;
+
+                    if (full.EndsWith(".Properties.Resources", StringComparison.Ordinal))
+                    {
+                        resType = t;
+                        break;
+                    }
+                }
+
+                if (resType == null) return null;
+
+                PropertyInfo prop = resType.GetProperty("default_avatar", BindingFlags.Public | BindingFlags.Static);
+                if (prop == null)
+                {
+                    PropertyInfo[] props = resType.GetProperties(BindingFlags.Public | BindingFlags.Static);
+                    for (int i = 0; i < props.Length; i++)
+                    {
+                        PropertyInfo p = props[i];
+                        if (p == null) continue;
+                        if (p.Name != null && p.Name.IndexOf("default_avatar", StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            prop = p;
+                            break;
+                        }
+                    }
+                }
+
+                if (prop == null) return null;
+
+                object val = prop.GetValue(null, null);
+                Image img = val as Image;
+                if (img == null) return null;
+
+                return (Image)img.Clone();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         #endregion
 
-        #region ====== CORE: ADD / CREATE BUBBLE ======
+        #region ====== TẠO BUBBLE / THÊM VÀO CONTAINER ======
 
         /// <summary>
         /// Callback cho ChatRenderer (cách cũ): tạo bubble và add vào FlowLayoutPanel container.
@@ -214,7 +287,7 @@ namespace ChatApp.Controllers
                     message = msg.Text ?? string.Empty;
                 }
 
-                bubble.SetMessage(displayName, message, time, isMine);
+                bubble.SetMessage(msg.SenderId, displayName, message, time, isMine);
 
                 if (laTinFile)
                 {
@@ -239,7 +312,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPLAY NAME ======
+        #region ====== XỬ LÝ TÊN HIỂN THỊ (DISPLAY NAME) ======
 
         private string ResolveDisplayName(ChatMessage msg, bool isMine)
         {
@@ -335,7 +408,7 @@ namespace ChatApp.Controllers
                             message = msg.Text ?? string.Empty;
                         }
 
-                        bubble.SetMessage(newName, message, time, false);
+                        bubble.SetMessage(msg.SenderId, newName, message, time, false);
 
                         if (laTinFile)
                         {
@@ -382,7 +455,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CLICK: FILE ======
+        #region ====== SỰ KIỆN CLICK: FILE ======
 
         private void AttachFileClickRecursive(Control root)
         {
@@ -412,7 +485,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CLICK: IMAGE ======
+        #region ====== SỰ KIỆN CLICK: ẢNH ======
 
         private void AttachImageClickRecursive(Control root)
         {
@@ -437,7 +510,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== TAG HELPER ======
+        #region ====== HỖ TRỢ LẤY TAG (CHATMESSAGE) ======
 
         private ChatMessage FindChatMessageFromTag(Control start)
         {
@@ -453,7 +526,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {

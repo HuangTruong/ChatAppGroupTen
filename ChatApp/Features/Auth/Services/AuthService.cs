@@ -412,6 +412,16 @@ namespace ChatApp.Services.Firebase
             return userProfile;
         }
 
+        public async Task <string> GetLoccalIdbyDisplayName (string DisplayName)
+        {
+            var user = await _http.GetAsync<User>(DisplayName);
+            if (user != null)
+            {
+                return user.LocalId;
+            }
+            return null;
+        }
+
         #endregion
     }
 }

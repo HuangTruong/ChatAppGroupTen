@@ -8,15 +8,15 @@ using System.Windows.Forms;
 namespace ChatApp.Controllers
 {
     /// <summary>
-    /// Controller gom flow tạo nhóm:
-    /// - Show form TaoNhom
-    /// - CreateGroupAsync
-    /// - Reload danh sách hội thoại
-    /// - Open group vừa tạo
+    /// Controller gom luồng tạo nhóm:
+    /// - Mở form TaoNhom để chọn tên nhóm + thành viên
+    /// - Gọi CreateGroupAsync để tạo nhóm trên Firebase
+    /// - Reload lại danh sách hội thoại (để thấy nhóm mới)
+    /// - Tự mở nhóm vừa tạo để bắt đầu chat ngay
     /// </summary>
     public class GroupCreateController
     {
-        #region ====== FIELDS ======
+        #region ====== BIẾN THÀNH VIÊN ======
 
         private readonly string _currentUserId;
         private readonly string _token;
@@ -24,11 +24,14 @@ namespace ChatApp.Controllers
         private readonly NhanTinNhomController _groupController;
         private readonly ConversationListController _conversationListController;
 
+        /// <summary>
+        /// Callback mở group theo groupId (thường gọi ChatSessionController.OpenGroupConversationById).
+        /// </summary>
         private readonly Action<string> _openGroupById;
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public GroupCreateController(
             string currentUserId,
@@ -46,7 +49,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== FLOW ======
+        #region ====== LUỒNG TẠO NHÓM ======
 
         public void ShowCreateGroupFlow(IWin32Window owner, Dictionary<string, User> friends)
         {
@@ -57,7 +60,7 @@ namespace ChatApp.Controllers
                 return;
             }
 
-            // chạy async để không block UI khi create + reload
+            // Chạy async để không block UI khi create + reload
             _ = RunCreateGroupAsync(owner, friends);
         }
 
@@ -67,21 +70,30 @@ namespace ChatApp.Controllers
             {
                 using (TaoNhom f = new TaoNhom(friends, _currentUserId, _token))
                 {
-                    if (f.ShowDialog(owner) != DialogResult.OK) return;
+                    DialogResult dr = f.ShowDialog(owner);
+                    if (dr != DialogResult.OK)
+                    {
+                        return;
+                    }
 
                     string groupName = f.GroupName;
                     List<string> members = f.SelectedMemberIds;
 
-                    string newGroupId = await _groupController.CreateGroupAsync(groupName, members).ConfigureAwait(true);
+                    string newGroupId = await _groupController
+                        .CreateGroupAsync(_currentUserId, groupName, members)
+                        .ConfigureAwait(true);
 
                     if (_conversationListController != null)
                     {
                         await _conversationListController.ReloadAsync().ConfigureAwait(true);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(newGroupId) && _openGroupById != null)
+                    if (!string.IsNullOrWhiteSpace(newGroupId))
                     {
-                        _openGroupById(newGroupId);
+                        if (_openGroupById != null)
+                        {
+                            _openGroupById(newGroupId);
+                        }
                     }
                 }
             }

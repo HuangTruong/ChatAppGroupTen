@@ -9,39 +9,41 @@ using System.Windows.Forms;
 namespace ChatApp
 {
     /// <summary>
-    /// Form Nhắn tin (thin view):
-    /// - Chỉ làm nhiệm vụ: hook event + gọi Controller
-    /// - Mọi logic "làm việc" (listen, render bubble, send file, download...) nằm ở Controllers
+    /// NhanTin (thin view): Form nhắn tin “mỏng”.
+    /// - Form chỉ lo: khởi tạo, gắn sự kiện, gọi controller
+    /// - Toàn bộ logic làm việc (listen realtime, render chat, gửi file/tin, tải file, mở ảnh...)
+    ///   đã được tách ra Controllers/Services để dễ bảo trì và mở rộng.
     /// </summary>
     public partial class NhanTin : Form
     {
-        #region ====== CORE FIELDS ======
+        #region ====== THÔNG TIN ĐĂNG NHẬP ======
 
         private readonly string _idDangNhap;
         private readonly string _tokenDangNhap;
 
         #endregion
 
-        #region ====== SERVICES ======
+        #region ====== SERVICES (NỀN) ======
 
         private readonly ThemeService _themeService = new ThemeService();
         private readonly AuthService _authService = new AuthService();
 
         #endregion
 
-        #region ====== DOMAIN CONTROLLERS ======
+        #region ====== CONTROLLERS XỬ LÝ DỮ LIỆU ======
 
         private readonly NhanTinController _nhanTinController;
         private readonly NhanTinNhomController _nhanTinNhomController;
 
         #endregion
 
-        #region ====== UI CONTROLLERS ======
+        #region ====== CONTROLLERS/UI: RENDER & TƯƠNG TÁC ======
 
         private const string GROUP_TAG_PREFIX = "GROUP:";
 
         private readonly AvatarController _avatarController;
         private readonly ConversationListController _conversationListController;
+
         private readonly GroupSenderNameController _groupSenderNameController;
         private readonly ImageThumbController _imageThumbController;
 
@@ -57,7 +59,7 @@ namespace ChatApp
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== KHỞI TẠO FORM ======
 
         /// <summary>
         /// Khởi tạo form Nhắn tin với localId + token hiện tại.
@@ -69,14 +71,13 @@ namespace ChatApp
             _idDangNhap = localId;
             _tokenDangNhap = token;
 
-            // TLS 1.2 để tải HTTPS ổn định hơn
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            ServicePointManager.Expect100Continue = false;
-            ServicePointManager.CheckCertificateRevocationList = false;
+            SetupNetworkDefaults();
 
-            _nhanTinController = new NhanTinController(localId, token);
-            _nhanTinNhomController = new NhanTinNhomController(localId, token);
+            // Controller dữ liệu
+            _nhanTinController = new NhanTinController(_idDangNhap, _tokenDangNhap);
+            _nhanTinNhomController = new NhanTinNhomController(_idDangNhap, _tokenDangNhap);
 
+            // Controller UI hỗ trợ
             _avatarController = new AvatarController();
             _groupSenderNameController = new GroupSenderNameController(_authService);
             _imageThumbController = new ImageThumbController();
@@ -84,7 +85,7 @@ namespace ChatApp
             _fileDownloadController = new FileDownloadController();
             _imageViewerController = new ImageViewerController();
 
-            // Bubble controller sẽ là nơi tạo MessageBubbles + hook click
+            // Bubble controller: tạo MessageBubbles + gắn click (file/ảnh) + cập nhật tên sender nhóm
             _chatBubbleController = new ChatBubbleController(
                 currentUserId: _idDangNhap,
                 uiOwner: this,
@@ -95,17 +96,16 @@ namespace ChatApp
                 imageViewerController: _imageViewerController
             );
 
-            // Chat view controller sẽ wrap ChatRenderer (render trực tiếp lên pnlKhungChat, KHÔNG dùng FlowLayoutPanel)
+            // Chat view controller: wrap ChatRenderer (render trực tiếp lên pnlKhungChat)
             _chatViewController = new ChatViewController(
                 hostPanel: pnlKhungChat,
                 bubbleFactory: _chatBubbleController.CreateBubbleControl
             );
 
-            // init renderer + bind root để controller có thể update bubble đã render (tên người gửi nhóm, ...)
             _chatViewController.Initialize();
             _chatBubbleController.BindRenderRoot(pnlKhungChat);
 
-            // Session controller: quản lý "đang chat ai/nhóm", start/stop listen, gọi render
+            // Session controller: quản lý “đang chat ai/nhóm”, start/stop listen, render initial/append
             _chatSessionController = new ChatSessionController(
                 currentUserId: _idDangNhap,
                 token: _tokenDangNhap,
@@ -122,14 +122,17 @@ namespace ChatApp
                 chatBubbleController: _chatBubbleController
             );
 
-            // Danh sách conversation: click item sẽ chuyển cuộc trò chuyện qua SessionController
+            // Conversation list: click item sẽ gọi SessionController để mở hội thoại
             _conversationListController = new ConversationListController(
                 pnlDanhSachChat,
                 loadFriendsAsync: delegate { return _nhanTinController.GetFriendUsersAsync(_idDangNhap); },
                 loadGroupsAsync: delegate { return _nhanTinNhomController.GetMyGroupsAsync(); },
                 onItemClicked: delegate (object sender, EventArgs e)
                 {
-                    if (_chatSessionController != null) _chatSessionController.OnConversationItemClicked(sender, e, GROUP_TAG_PREFIX, _conversationListController);
+                    if (_chatSessionController != null)
+                    {
+                        _chatSessionController.OnConversationItemClicked(sender, e, GROUP_TAG_PREFIX, _conversationListController);
+                    }
                 },
                 groupTagPrefix: GROUP_TAG_PREFIX
             );
@@ -141,10 +144,16 @@ namespace ChatApp
                 authService: _authService,
                 conversationListController: _conversationListController,
                 applyTheme: delegate (bool isDark) { ThemeManager.ApplyTheme(this, isDark); },
-                setMeName: delegate (string name) { if (!string.IsNullOrWhiteSpace(name)) lblTenNguoiDung.Text = name; }
+                setMeName: delegate (string name)
+                {
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        lblTenNguoiDung.Text = name;
+                    }
+                }
             );
 
-            // Tạo nhóm + reload list + open group
+            // Create group: mở form tạo nhóm + create/reload/open group mới
             _groupCreateController = new GroupCreateController(
                 currentUserId: _idDangNhap,
                 token: _tokenDangNhap,
@@ -152,16 +161,27 @@ namespace ChatApp
                 conversationListController: _conversationListController,
                 openGroupById: delegate (string groupId)
                 {
-                    if (_chatSessionController != null) _chatSessionController.OpenGroupConversationById(groupId, _conversationListController);
+                    if (_chatSessionController != null)
+                    {
+                        _chatSessionController.OpenGroupConversationById(groupId, _conversationListController);
+                    }
                 }
             );
 
             HookEvents();
         }
 
+        private static void SetupNetworkDefaults()
+        {
+            // TLS 1.2 để HTTPS ổn định hơn (tải file / gọi REST)
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.Expect100Continue = false;
+            ServicePointManager.CheckCertificateRevocationList = false;
+        }
+
         #endregion
 
-        #region ====== EVENTS HOOK ======
+        #region ====== GẮN SỰ KIỆN ======
 
         private void HookEvents()
         {
@@ -183,32 +203,37 @@ namespace ChatApp
 
         #endregion
 
-        #region ====== LIFECYCLE ======
+        #region ====== VÒNG ĐỜI FORM ======
 
         private async void NhanTin_Load(object sender, EventArgs e)
         {
-            await _chatStartupController.InitializeAsync();
+            await _chatStartupController.InitializeAsync().ConfigureAwait(true);
         }
 
         private void NhanTin_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            SafeDisposeAll();
+        }
+
+        private void SafeDisposeAll()
         {
             try { if (_chatSessionController != null) _chatSessionController.Dispose(); } catch { }
 
             try { if (_chatViewController != null) _chatViewController.Dispose(); } catch { }
             try { if (_chatBubbleController != null) _chatBubbleController.Dispose(); } catch { }
 
-            try { _nhanTinController.Dispose(); } catch { }
-            try { _nhanTinNhomController.Dispose(); } catch { }
+            try { if (_nhanTinController != null) _nhanTinController.Dispose(); } catch { }
+            try { if (_nhanTinNhomController != null) _nhanTinNhomController.Dispose(); } catch { }
 
-            try { _conversationListController.Dispose(); } catch { }
-            try { _groupSenderNameController.Dispose(); } catch { }
-            try { _imageThumbController.Dispose(); } catch { }
-            try { _fileDownloadController.Dispose(); } catch { }
+            try { if (_conversationListController != null) _conversationListController.Dispose(); } catch { }
+            try { if (_groupSenderNameController != null) _groupSenderNameController.Dispose(); } catch { }
+            try { if (_imageThumbController != null) _imageThumbController.Dispose(); } catch { }
+            try { if (_fileDownloadController != null) _fileDownloadController.Dispose(); } catch { }
         }
 
         #endregion
 
-        #region ====== INPUT / SEND ======
+        #region ====== NHẬP & GỬI TIN NHẮN ======
 
         private void TxtNhapTinNhan_KeyDown(object sender, KeyEventArgs e)
         {
@@ -224,21 +249,20 @@ namespace ChatApp
             string text = (txtNhapTinNhan.Text ?? string.Empty).Trim();
             txtNhapTinNhan.Clear();
 
-            await _chatSessionController.SendTextAsync(text);
+            await _chatSessionController.SendTextAsync(text).ConfigureAwait(true);
         }
 
         private async void PicSendFile_Click(object sender, EventArgs e)
         {
-            await _chatSessionController.PickAndSendAttachmentAsync(this);
+            await _chatSessionController.PickAndSendAttachmentAsync(this).ConfigureAwait(true);
         }
 
         #endregion
 
-        #region ====== RIGHT PANEL BUTTONS ======
+        #region ====== CÁC NÚT CHỨC NĂNG ======
 
         private void btnTaoNhom_Click(object sender, EventArgs e)
         {
-            // Dùng controller để mở form tạo nhóm + xử lý create/reload/open
             _groupCreateController.ShowCreateGroupFlow(this, _conversationListController.Friends);
         }
 
@@ -266,17 +290,12 @@ namespace ChatApp
 
             var pt = picEmoji.PointToScreen(System.Drawing.Point.Empty);
             frm.StartPosition = FormStartPosition.Manual;
-            frm.Location = new System.Drawing.Point(pt.X - (frm.Width / 2) + (picEmoji.Width / 2), pt.Y - frm.Height - 10);
-            frm.Show();
-        }
+            frm.Location = new System.Drawing.Point(
+                pt.X - (frm.Width / 2) + (picEmoji.Width / 2),
+                pt.Y - frm.Height - 10
+            );
 
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            Hide();
-            NhanTin f = new NhanTin(_idDangNhap, _tokenDangNhap);
-            f.TopMost = true;
-            f.Show();
-            Close();
+            frm.Show();
         }
 
         #endregion

@@ -12,14 +12,16 @@ namespace ChatApp.Services.Firebase
     /// </summary>
     public class HttpService
     {
-        #region ====== FIELDS ======
+        #region ====== BIẾN THÀNH VIÊN ======
 
         /// <summary>
         /// HttpClient dùng chung trong HttpService.
         /// </summary>
         private readonly HttpClient _client = new HttpClient();
 
+        #endregion
 
+        #region ====== HÀM DÙNG CHUNG ======
 
         /// <summary>
         /// Ném Exception nếu HTTP response không thành công (để không bị fail-silent).
@@ -49,21 +51,33 @@ namespace ChatApp.Services.Firebase
         /// <summary>
         /// Gửi request POST với body JSON và deserialize phản hồi về kiểu T.
         /// </summary>
-        /// <typeparam name="T">Kiểu dữ liệu mong muốn cho phản hồi.</typeparam>
-        /// <param name="url">Địa chỉ endpoint.</param>
-        /// <param name="data">Đối tượng sẽ được serialize sang JSON.</param>
-        /// <returns>Đối tượng kiểu T đọc được từ JSON phản hồi.</returns>
         public async Task<T> PostAsync<T>(string url, object data)
         {
-            var json = JsonConvert.SerializeObject(data);
-            var http = new StringContent(json, Encoding.UTF8, "application/json");
+            string json = JsonConvert.SerializeObject(data);
+            StringContent http = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var res = await _client.PostAsync(url, http).ConfigureAwait(false);
-            var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
-
+            HttpResponseMessage res = await _client.PostAsync(url, http).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             EnsureSuccess(res, body);
             return JsonConvert.DeserializeObject<T>(body);
+        }
+
+        #endregion
+
+        #region ====== GET (RAW) ======
+
+        /// <summary>
+        /// Gửi request GET và trả về chuỗi raw (không deserialize).
+        /// Dùng cho các endpoint trả về string/null hoặc cần tự parse.
+        /// </summary>
+        public async Task<string> GetRawAsync(string url)
+        {
+            HttpResponseMessage res = await _client.GetAsync(url).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            EnsureSuccess(res, body);
+            return body;
         }
 
         #endregion
@@ -73,14 +87,10 @@ namespace ChatApp.Services.Firebase
         /// <summary>
         /// Gửi request GET và deserialize JSON phản hồi về kiểu T.
         /// </summary>
-        /// <typeparam name="T">Kiểu dữ liệu mong muốn cho phản hồi.</typeparam>
-        /// <param name="url">Địa chỉ endpoint.</param>
-        /// <returns>Đối tượng kiểu T đọc được từ JSON phản hồi.</returns>
         public async Task<T> GetAsync<T>(string url)
         {
-            var res = await _client.GetAsync(url).ConfigureAwait(false);
-            var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
-
+            HttpResponseMessage res = await _client.GetAsync(url).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             EnsureSuccess(res, body);
             return JsonConvert.DeserializeObject<T>(body);
@@ -94,15 +104,14 @@ namespace ChatApp.Services.Firebase
         /// Gửi request PUT với body JSON (không cần đọc phản hồi).
         /// Thường dùng để ghi đè node trên Firebase Realtime Database.
         /// </summary>
-        /// <param name="url">Địa chỉ endpoint.</param>
-        /// <param name="data">Đối tượng sẽ được serialize sang JSON.</param>
         public async Task PutAsync(string url, object data)
         {
-            var json = JsonConvert.SerializeObject(data);
-            var http = new StringContent(json, Encoding.UTF8, "application/json");
+            string json = JsonConvert.SerializeObject(data);
+            StringContent http = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var res = await _client.PutAsync(url, http).ConfigureAwait(false);
-            var body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+            HttpResponseMessage res = await _client.PutAsync(url, http).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+
             EnsureSuccess(res, body);
         }
 
@@ -111,31 +120,22 @@ namespace ChatApp.Services.Firebase
         #region ====== PATCH (JSON) ======
 
         /// <summary>
-        /// Gửi request PATCH với body JSON (không cần đọc phản hồi).
+        /// Gửi request PATCH với body JSON.
         /// Thường dùng để cập nhật một phần dữ liệu (update field) trên Firebase.
         /// </summary>
-        /// <param name="url">Địa chỉ endpoint.</param>
-        /// <param name="data">Đối tượng sẽ được serialize sang JSON.</param>
         public async Task PatchAsync(string url, object data)
         {
-            var json = JsonConvert.SerializeObject(data);
+            string json = JsonConvert.SerializeObject(data);
 
-            var method = new HttpMethod("PATCH");
-            var req = new HttpRequestMessage(method, url)
-            {
-                Content = new StringContent(json, Encoding.UTF8, "application/json")
-            };
+            HttpMethod method = new HttpMethod("PATCH");
+            HttpRequestMessage req = new HttpRequestMessage(method, url);
+            req.Content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            await _client.SendAsync(req).ConfigureAwait(false);
+            HttpResponseMessage res = await _client.SendAsync(req).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            EnsureSuccess(res, body);
         }
-
-        //// Nếu project target .NET hỗ trợ PatchAsync sẵn có thể dùng phiên bản này:
-        ////public async Task PatchAsync(string url, object data)
-        ////{
-        ////    var json = JsonConvert.SerializeObject(data);
-        ////    var http = new StringContent(json, Encoding.UTF8, "application/json");
-        ////    await _client.PatchAsync(url, http);
-        ////}
 
         #endregion
 
@@ -144,10 +144,12 @@ namespace ChatApp.Services.Firebase
         /// <summary>
         /// Gửi request DELETE tới endpoint, thường dùng để xóa node trên Firebase.
         /// </summary>
-        /// <param name="url">Địa chỉ endpoint.</param>
         public async Task DeleteAsync(string url)
         {
-            await _client.DeleteAsync(url).ConfigureAwait(false);
+            HttpResponseMessage res = await _client.DeleteAsync(url).ConfigureAwait(false);
+            string body = await res.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            EnsureSuccess(res, body);
         }
 
         #endregion

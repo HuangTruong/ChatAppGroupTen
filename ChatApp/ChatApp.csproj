@@ -231,6 +231,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Features\Chat\Controllers\Media\AvatarController.cs" />
+    <Compile Include="Features\Chat\Controllers\Session\RealtimeMessageListener.cs" />
     <Compile Include="Features\Settings\Controllers\CaiDatController.cs" />
     <Compile Include="Features\Chat\Controllers\Messages\ChatBubbleController.cs" />
     <Compile Include="Features\Chat\Controllers\Session\ChatSessionController.cs" />
@@ -459,12 +460,10 @@
     <None Include="Resources\Logo.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\AvatarMacDinh.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\check.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\default_avatar.png" />
     <Content Include="Resources\Emoji\cool.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

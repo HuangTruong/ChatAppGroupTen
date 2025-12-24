@@ -7,19 +7,28 @@ using System.Threading.Tasks;
 namespace ChatApp.Services.Firebase
 {
     /// <summary>
-    /// Service xử lý tin nhắn nhóm:
-    /// - Send text / file
-    /// - Load history / load incremental
-    /// Node: groupMessages/{groupId}/{messageId}
+    /// GroupMessageService: Service làm việc với tin nhắn nhóm trên Firebase (REST).
+    ///
+    /// Bạn cần nhớ 1 node chính:
+    /// - groupMessages/{groupId}/{messageId}
+    ///
+    /// Service này làm 2 việc:
+    /// 1) Gửi tin nhắn (text / file / image)
+    /// 2) Tải lịch sử (tất cả / từ mốc thời gian / gần nhất)
     /// </summary>
     public class GroupMessageService
     {
+        #region ====== BIẾN THÀNH VIÊN ======
+
         private readonly HttpService _http = new HttpService();
 
-        #region ====== INTERNAL DTO ======
+        #endregion
+
+        #region ====== DTO NỘI BỘ (DỮ LIỆU LƯU TRÊN FIREBASE) ======
 
         /// <summary>
         /// Dữ liệu tin nhắn nhóm lưu trên Firebase.
+        /// (Đây là schema JSON của 1 message trong groupMessages/{groupId}/{messageId})
         /// </summary>
         public class GroupMessageData
         {
@@ -28,7 +37,7 @@ namespace ChatApp.Services.Firebase
             public long Timestamp { get; set; }
 
             /// <summary>
-            /// "text" / "file" / "image".
+            /// Loại tin: "text" / "file" / "image"
             /// </summary>
             public string Type { get; set; }
 
@@ -40,6 +49,10 @@ namespace ChatApp.Services.Firebase
             public string ImageBase64 { get; set; }
         }
 
+        /// <summary>
+        /// Kết quả trả về khi POST lên Firebase:
+        /// Firebase sẽ trả { "name": "pushKey..." }
+        /// </summary>
         private class FirebasePostResult
         {
             public string name { get; set; }
@@ -47,14 +60,26 @@ namespace ChatApp.Services.Firebase
 
         #endregion
 
-        #region ====== URL HELPERS ======
+        #region ====== HỖ TRỢ TẠO URL FIREBASE ======
 
         private static string Db(string path, string token)
         {
-            if (path == null) path = string.Empty;
+            if (path == null)
+            {
+                path = string.Empty;
+            }
 
-            string auth = string.IsNullOrEmpty(token) ? string.Empty : ("?auth=" + token);
-            return FirebaseConfig.DatabaseUrl.TrimEnd('/') + "/" + path + ".json" + auth;
+            string authQuery;
+            if (string.IsNullOrEmpty(token))
+            {
+                authQuery = string.Empty;
+            }
+            else
+            {
+                authQuery = "?auth=" + token;
+            }
+
+            return FirebaseConfig.DatabaseUrl.TrimEnd('/') + "/" + path + ".json" + authQuery;
         }
 
         private static string AppendQuery(string baseUrl, string query)
@@ -64,23 +89,31 @@ namespace ChatApp.Services.Firebase
                 return baseUrl;
             }
 
-            return baseUrl + (baseUrl.Contains("?") ? "&" : "?") + query;
+            bool hasQuestion = baseUrl.Contains("?");
+            if (hasQuestion)
+            {
+                return baseUrl + "&" + query;
+            }
+
+            return baseUrl + "?" + query;
         }
 
         /// <summary>
-        /// Quote chuỗi đúng kiểu Firebase REST query (orderBy="Timestamp").
+        /// Bọc chuỗi theo format query của Firebase REST:
+        /// ví dụ orderBy="Timestamp"
         /// </summary>
-        private static string Q(string value)
+        private static string QuoteForFirebase(string value)
         {
             return "\"" + value + "\"";
         }
 
         #endregion
 
-        #region ====== SEND TEXT / FILE ======
+        #region ====== GỬI TIN NHẮN NHÓM ======
 
         /// <summary>
         /// Gửi tin nhắn text vào groupMessages/{groupId}.
+        /// Trả về messageId (push key) nếu thành công.
         /// </summary>
         public async Task<string> SendTextAsync(
             string groupId,
@@ -113,10 +146,16 @@ namespace ChatApp.Services.Firebase
             data.Timestamp = timestamp;
             data.Type = "text";
 
-            FirebasePostResult res = await _http.PostAsync<FirebasePostResult>(
-                Db("groupMessages/" + gid, token), data).ConfigureAwait(false);
+            FirebasePostResult res = await _http
+                .PostAsync<FirebasePostResult>(Db("groupMessages/" + gid, token), data)
+                .ConfigureAwait(false);
 
-            return res != null ? res.name : null;
+            if (res == null)
+            {
+                return null;
+            }
+
+            return res.name;
         }
 
         /// <summary>
@@ -130,6 +169,7 @@ namespace ChatApp.Services.Firebase
 
         /// <summary>
         /// Gửi tin nhắn file vào groupMessages/{groupId}.
+        /// Trả về messageId (push key) nếu thành công.
         /// </summary>
         public async Task<string> SendFileAsync(
             string groupId,
@@ -163,20 +203,26 @@ namespace ChatApp.Services.Firebase
             data.Content = string.Empty;
             data.Timestamp = timestamp;
             data.Type = "file";
-            data.FileName = fileName ?? string.Empty;
+            data.FileName = fileName == null ? string.Empty : fileName;
             data.FileSize = fileSize;
             data.FileUrl = fileUrl;
 
-            FirebasePostResult res = await _http.PostAsync<FirebasePostResult>(
-                Db("groupMessages/" + gid, token), data).ConfigureAwait(false);
+            FirebasePostResult res = await _http
+                .PostAsync<FirebasePostResult>(Db("groupMessages/" + gid, token), data)
+                .ConfigureAwait(false);
 
-            return res != null ? res.name : null;
+            if (res == null)
+            {
+                return null;
+            }
+
+            return res.name;
         }
-
 
         /// <summary>
         /// Gửi tin nhắn ảnh (base64) vào groupMessages/{groupId}.
-        /// Lưu ý: base64 sẽ làm data lớn hơn, chỉ nên dùng cho ảnh dung lượng nhỏ/vừa.
+        /// Lưu ý: base64 làm JSON lớn hơn, chỉ nên dùng cho ảnh nhỏ/vừa.
+        /// Trả về messageId (push key) nếu thành công.
         /// </summary>
         public async Task<string> SendImageAsync(
             string groupId,
@@ -211,23 +257,30 @@ namespace ChatApp.Services.Firebase
             data.Content = string.Empty;
             data.Timestamp = timestamp;
             data.Type = "image";
-            data.FileName = fileName ?? string.Empty;
+            data.FileName = fileName == null ? string.Empty : fileName;
             data.FileSize = fileSize;
             data.ImageMimeType = string.IsNullOrWhiteSpace(mimeType) ? "image/*" : mimeType;
             data.ImageBase64 = imageBase64;
 
-            FirebasePostResult res = await _http.PostAsync<FirebasePostResult>(
-                Db("groupMessages/" + gid, token), data).ConfigureAwait(false);
+            FirebasePostResult res = await _http
+                .PostAsync<FirebasePostResult>(Db("groupMessages/" + gid, token), data)
+                .ConfigureAwait(false);
 
-            return res != null ? res.name : null;
+            if (res == null)
+            {
+                return null;
+            }
+
+            return res.name;
         }
 
         #endregion
 
-        #region ====== LOAD HISTORY ======
+        #region ====== TẢI LỊCH SỬ TIN NHẮN NHÓM ======
 
         /// <summary>
-        /// Load toàn bộ lịch sử tin nhắn nhóm.
+        /// Tải toàn bộ lịch sử tin nhắn nhóm.
+        /// Trả về Dictionary(messageId -> data).
         /// </summary>
         public async Task<Dictionary<string, GroupMessageData>> GetAllAsync(string groupId, string token = null)
         {
@@ -237,17 +290,22 @@ namespace ChatApp.Services.Firebase
                 throw new ArgumentException("groupId rỗng.");
             }
 
-            Dictionary<string, GroupMessageData> dict =
-                await _http.GetAsync<Dictionary<string, GroupMessageData>>(
-                    Db("groupMessages/" + gid, token)).ConfigureAwait(false);
+            Dictionary<string, GroupMessageData> dict = await _http
+                .GetAsync<Dictionary<string, GroupMessageData>>(Db("groupMessages/" + gid, token))
+                .ConfigureAwait(false);
 
-            return dict ?? new Dictionary<string, GroupMessageData>();
+            if (dict == null)
+            {
+                return new Dictionary<string, GroupMessageData>();
+            }
+
+            return dict;
         }
 
         /// <summary>
-        /// Load tin nhắn mới từ một mốc thời gian (Timestamp) trở đi.
-        /// Lưu ý: REST query của Firebase sẽ trả cả phần tử bằng startAt,
-        /// nên nên truyền sinceTimestamp+1 để tránh trùng.
+        /// Tải các tin nhắn từ mốc thời gian (Timestamp) trở đi.
+        /// Lưu ý: Firebase REST trả cả phần tử bằng startAt,
+        /// nên thường truyền sinceTimestamp + 1 để tránh trùng.
         /// </summary>
         public async Task<Dictionary<string, GroupMessageData>> GetSinceAsync(
             string groupId,
@@ -260,19 +318,25 @@ namespace ChatApp.Services.Firebase
                 throw new ArgumentException("groupId rỗng.");
             }
 
-            // orderBy="Timestamp"&startAt=123
-            string q = "orderBy=" + Uri.EscapeDataString(Q("Timestamp")) +
-                       "&startAt=" + startAtTimestamp.ToString(CultureInfo.InvariantCulture);
+            string query = "orderBy=" + Uri.EscapeDataString(QuoteForFirebase("Timestamp")) +
+                           "&startAt=" + startAtTimestamp.ToString(CultureInfo.InvariantCulture);
 
-            Dictionary<string, GroupMessageData> dict =
-                await _http.GetAsync<Dictionary<string, GroupMessageData>>(
-                    AppendQuery(Db("groupMessages/" + gid, token), q)).ConfigureAwait(false);
+            string url = AppendQuery(Db("groupMessages/" + gid, token), query);
 
-            return dict ?? new Dictionary<string, GroupMessageData>();
+            Dictionary<string, GroupMessageData> dict = await _http
+                .GetAsync<Dictionary<string, GroupMessageData>>(url)
+                .ConfigureAwait(false);
+
+            if (dict == null)
+            {
+                return new Dictionary<string, GroupMessageData>();
+            }
+
+            return dict;
         }
 
         /// <summary>
-        /// Load các tin nhắn gần nhất (limitToLast).
+        /// Tải các tin nhắn gần nhất (limitToLast).
         /// </summary>
         public async Task<Dictionary<string, GroupMessageData>> GetRecentAsync(
             string groupId,
@@ -285,17 +349,30 @@ namespace ChatApp.Services.Firebase
                 throw new ArgumentException("groupId rỗng.");
             }
 
-            if (limit <= 0) limit = 80;
-            if (limit > 300) limit = 300;
+            if (limit <= 0)
+            {
+                limit = 80;
+            }
+            if (limit > 300)
+            {
+                limit = 300;
+            }
 
-            string q = "orderBy=" + Uri.EscapeDataString(Q("Timestamp")) +
-                       "&limitToLast=" + limit.ToString(CultureInfo.InvariantCulture);
+            string query = "orderBy=" + Uri.EscapeDataString(QuoteForFirebase("Timestamp")) +
+                           "&limitToLast=" + limit.ToString(CultureInfo.InvariantCulture);
 
-            Dictionary<string, GroupMessageData> dict =
-                await _http.GetAsync<Dictionary<string, GroupMessageData>>(
-                    AppendQuery(Db("groupMessages/" + gid, token), q)).ConfigureAwait(false);
+            string url = AppendQuery(Db("groupMessages/" + gid, token), query);
 
-            return dict ?? new Dictionary<string, GroupMessageData>();
+            Dictionary<string, GroupMessageData> dict = await _http
+                .GetAsync<Dictionary<string, GroupMessageData>>(url)
+                .ConfigureAwait(false);
+
+            if (dict == null)
+            {
+                return new Dictionary<string, GroupMessageData>();
+            }
+
+            return dict;
         }
 
         #endregion

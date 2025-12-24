@@ -13,7 +13,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class ChatViewController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly Panel _hostPanel;
 
@@ -27,7 +27,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== PROPERTIES ======
+        #region ====== THUỘC TÍNH ======
 
         /// <summary>
         /// Giới hạn số tin giữ trên UI để tránh nặng dần.
@@ -36,7 +36,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public ChatViewController(Panel hostPanel, Func<ChatMessage, Control> bubbleFactory)
         {
@@ -48,7 +48,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== INIT ======
+        #region ====== KHỞI TẠO RENDERER ======
 
         public void Initialize()
         {
@@ -67,7 +67,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== RENDER API ======
+        #region ====== API RENDER CHAT ======
 
         public void Clear()
         {
@@ -108,7 +108,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         private void DisposeRenderer()
         {

@@ -40,7 +40,7 @@
             this.pnlBackground.BackColor = System.Drawing.Color.DodgerBlue;
             this.pnlBackground.Controls.Add(this.lblDisplayName);
             this.pnlBackground.Controls.Add(this.picAvatar);
-            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlBackground.Location = new System.Drawing.Point(5, 5);
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Padding = new System.Windows.Forms.Padding(5);
@@ -67,7 +67,7 @@
             this.picAvatar.Location = new System.Drawing.Point(5, 5);
             this.picAvatar.Name = "picAvatar";
             this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatar.Size = new System.Drawing.Size(57, 56);
+            this.picAvatar.Size = new System.Drawing.Size(50, 50);
             this.picAvatar.TabIndex = 0;
             this.picAvatar.TabStop = false;
             // 
@@ -76,11 +76,11 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoScroll = true;
+            this.AutoScroll = false;
             this.Controls.Add(this.pnlBackground);
             this.Name = "Conversations";
             this.Padding = new System.Windows.Forms.Padding(5);
-            this.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.Size = new System.Drawing.Size(228, 76);
             this.Tag = "Conversations";
             this.pnlBackground.ResumeLayout(false);

@@ -14,7 +14,7 @@ namespace ChatApp.Controllers
     /// </summary>
     public class GroupSenderNameController : IDisposable
     {
-        #region ====== FIELDS ======
+        #region ====== KHAI BÁO BIẾN ======
 
         private readonly AuthService _authService;
 
@@ -24,7 +24,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== CTOR ======
+        #region ====== HÀM KHỞI TẠO ======
 
         public GroupSenderNameController(AuthService authService)
         {
@@ -33,7 +33,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== PUBLIC API ======
+        #region ====== HÀM CÔNG KHAI ======
 
         /// <summary>
         /// Lấy display name (ưu tiên cache). Nếu chưa có cache => trả về senderId.
@@ -129,7 +129,7 @@ namespace ChatApp.Controllers
 
         #endregion
 
-        #region ====== DISPOSE ======
+        #region ====== GIẢI PHÓNG TÀI NGUYÊN ======
 
         public void Dispose()
         {
