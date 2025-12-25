@@ -1077,6 +1077,10 @@ namespace ChatApp
         /// </summary>
         private void OpenGroupConversation(string groupId)
         {
+            //// Load avatar người dùng (Firebase)
+            //string base64 = await _authService.GetAvatarAsync(idNguoiDung);
+            //picAnhDaiDienGiua.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
+
             if (string.IsNullOrWhiteSpace(groupId)) return;
 
             idNguoiDangChat = groupId;
@@ -1127,6 +1131,7 @@ namespace ChatApp
                         RenderInitialMessages(full, groupId);
                     });
                 });
+
         }
 
         private async void btnTaoNhom_Click(object sender, EventArgs e)
