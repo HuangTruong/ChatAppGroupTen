@@ -230,99 +230,89 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Features\Chat\Controllers\Media\AvatarController.cs" />
-    <Compile Include="Features\Chat\Controllers\Session\RealtimeMessageListener.cs" />
-    <Compile Include="Features\Settings\Controllers\CaiDatController.cs" />
-    <Compile Include="Features\Chat\Controllers\Messages\ChatBubbleController.cs" />
-    <Compile Include="Features\Chat\Controllers\Session\ChatSessionController.cs" />
-    <Compile Include="Features\Chat\Controllers\Session\ChatStartupController.cs" />
-    <Compile Include="Features\Chat\Services\ChatTextFormatter.cs" />
-    <Compile Include="Features\Chat\Controllers\View\ChatViewController.cs" />
-    <Compile Include="Features\Chat\Controllers\View\ConversationListController.cs" />
-    <Compile Include="Features\Auth\Controllers\DangKyController.cs" />
-    <Compile Include="Features\Auth\Controllers\DangNhapController.cs" />
-    <Compile Include="Features\Chat\Controllers\Media\FileDownloadController.cs" />
-    <Compile Include="Features\Friends\Controllers\FriendController.cs" />
-    <Compile Include="Features\Groups\Controllers\GroupCreateController.cs" />
-    <Compile Include="Features\Chat\Controllers\Messages\GroupSenderNameController.cs" />
-    <Compile Include="Features\Chat\Controllers\Media\ImageThumbController.cs" />
-    <Compile Include="Features\Chat\Controllers\Media\ImageViewerController.cs" />
-    <Compile Include="Features\Chat\Controllers\Core\NhanTinController.cs" />
-    <Compile Include="Features\Chat\Controllers\Core\NhanTinNhomController.cs" />
-    <Compile Include="Features\Auth\Controllers\QuenMatKhauController.cs" />
-    <Compile Include="Features\Chat\UI\Controls\Conversations.cs">
+    <Compile Include="Controllers\CaiDatController.cs" />
+    <Compile Include="Controllers\DangKyController.cs" />
+    <Compile Include="Controllers\DangNhapController.cs" />
+    <Compile Include="Controllers\FriendController.cs" />
+    <Compile Include="Controllers\NhanTinController.cs" />
+    <Compile Include="Controllers\NhanTinNhomController.cs" />
+    <Compile Include="Controllers\QuenMatKhauController.cs" />
+    <Compile Include="Controls\Conversations.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\Conversations.Designer.cs">
+    <Compile Include="Controls\Conversations.Designer.cs">
       <DependentUpon>Conversations.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\FriendRequestItem.cs">
+    <Compile Include="Controls\FriendRequestItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\FriendRequestItem.Designer.cs">
+    <Compile Include="Controls\FriendRequestItem.Designer.cs">
       <DependentUpon>FriendRequestItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\MessageBubbles.cs">
+    <Compile Include="Controls\MessageBubbles.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\MessageBubbles.Designer.cs">
+    <Compile Include="Controls\MessageBubbles.Designer.cs">
       <DependentUpon>MessageBubbles.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\UserListItem.cs">
+    <Compile Include="Controls\UserListItem.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Controls\UserListItem.Designer.cs">
+    <Compile Include="Controls\UserListItem.Designer.cs">
       <DependentUpon>UserListItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Settings\UI\Forms\CaiDat.cs">
+    <Compile Include="Forms\CaiDat.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Settings\UI\Forms\CaiDat.Designer.cs">
+    <Compile Include="Forms\CaiDat.Designer.cs">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\UI\Forms\Emoji.cs">
+    <Compile Include="Forms\FormEmoji.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Forms\Emoji.Designer.cs">
-      <DependentUpon>Emoji.cs</DependentUpon>
+    <Compile Include="Forms\FormEmoji.Designer.cs">
+      <DependentUpon>FormEmoji.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Friends\UI\Forms\LoiMoiKetBan.cs">
+    <Compile Include="Forms\FormLoiMoiKetBan.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Friends\UI\Forms\LoiMoiKetBan.Designer.cs">
-      <DependentUpon>LoiMoiKetBan.cs</DependentUpon>
+    <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
+      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\UI\Forms\ImageViewer.cs">
+    <Compile Include="Forms\ImageViewerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Groups\UI\Forms\TaoNhom.cs">
+    <Compile Include="Forms\TaoNhom.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Groups\UI\Forms\TaoNhom.Designer.cs">
+    <Compile Include="Forms\TaoNhom.Designer.cs">
       <DependentUpon>TaoNhom.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Friends\UI\Forms\TimKiemBanBe.cs">
+    <Compile Include="Forms\TaoNhomForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Friends\UI\Forms\TimKiemBanBe.Designer.cs">
+    <Compile Include="Forms\TimKiemBanBe.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TimKiemBanBe.Designer.cs">
       <DependentUpon>TimKiemBanBe.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\XacNhanEmail.cs">
+    <Compile Include="Forms\XacNhanEmail.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\XacNhanEmail.Designer.cs">
+    <Compile Include="Forms\XacNhanEmail.Designer.cs">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </Compile>
-    <Compile Include="Shared\Helpers\KeySanitizer.cs" />
-    <Compile Include="Shared\Models\Friends\FriendRequest.cs" />
-    <Compile Include="Shared\Models\Groups\GroupInfo.cs" />
-    <Compile Include="Shared\Models\Messages\ChatMessage.cs" />
-    <Compile Include="Shared\Models\Themes\ThemeSetting.cs" />
-    <Compile Include="Shared\Models\Users\User.cs" />
-    <Compile Include="Features\Chat\UI\Forms\NhanTin.cs">
+    <Compile Include="Helpers\KeySanitizer.cs" />
+    <Compile Include="Models\Friends\FriendRequest.cs" />
+    <Compile Include="Models\Groups\GroupInfo.cs" />
+    <Compile Include="Models\Messages\ChatMessage.cs" />
+    <Compile Include="Models\Themes\ThemeSetting.cs" />
+    <Compile Include="Models\Users\User.cs" />
+    <Compile Include="Forms\NhanTin.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Forms\NhanTin.Designer.cs">
+    <Compile Include="Forms\NhanTin.Designer.cs">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
@@ -330,83 +320,82 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Features\Chat\Services\AttachmentClassifier.cs" />
-    <Compile Include="Features\Auth\Services\EmailVerificationService.cs" />
-    <Compile Include="Features\Auth\Services\SmtpEmailSender.cs" />
-    <Compile Include="Features\Chat\Services\FileAttachmentUploader.cs" />
-    <Compile Include="Features\Auth\Services\AuthService.cs" />
-    <Compile Include="Shared\Infrastructure\Firebase\FirebaseConfig.cs" />
-    <Compile Include="Features\Friends\Services\FriendService.cs" />
-    <Compile Include="Features\Groups\Services\GroupMessageService.cs" />
-    <Compile Include="Features\Groups\Services\GroupService.cs" />
-    <Compile Include="Shared\Infrastructure\Firebase\HttpService.cs" />
-    <Compile Include="Features\Auth\UI\Form\DangKy.cs">
+    <Compile Include="Services\Attachments\AttachmentClassifier.cs" />
+    <Compile Include="Services\Auth\EmailVerificationService.cs" />
+    <Compile Include="Services\Email\SmtpEmailSender.cs" />
+    <Compile Include="Services\FileHost\FileAttachmentUploader.cs" />
+    <Compile Include="Services\Firebase\AuthService.cs" />
+    <Compile Include="Services\Firebase\FirebaseConfig.cs" />
+    <Compile Include="Services\Firebase\FriendService.cs" />
+    <Compile Include="Services\Firebase\GroupMessageService.cs" />
+    <Compile Include="Services\Firebase\GroupService.cs" />
+    <Compile Include="Services\Firebase\HttpService.cs" />
+    <Compile Include="Forms\DangKy.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\DangKy.Designer.cs">
+    <Compile Include="Forms\DangKy.Designer.cs">
       <DependentUpon>DangKy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\DangNhap.cs">
+    <Compile Include="Forms\DangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\DangNhap.Designer.cs">
+    <Compile Include="Forms\DangNhap.Designer.cs">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Features\Chat\UI\Forms\TrangChu.cs">
+    <Compile Include="Forms\TrangChu.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Chat\UI\Forms\TrangChu.Designer.cs">
+    <Compile Include="Forms\TrangChu.Designer.cs">
       <DependentUpon>TrangChu.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\QuenMatKhau.cs">
+    <Compile Include="Forms\QuenMatKhau.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Features\Auth\UI\Form\QuenMatKhau.Designer.cs">
+    <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
-    <Compile Include="Features\Settings\Services\ThemeService.cs" />
-    <Compile Include="Features\Chat\Services\ChatRenderer.cs" />
-    <Compile Include="Features\Settings\Services\ThemeColor.cs" />
-    <Compile Include="Features\Settings\Services\ThemeManager.cs" />
-    <EmbeddedResource Include="Features\Chat\UI\Controls\Conversations.resx">
+    <Compile Include="Services\Firebase\ThemeService.cs" />
+    <Compile Include="Services\UI\ThemeColor.cs" />
+    <Compile Include="Services\UI\ThemeManager.cs" />
+    <EmbeddedResource Include="Controls\Conversations.resx">
       <DependentUpon>Conversations.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Controls\FriendRequestItem.resx">
+    <EmbeddedResource Include="Controls\FriendRequestItem.resx">
       <DependentUpon>FriendRequestItem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Controls\MessageBubbles.resx">
+    <EmbeddedResource Include="Controls\MessageBubbles.resx">
       <DependentUpon>MessageBubbles.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Controls\UserListItem.resx">
+    <EmbeddedResource Include="Controls\UserListItem.resx">
       <DependentUpon>UserListItem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Settings\UI\Forms\CaiDat.resx">
+    <EmbeddedResource Include="Forms\CaiDat.resx">
       <DependentUpon>CaiDat.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Forms\Emoji.resx">
-      <DependentUpon>Emoji.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormEmoji.resx">
+      <DependentUpon>FormEmoji.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Friends\UI\Forms\LoiMoiKetBan.resx">
-      <DependentUpon>LoiMoiKetBan.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
+      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Forms\NhanTin.resx">
+    <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Groups\UI\Forms\TaoNhom.resx">
+    <EmbeddedResource Include="Forms\TaoNhom.resx">
       <DependentUpon>TaoNhom.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Friends\UI\Forms\TimKiemBanBe.resx">
+    <EmbeddedResource Include="Forms\TimKiemBanBe.resx">
       <DependentUpon>TimKiemBanBe.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Auth\UI\Form\XacNhanEmail.resx">
+    <EmbeddedResource Include="Forms\XacNhanEmail.resx">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Auth\UI\Form\DangKy.resx">
+    <EmbeddedResource Include="Forms\DangKy.resx">
       <DependentUpon>DangKy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Auth\UI\Form\DangNhap.resx">
+    <EmbeddedResource Include="Forms\DangNhap.resx">
       <DependentUpon>DangNhap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -414,10 +403,10 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Chat\UI\Forms\TrangChu.resx">
+    <EmbeddedResource Include="Forms\TrangChu.resx">
       <DependentUpon>TrangChu.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Features\Auth\UI\Form\QuenMatKhau.resx">
+    <EmbeddedResource Include="Forms\QuenMatKhau.resx">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -460,10 +449,12 @@
     <None Include="Resources\Logo.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\AvatarMacDinh.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Resources\check.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\default_avatar.png" />
     <Content Include="Resources\Emoji\cool.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
