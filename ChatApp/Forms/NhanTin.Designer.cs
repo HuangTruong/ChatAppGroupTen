@@ -27,7 +27,6 @@
             this.pnlTrai = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlDanhSachChat = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlGiua = new Guna.UI2.WinForms.Guna2Panel();
-            this.pnlKhungChat = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlInput = new Guna.UI2.WinForms.Guna2Panel();
             this.txtNhapTinNhan = new Guna.UI2.WinForms.Guna2TextBox();
             this.PicSendFile = new Guna.UI2.WinForms.Guna2CirclePictureBox();
@@ -45,6 +44,8 @@
             this.btnRequest = new Guna.UI2.WinForms.Guna2Button();
             this.btnRefresh = new Guna.UI2.WinForms.Guna2Button();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
+            this.pnlKhungChat = new Guna.UI2.WinForms.Guna2Panel();
+            this.flpKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.pnlInput.SuspendLayout();
@@ -56,6 +57,7 @@
             this.pnlButtons.SuspendLayout();
             this.flpPhai.SuspendLayout();
             this.pnlBackground.SuspendLayout();
+            this.pnlKhungChat.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTrai
@@ -96,20 +98,6 @@
             this.pnlGiua.Padding = new System.Windows.Forms.Padding(12);
             this.pnlGiua.Size = new System.Drawing.Size(637, 630);
             this.pnlGiua.TabIndex = 0;
-            // 
-            // pnlKhungChat
-            // 
-            this.pnlKhungChat.AutoScroll = true;
-            this.pnlKhungChat.BackColor = System.Drawing.Color.Transparent;
-            this.pnlKhungChat.BorderRadius = 10;
-            this.pnlKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlKhungChat.FillColor = System.Drawing.Color.White;
-            this.pnlKhungChat.Location = new System.Drawing.Point(12, 88);
-            this.pnlKhungChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlKhungChat.Name = "pnlKhungChat";
-            this.pnlKhungChat.Padding = new System.Windows.Forms.Padding(11, 10, 11, 10);
-            this.pnlKhungChat.Size = new System.Drawing.Size(613, 460);
-            this.pnlKhungChat.TabIndex = 2;
             // 
             // pnlInput
             // 
@@ -372,6 +360,29 @@
             this.pnlBackground.Size = new System.Drawing.Size(1181, 654);
             this.pnlBackground.TabIndex = 1;
             // 
+            // pnlKhungChat
+            // 
+            this.pnlKhungChat.AutoScroll = true;
+            this.pnlKhungChat.BackColor = System.Drawing.Color.Transparent;
+            this.pnlKhungChat.BorderRadius = 10;
+            this.pnlKhungChat.Controls.Add(this.flpKhungChat);
+            this.pnlKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlKhungChat.FillColor = System.Drawing.Color.White;
+            this.pnlKhungChat.Location = new System.Drawing.Point(12, 88);
+            this.pnlKhungChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlKhungChat.Name = "pnlKhungChat";
+            this.pnlKhungChat.Padding = new System.Windows.Forms.Padding(11, 10, 11, 10);
+            this.pnlKhungChat.Size = new System.Drawing.Size(613, 460);
+            this.pnlKhungChat.TabIndex = 2;
+            // 
+            // flpKhungChat
+            // 
+            this.flpKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpKhungChat.Location = new System.Drawing.Point(11, 10);
+            this.flpKhungChat.Name = "flpKhungChat";
+            this.flpKhungChat.Size = new System.Drawing.Size(591, 440);
+            this.flpKhungChat.TabIndex = 0;
+            // 
             // NhanTin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -393,6 +404,7 @@
             this.pnlButtons.ResumeLayout(false);
             this.flpPhai.ResumeLayout(false);
             this.pnlBackground.ResumeLayout(false);
+            this.pnlKhungChat.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -415,10 +427,11 @@
         private Guna.UI2.WinForms.Guna2Button btnSearchFriends;
         private Guna.UI2.WinForms.Guna2Button btnTaoNhom;
         private System.Windows.Forms.FlowLayoutPanel flpPhai;
-        private Guna.UI2.WinForms.Guna2Panel pnlKhungChat;
         private Guna.UI2.WinForms.Guna2Panel pnlDanhSachChat;
         private Guna.UI2.WinForms.Guna2Panel pnlButtons;
         private Guna.UI2.WinForms.Guna2Button btnGui;
         private Guna.UI2.WinForms.Guna2Button btnRefresh;
+        private Guna.UI2.WinForms.Guna2Panel pnlKhungChat;
+        private System.Windows.Forms.FlowLayoutPanel flpKhungChat;
     }
 }

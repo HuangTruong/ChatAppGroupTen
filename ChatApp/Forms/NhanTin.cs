@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -61,6 +60,7 @@ namespace ChatApp
         /// Prefix tag để nhận biết item nhóm trong danh sách chat.
         /// </summary>
         private const string GROUP_TAG_PREFIX = "GROUP:";
+
         /// <summary>
         /// Danh sách bạn bè (key = safeId).
         /// </summary>
@@ -75,9 +75,6 @@ namespace ChatApp
         /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
         /// </summary>
         private readonly ThemeService _themeService = new ThemeService();
-
-        // ====== CHAT UI CONTAINER (chống lag layout) ======
-        private FlowLayoutPanel _chatContainer;
 
         // ====== BATCH UI (gom nhiều tin mới rồi vẽ 1 lượt) ======
         private readonly object _pendingLock = new object();
@@ -108,6 +105,11 @@ namespace ChatApp
         private readonly HashSet<string> _senderNameLoading =
             new HashSet<string>(StringComparer.Ordinal);
 
+        /// <summary>
+        /// Danh sách tin nhắn đã vẽ lên UI.
+        /// </summary>
+        private readonly List<ChatMessage> danhSachTinNhanDangVe =
+            new List<ChatMessage>();
 
         #endregion
 
@@ -122,10 +124,12 @@ namespace ChatApp
 
             idDangNhap = localId;
             tokenDangNhap = token;
+
             boDieuKhienNhanTin = new NhanTinController(localId, token);
-
-
             boDieuKhienNhanTinNhom = new NhanTinNhomController(localId, token);
+
+            // ĐỔI KHUNG CHAT: dùng FlowLayoutPanel thay cho Panel
+            SetupChatFlowPanel();
 
             // Hook tạo nhóm (Designer có thể chưa gắn event)
             try
@@ -137,9 +141,6 @@ namespace ChatApp
                 }
             }
             catch { }
-
-            // Setup chat container bên trong pnlKhungChat
-            SetupChatContainer();
 
             // Event form
             Load += NhanTin_Load;
@@ -161,77 +162,83 @@ namespace ChatApp
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.CheckCertificateRevocationList = false;
-
-            // Batch flush timer (UI)
-            InitFlushTimer();
         }
 
+        #endregion
+
+        #region ====== FLOW CHAT PANEL (flpKhungChat) ======
+
         /// <summary>
-        /// Tạo FlowLayoutPanel container để vẽ bubble, giảm giật do Dock/SetChildIndex.
+        /// Cấu hình khung chat dùng FlowLayoutPanel để hiển thị tin theo chiều dọc (cũ -> mới).
         /// </summary>
-        private void SetupChatContainer()
+        private void SetupChatFlowPanel()
         {
+            if (flpKhungChat == null) return;
+
+            flpKhungChat.SuspendLayout();
             try
             {
-                pnlKhungChat.SuspendLayout();
-                pnlKhungChat.Controls.Clear();
-                pnlKhungChat.AutoScroll = true;
-
-                _chatContainer = new FlowLayoutPanel();
-                _chatContainer.Dock = DockStyle.Top;
-                _chatContainer.AutoSize = true;
-                _chatContainer.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-                _chatContainer.WrapContents = false;
-                _chatContainer.FlowDirection = FlowDirection.TopDown;
-                _chatContainer.Padding = new Padding(6, 6, 6, 6);
-
-                pnlKhungChat.Controls.Add(_chatContainer);
-
-                pnlKhungChat.SizeChanged -= PnlKhungChat_SizeChanged;
-                pnlKhungChat.SizeChanged += PnlKhungChat_SizeChanged;
+                flpKhungChat.AutoScroll = true;
+                flpKhungChat.FlowDirection = FlowDirection.TopDown;
+                flpKhungChat.WrapContents = false;
+                flpKhungChat.Padding = new Padding(10, 10, 10, 10);
             }
             finally
             {
-                pnlKhungChat.ResumeLayout();
+                flpKhungChat.ResumeLayout();
             }
+
+            // Khi resize form, bubble tự giãn theo bề ngang
+            flpKhungChat.SizeChanged -= FlpKhungChat_SizeChanged;
+            flpKhungChat.SizeChanged += FlpKhungChat_SizeChanged;
         }
 
-        private void PnlKhungChat_SizeChanged(object sender, EventArgs e)
+        private void FlpKhungChat_SizeChanged(object sender, EventArgs e)
         {
-            ResizeChatBubbles();
-        }
+            if (flpKhungChat == null) return;
 
-        private void ResizeChatBubbles()
-        {
-            if (_chatContainer == null) return;
+            int w = GetBubbleWidth();
+            if (w < 50) return;
 
-            int scroll = (pnlKhungChat.VerticalScroll != null && pnlKhungChat.VerticalScroll.Visible)
-                ? SystemInformation.VerticalScrollBarWidth
-                : 0;
-
-            int w = pnlKhungChat.ClientSize.Width - scroll - 12;
-            if (w < 120) w = 120;
-
-            _chatContainer.SuspendLayout();
+            flpKhungChat.SuspendLayout();
             try
             {
-                foreach (Control c in _chatContainer.Controls)
+                foreach (Control c in flpKhungChat.Controls)
                 {
-                    if (c == null) continue;
                     c.Width = w;
                 }
             }
             finally
             {
-                _chatContainer.ResumeLayout();
+                flpKhungChat.ResumeLayout();
             }
         }
 
-        private void InitFlushTimer()
+        /// <summary>
+        /// Lấy độ rộng hợp lý cho bubble trong FlowLayoutPanel.
+        /// </summary>
+        private int GetBubbleWidth()
         {
-            _flushTimer = new System.Windows.Forms.Timer();
-            _flushTimer.Interval = 60; // 50-80ms là ổn: mượt + không spam layout
-            _flushTimer.Tick += FlushTimer_Tick;
+            if (flpKhungChat == null) return 300;
+
+            int w = flpKhungChat.ClientSize.Width
+                    - flpKhungChat.Padding.Left
+                    - flpKhungChat.Padding.Right
+                    - 5;
+
+            return w;
+        }
+
+        /// <summary>
+        /// Cuộn xuống tin nhắn mới nhất (cuối danh sách).
+        /// </summary>
+        private void ScrollToBottom()
+        {
+            if (flpKhungChat == null) return;
+            if (flpKhungChat.Controls.Count == 0) return;
+
+            Control last = flpKhungChat.Controls[flpKhungChat.Controls.Count - 1];
+            flpKhungChat.ScrollControlIntoView(last);
         }
 
         #endregion
@@ -299,10 +306,9 @@ namespace ChatApp
             {
                 tatCaNguoiDung = await boDieuKhienNhanTin.GetFriendUsersAsync(idDangNhap);
 
-
-
                 // Load nhóm và add vào danh sách chat (hiển thị trước bạn bè)
                 await LoadGroupsIntoListAsync();
+
                 if (tatCaNguoiDung == null || tatCaNguoiDung.Count == 0)
                 {
                     return;
@@ -335,17 +341,12 @@ namespace ChatApp
             }
         }
 
-        /// <summary>
-        /// Lọc danh sách bạn bè khi gõ vào ô txtTimKiem.
-        /// Tìm theo FullName / DisplayName / Email.
-        /// </summary>
-
         #endregion
 
         #region ====== ITEM DANH SÁCH BẠN BÈ (UI) ======
 
         /// <summary>
-        /// Tạo 1 item user trong flpDanhSachChat.
+        /// Tạo 1 item user trong pnlDanhSachChat.
         /// </summary>
         private void AddUserItem(string userId, User user)
         {
@@ -358,7 +359,7 @@ namespace ChatApp
             conversations.ItemClicked -= UserItem_Click;
             conversations.ItemClicked += UserItem_Click;
 
-            conversations.Dock = DockStyle.Top;    
+            conversations.Dock = DockStyle.Top;
             pnlDanhSachChat.Controls.Add(conversations);
         }
 
@@ -406,7 +407,6 @@ namespace ChatApp
             return ten;
         }
 
-
         #endregion
 
         #region ====== GROUP SENDER FULLNAME ======
@@ -436,148 +436,6 @@ namespace ChatApp
 
             // fallback tạm (sẽ tự update sau khi tải xong)
             return senderId;
-        }
-
-        /// <summary>
-        /// Đảm bảo đã tải FullName sender từ Firebase (chỉ tải 1 lần).
-        /// Khi tải xong sẽ update lại những bubble của sender đó.
-        /// </summary>
-        private void EnsureGroupSenderFullNameLoaded(string senderId)
-        {
-            if (string.IsNullOrWhiteSpace(senderId)) return;
-
-            // Nếu không ở chế độ nhóm thì thôi
-            if (!dangChatNhom) return;
-
-            // Tránh request trùng
-            lock (_senderNameLock)
-            {
-                if (_senderFullNameCache.ContainsKey(senderId))
-                {
-                    return;
-                }
-
-                if (_senderNameLoading.Contains(senderId))
-                {
-                    return;
-                }
-
-                _senderNameLoading.Add(senderId);
-            }
-
-            Task.Run(async delegate
-            {
-                string fullName = null;
-
-                try
-                {
-                    User u = await _authService.GetUserByIdAsync(senderId).ConfigureAwait(false);
-                    fullName = GetUserFullName(u);
-                }
-                catch
-                {
-                    fullName = null;
-                }
-
-                lock (_senderNameLock)
-                {
-                    _senderNameLoading.Remove(senderId);
-
-                    // set cache (kể cả null để khỏi gọi lại liên tục)
-                    _senderFullNameCache[senderId] = fullName;
-                }
-
-                // Update UI nếu vẫn đang chat nhóm đó
-                try
-                {
-                    if (this.IsDisposed) return;
-
-                    this.BeginInvoke((Action)delegate
-                    {
-                        if (this.IsDisposed) return;
-                        if (!dangChatNhom) return;
-
-                        UpdateRenderedBubblesSenderName(senderId);
-                    });
-                }
-                catch
-                {
-                    // ignore
-                }
-            });
-        }
-
-        /// <summary>
-        /// Duyệt các bubble đã render, bubble nào thuộc senderId thì set lại displayName.
-        /// </summary>
-        private void UpdateRenderedBubblesSenderName(string senderId)
-        {
-            if (_chatContainer == null) return;
-            if (string.IsNullOrWhiteSpace(senderId)) return;
-
-            string newName = GetGroupSenderDisplayName(senderId);
-
-            _chatContainer.SuspendLayout();
-            try
-            {
-                foreach (Control c in _chatContainer.Controls)
-                {
-                    MessageBubbles bubble = c as MessageBubbles;
-                    if (bubble == null) continue;
-
-                    ChatMessage msg = bubble.Tag as ChatMessage;
-                    if (msg == null) continue;
-
-                    if (msg.IsMine) continue;
-
-                    if (!string.Equals(msg.SenderId, senderId, StringComparison.Ordinal))
-                    {
-                        continue;
-                    }
-
-                    bool laTinFile = string.Equals(msg.MessageType, "file", StringComparison.OrdinalIgnoreCase);
-                    bool laTinAnh = string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase);
-
-                    string time = FormatTimestamp(msg.Timestamp);
-
-                    if (laTinAnh)
-                    {
-                        Image thumb = TaoThumbnailTuMessage(msg);
-                        // Ảnh trong chat: không hiện tên file (UI gọn hơn)
-                        string caption = string.Empty;
-
-                        bubble.SetImageMessage(newName, thumb, caption, time, false);
-
-                        bubble.Cursor = Cursors.Hand;
-                        GanClickDeXemAnh(bubble);
-                    }
-                    else
-                    {
-                        string message;
-                        if (laTinFile)
-                        {
-                            string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                            message = ten + " (" + FormatBytes(msg.FileSize) + ")";
-                        }
-                        else
-                        {
-                            message = msg.Text ?? string.Empty;
-                        }
-
-                        bubble.SetMessage(newName, message, time, false,senderId);
-
-                        if (laTinFile)
-                        {
-                            bubble.Cursor = Cursors.Hand;
-                            GanClickDeTaiFile(bubble);
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                _chatContainer.ResumeLayout();
-            }
         }
 
         #endregion
@@ -622,6 +480,7 @@ namespace ChatApp
 
             // Dừng listen nhóm nếu đang chạy
             try { boDieuKhienNhanTinNhom.StopListen(); } catch { }
+
             User nguoiDung;
             if (tatCaNguoiDung != null && tatCaNguoiDung.TryGetValue(otherUserId, out nguoiDung))
             {
@@ -633,8 +492,6 @@ namespace ChatApp
                 lblTenDangNhapGiua.Text = "";
             }
 
-            ResetChatUI();
-
             // Listen incremental (mượt hơn rất nhiều)
             boDieuKhienNhanTin.StartListenConversation(
                 otherUserId,
@@ -645,7 +502,7 @@ namespace ChatApp
                     {
                         BeginInvoke(new Action(delegate
                         {
-                            RenderInitialMessages(initial, otherUserId);
+                            RenderMessages(initial, otherUserId);
                         }));
                     }
                     catch { }
@@ -657,7 +514,7 @@ namespace ChatApp
                     {
                         BeginInvoke(new Action(delegate
                         {
-                            QueueAppendMessage(msg, otherUserId);
+                            AddMessageBubble(msg);
                         }));
                     }
                     catch { }
@@ -669,296 +526,194 @@ namespace ChatApp
                     {
                         BeginInvoke(new Action(delegate
                         {
-                            // Reset hiếm khi xảy ra (edit/remove/snapshot)
-                            RenderInitialMessages(full, otherUserId);
+                            RenderMessages(full, otherUserId);
                         }));
                     }
                     catch { }
                 });
         }
 
-        private void ResetChatUI()
-        {
-            lock (_pendingLock)
-            {
-                _pendingAdds.Clear();
-            }
-
-            _drawnMessageIds.Clear();
-
-            if (_flushTimer != null)
-            {
-                _flushTimer.Stop();
-            }
-
-            if (_chatContainer != null)
-            {
-                _chatContainer.SuspendLayout();
-                try
-                {
-                    _chatContainer.Controls.Clear();
-                }
-                finally
-                {
-                    _chatContainer.ResumeLayout();
-                }
-            }
-        }
-
         #endregion
 
-        #region ====== VẼ TIN NHẮN ======
+        #region ====== VẼ TIN NHẮN LÊN KHUNG CHAT (FLOW) ======
 
         /// <summary>
-        /// Vẽ batch ban đầu (1 lần) - tránh render lại liên tục.
+        /// Vẽ tin nhắn:
+        /// - Nếu lần đầu: vẽ toàn bộ.
+        /// - Nếu thêm mới: chỉ append phần mới.
+        /// - Nếu số lượng giảm: vẽ lại toàn bộ.
         /// </summary>
-        private void RenderInitialMessages(IList<ChatMessage> messages, string ownerUserId)
+        private void RenderMessages(IList<ChatMessage> messages, string ownerUserId)
         {
+            // Nếu user đã đổi cuộc chat thì bỏ qua batch này.
             if (!string.Equals(idNguoiDangChat, ownerUserId, StringComparison.Ordinal))
             {
                 return;
             }
-
-            ResetChatUI();
 
             if (messages == null || messages.Count == 0)
             {
+                flpKhungChat.SuspendLayout();
+                try
+                {
+                    flpKhungChat.Controls.Clear();
+                    danhSachTinNhanDangVe.Clear();
+                }
+                finally
+                {
+                    flpKhungChat.ResumeLayout();
+                }
                 return;
             }
 
-            if (_chatContainer == null) return;
+            int soLuongCu = danhSachTinNhanDangVe.Count;
+            int soLuongMoi = messages.Count;
 
-            _chatContainer.SuspendLayout();
+            flpKhungChat.SuspendLayout();
             try
             {
-                for (int i = 0; i < messages.Count; i++)
+                if (soLuongCu == 0 || soLuongMoi < soLuongCu)
                 {
-                    ChatMessage m = messages[i];
-                    if (m == null) continue;
+                    // Lần đầu hoặc có thay đổi bất thường -> vẽ lại toàn bộ
+                    flpKhungChat.Controls.Clear();
+                    danhSachTinNhanDangVe.Clear();
 
-                    if (!string.IsNullOrEmpty(m.MessageId))
+                    int i = 0;
+                    while (i < soLuongMoi)
                     {
-                        if (_drawnMessageIds.Contains(m.MessageId))
-                        {
-                            continue;
-                        }
-                        _drawnMessageIds.Add(m.MessageId);
+                        ChatMessage tinNhan = messages[i];
+                        AddMessageBubble(tinNhan);
+                        danhSachTinNhanDangVe.Add(tinNhan);
+                        i++;
                     }
-
-                    AddMessageBubbleToContainer(m);
-                }
-            }
-            finally
-            {
-                _chatContainer.ResumeLayout();
-                ResizeChatBubbles();
-                ScrollToBottom();
-            }
-        }
-
-        /// <summary>
-        /// Queue append tin mới (gom lại để UI không giật khi tin đến dồn dập).
-        /// </summary>
-        private void QueueAppendMessage(ChatMessage msg, string ownerUserId)
-        {
-            if (!string.Equals(idNguoiDangChat, ownerUserId, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            if (msg == null) return;
-
-            // Tránh vẽ trùng
-            if (!string.IsNullOrEmpty(msg.MessageId))
-            {
-                if (_drawnMessageIds.Contains(msg.MessageId))
-                {
-                    return;
-                }
-            }
-
-            lock (_pendingLock)
-            {
-                _pendingAdds.Add(msg);
-            }
-
-            if (_flushTimer != null && !_flushTimer.Enabled)
-            {
-                _flushTimer.Start();
-            }
-        }
-
-        private void FlushTimer_Tick(object sender, EventArgs e)
-        {
-            if (_chatContainer == null) return;
-
-            List<ChatMessage> batch = null;
-
-            lock (_pendingLock)
-            {
-                if (_pendingAdds.Count == 0)
-                {
-                    if (_flushTimer != null) _flushTimer.Stop();
-                    return;
-                }
-
-                batch = new List<ChatMessage>(_pendingAdds);
-                _pendingAdds.Clear();
-            }
-
-            // Sort theo time để append đúng thứ tự
-            batch.Sort(delegate (ChatMessage a, ChatMessage b)
-            {
-                long ta = (a != null) ? a.Timestamp : 0;
-                long tb = (b != null) ? b.Timestamp : 0;
-                if (ta < tb) return -1;
-                if (ta > tb) return 1;
-                return 0;
-            });
-
-            _chatContainer.SuspendLayout();
-            try
-            {
-                for (int i = 0; i < batch.Count; i++)
-                {
-                    ChatMessage m = batch[i];
-                    if (m == null) continue;
-
-                    if (!string.IsNullOrEmpty(m.MessageId))
-                    {
-                        if (_drawnMessageIds.Contains(m.MessageId))
-                        {
-                            continue;
-                        }
-                        _drawnMessageIds.Add(m.MessageId);
-                    }
-
-                    AddMessageBubbleToContainer(m);
-                }
-
-                TrimOldMessagesIfNeeded();
-            }
-            finally
-            {
-                _chatContainer.ResumeLayout();
-                ResizeChatBubbles();
-                ScrollToBottom();
-            }
-        }
-
-        private void TrimOldMessagesIfNeeded()
-        {
-            if (_chatContainer == null) return;
-
-            int extra = _chatContainer.Controls.Count - MAX_UI_MESSAGES;
-            if (extra <= 0) return;
-
-            // Xóa bớt bubble cũ nhất ở đầu (TopDown => index 0 là cũ nhất)
-            for (int i = 0; i < extra; i++)
-            {
-                if (_chatContainer.Controls.Count == 0) break;
-
-                Control c = _chatContainer.Controls[0];
-                _chatContainer.Controls.RemoveAt(0);
-
-                try { c.Dispose(); } catch { }
-            }
-
-            // Note: _drawnMessageIds vẫn giữ, nhưng không sao (tránh vẽ trùng).
-            // Nếu bạn muốn tối ưu bộ nhớ thêm, có thể rebuild HashSet theo controls còn lại.
-        }
-
-        private void ScrollToBottom()
-        {
-            if (_chatContainer == null) return;
-            if (_chatContainer.Controls.Count == 0) return;
-
-            Control last = _chatContainer.Controls[_chatContainer.Controls.Count - 1];
-            try
-            {
-                pnlKhungChat.ScrollControlIntoView(last);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Thêm 1 bong bóng tin nhắn vào container.
-        /// </summary>
-        private void AddMessageBubbleToContainer(ChatMessage msg)
-        {
-            if (msg == null) return;
-
-            bool isMine = msg.IsMine;
-
-            string displayName;
-            if (isMine)
-            {
-                displayName = "Bạn";
-            }
-            else if (dangChatNhom)
-            {
-                displayName = GetGroupSenderDisplayName(msg.SenderId);
-                EnsureGroupSenderFullNameLoaded(msg.SenderId);
-            }
-            else
-            {
-                displayName = (lblTenDangNhapGiua.Text ?? string.Empty);
-            }
-
-            bool laTinFile = string.Equals(msg.MessageType, "file", StringComparison.OrdinalIgnoreCase);
-            bool laTinAnh = string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase);
-
-            string time = FormatTimestamp(msg.Timestamp);
-
-            MessageBubbles bubble = new MessageBubbles();
-            bubble.Margin = new Padding(3, 3, 3, 3);
-
-            bubble.Tag = msg;
-
-            if (laTinAnh)
-            {
-                Image thumb = TaoThumbnailTuMessage(msg);
-                // Ảnh trong chat: không hiện tên file (UI gọn hơn)
-                string caption = string.Empty;
-
-                bubble.SetImageMessage(displayName, thumb, caption, time, isMine);
-
-                bubble.Cursor = Cursors.Hand;
-                GanClickDeXemAnh(bubble);
-            }
-            else
-            {
-                string message;
-                if (laTinFile)
-                {
-                    string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                    message = ten + " (" + FormatBytes(msg.FileSize) + ")";
                 }
                 else
                 {
-                    message = msg.Text ?? string.Empty;
-                }
-
-                bubble.SetMessage(displayName, message, time, isMine,msg.SenderId);
-
-                if (laTinFile)
-                {
-                    bubble.Cursor = Cursors.Hand;
-                    GanClickDeTaiFile(bubble);
+                    // Bình thường thì chỉ vẽ thêm phần mới
+                    int i = soLuongCu;
+                    while (i < soLuongMoi)
+                    {
+                        ChatMessage tinNhan = messages[i];
+                        AddMessageBubble(tinNhan);
+                        danhSachTinNhanDangVe.Add(tinNhan);
+                        i++;
+                    }
                 }
             }
+            finally
+            {
+                flpKhungChat.ResumeLayout();
+            }
 
-            _chatContainer.Controls.Add(bubble);
-
+            // Mặc định: sau khi load xong đứng ở tin nhắn cuối
+            ScrollToBottom();
         }
 
-        private static string FormatTimestamp(long timestamp)
+        /// <summary>
+        /// Thêm 1 bong bóng tin nhắn vào khung chat (FlowLayoutPanel).
+        /// </summary>
+        private async void AddMessageBubble(ChatMessage msg)
         {
-            if (timestamp <= 0) return string.Empty;
+            if (msg == null) return;
+            if (flpKhungChat == null) return;
+            if (this.IsDisposed) return;
+
+            bool isMine = msg.IsMine;
+
+            // ====== LẤY TÊN NGƯỜI GỬI (GIỮ NGUYÊN LOGIC HIỆN TẠI) ======
+            string senderId = msg.SenderId;
+            User thongTinNguoiGui = null;
 
             try
             {
-                DateTime thoiGian = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
+                if (!string.IsNullOrWhiteSpace(senderId))
+                {
+                    thongTinNguoiGui = await _authService.GetUserByIdAsync(senderId);
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            string displayName = isMine
+                ? "Bạn"
+                : (thongTinNguoiGui != null && !string.IsNullOrWhiteSpace(thongTinNguoiGui.DisplayName)
+                    ? thongTinNguoiGui.DisplayName
+                    : "Người dùng");
+
+            string message = msg.Text ?? string.Empty;
+            string time = FormatTimestamp(msg.Timestamp);
+
+            MessageBubbles bubble = new MessageBubbles();
+            bubble.SetMessage(displayName, message, time, isMine, msg.SenderId);
+
+            bubble.Tag = msg;
+
+            // FlowLayoutPanel: không cần Dock
+            bubble.Margin = new Padding(0, 6, 0, 6);
+
+            // Giãn theo chiều ngang panel để nhìn đẹp và dễ đọc
+            int w = GetBubbleWidth();
+            if (w > 50) bubble.Width = w;
+
+            // ====== GẮN CLICK THEO LOẠI TIN (FILE / ẢNH) ======
+            try
+            {
+                string type = msg.MessageType ?? string.Empty;
+
+                if (type == string.Empty)
+                {
+                    string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
+                    message = ten + " (" + FormatBytes(msg.FileSize) + ")";
+                    GanClickDeTaiFile(bubble);
+                }
+                
+            }
+            catch
+            {
+                // ignore
+            }
+
+            // ====== ADD VÀO UI (AN TOÀN THREAD) ======
+            try
+            {
+                if (flpKhungChat.InvokeRequired)
+                {
+                    flpKhungChat.BeginInvoke(new Action(delegate
+                    {
+                        if (this.IsDisposed) return;
+
+                        flpKhungChat.Controls.Add(bubble);
+                        ScrollToBottom();
+                    }));
+                }
+                else
+                {
+                    flpKhungChat.Controls.Add(bubble);
+                    ScrollToBottom();
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        /// <summary>
+        /// Chuyển timestamp (ms) thành chuỗi dd/MM/yyyy HH:mm.
+        /// </summary>
+        private static string FormatTimestamp(long timestamp)
+        {
+            if (timestamp <= 0)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                DateTime thoiGian =
+                    DateTimeOffset.FromUnixTimeMilliseconds(timestamp).LocalDateTime;
                 return thoiGian.ToString("dd/MM/yyyy HH:mm");
             }
             catch
@@ -970,6 +725,7 @@ namespace ChatApp
         #endregion
 
         #region ====== GỬI TIN NHẮN ======
+
         private async void btnGui_Click(object sender, EventArgs e)
         {
             string noiDungTin = (txtNhapTinNhan.Text ?? string.Empty).Trim();
@@ -998,7 +754,7 @@ namespace ChatApp
                     ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupMessageAsync(idNguoiDangChat, noiDungTin);
                     if (sent != null)
                     {
-                        QueueAppendMessage(sent, idNguoiDangChat);
+                        // listener sẽ tự append
                     }
                 }
                 else
@@ -1021,7 +777,7 @@ namespace ChatApp
         #region ====== NHÓM CHAT ======
 
         /// <summary>
-        /// Load danh sách nhóm của user và add vào flpDanhSachChat.
+        /// Load danh sách nhóm của user và add vào pnlDanhSachChat.
         /// Được gọi bên trong LoadUsersAsync() để hiển thị nhóm trước bạn bè.
         /// </summary>
         private async Task LoadGroupsIntoListAsync()
@@ -1077,10 +833,6 @@ namespace ChatApp
         /// </summary>
         private void OpenGroupConversation(string groupId)
         {
-            //// Load avatar người dùng (Firebase)
-            //string base64 = await _authService.GetAvatarAsync(idNguoiDung);
-            //picAnhDaiDienGiua.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
-
             if (string.IsNullOrWhiteSpace(groupId)) return;
 
             idNguoiDangChat = groupId;
@@ -1100,8 +852,6 @@ namespace ChatApp
                 lblTenDangNhapGiua.Text = "Nhóm chat";
             }
 
-            ResetChatUI();
-
             boDieuKhienNhanTinNhom.StartListenGroup(
                 groupId,
                 onInitialLoaded: delegate (List<ChatMessage> initial)
@@ -1110,7 +860,7 @@ namespace ChatApp
 
                     this.BeginInvoke((Action)delegate
                     {
-                        RenderInitialMessages(initial, groupId);
+                        RenderMessages(initial, groupId);
                     });
                 },
                 onMessageAdded: delegate (ChatMessage msg)
@@ -1119,7 +869,7 @@ namespace ChatApp
 
                     this.BeginInvoke((Action)delegate
                     {
-                        QueueAppendMessage(msg, groupId);
+                        AddMessageBubble(msg);
                     });
                 },
                 onReset: delegate (List<ChatMessage> full)
@@ -1128,10 +878,9 @@ namespace ChatApp
 
                     this.BeginInvoke((Action)delegate
                     {
-                        RenderInitialMessages(full, groupId);
+                        RenderMessages(full, groupId);
                     });
                 });
-
         }
 
         private async void btnTaoNhom_Click(object sender, EventArgs e)
@@ -1145,7 +894,7 @@ namespace ChatApp
                     return;
                 }
 
-                using (TaoNhom f = new TaoNhom(tatCaNguoiDung,idDangNhap,tokenDangNhap))
+                using (TaoNhom f = new TaoNhom(tatCaNguoiDung, idDangNhap, tokenDangNhap))
                 {
                     if (f.ShowDialog() != DialogResult.OK)
                     {
@@ -1227,14 +976,13 @@ namespace ChatApp
                         ChatMessage sent = await boDieuKhienNhanTinNhom.SendGroupAttachmentMessageAsync(idNguoiDangChat, ofd.FileName);
                         if (sent != null)
                         {
-                            QueueAppendMessage(sent, idNguoiDangChat);
+                            // listener sẽ tự append
                         }
                     }
                     else
                     {
                         await boDieuKhienNhanTin.SendAttachmentMessageAsync(idNguoiDangChat, ofd.FileName);
                     }
-
                 }
             }
             catch (Exception ex)
@@ -1363,8 +1111,6 @@ namespace ChatApp
             }
         }
 
-
-
         #region ====== ẢNH: CLICK ĐỂ XEM FULL + DOWNLOAD ======
 
         private void GanClickDeXemAnh(Control root)
@@ -1490,11 +1236,12 @@ namespace ChatApp
             FormEmoji frm = new FormEmoji();
 
             // Nhận emoji từ FormEmoji
-            frm.OnEmojiSelected = (emojiCode) => {
+            frm.OnEmojiSelected = (emojiCode) =>
+            {
                 // Thêm mã emoji vào văn bản hiện tại
-                txtNhapTinNhan.AppendText($" :{emojiCode}: ");
+                txtNhapTinNhan.AppendText(string.Format(" :{0}: ", emojiCode));
 
-                // Quan trọng: Trả focus về ô nhập liệu để người dùng gõ tiếp được ngay
+                // Trả focus về ô nhập liệu
                 txtNhapTinNhan.Focus();
                 txtNhapTinNhan.SelectionStart = txtNhapTinNhan.Text.Length;
             };
@@ -1512,7 +1259,7 @@ namespace ChatApp
         private void btnRefresh_Click(object sender, EventArgs e)
         {
             this.Hide();
-            var f = new NhanTin(idDangNhap,tokenDangNhap);
+            var f = new NhanTin(idDangNhap, tokenDangNhap);
             f.TopMost = true;
             f.Show();
             this.Close();
