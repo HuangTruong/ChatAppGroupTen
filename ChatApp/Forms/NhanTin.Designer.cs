@@ -43,8 +43,8 @@
             this.btnTaoNhom = new Guna.UI2.WinForms.Guna2Button();
             this.btnSearchFriends = new Guna.UI2.WinForms.Guna2Button();
             this.btnRequest = new Guna.UI2.WinForms.Guna2Button();
-            this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.btnRefresh = new Guna.UI2.WinForms.Guna2Button();
+            this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
             this.pnlInput.SuspendLayout();
@@ -338,22 +338,6 @@
             this.btnRequest.Text = "Lời Mời";
             this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
             // 
-            // pnlBackground
-            // 
-            this.pnlBackground.Controls.Add(this.pnlGiua);
-            this.pnlBackground.Controls.Add(this.pnlTrai);
-            this.pnlBackground.Controls.Add(this.pnlPhai);
-            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
-            this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
-            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
-            this.pnlBackground.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlBackground.Name = "pnlBackground";
-            this.pnlBackground.Padding = new System.Windows.Forms.Padding(12);
-            this.pnlBackground.Size = new System.Drawing.Size(1181, 654);
-            this.pnlBackground.TabIndex = 1;
-            // 
             // btnRefresh
             // 
             this.btnRefresh.BorderRadius = 20;
@@ -370,6 +354,22 @@
             this.btnRefresh.TabIndex = 9;
             this.btnRefresh.Text = "Tải Lại Trang";
             this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            // 
+            // pnlBackground
+            // 
+            this.pnlBackground.Controls.Add(this.pnlGiua);
+            this.pnlBackground.Controls.Add(this.pnlTrai);
+            this.pnlBackground.Controls.Add(this.pnlPhai);
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
+            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
+            this.pnlBackground.Location = new System.Drawing.Point(0, 0);
+            this.pnlBackground.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlBackground.Name = "pnlBackground";
+            this.pnlBackground.Padding = new System.Windows.Forms.Padding(12);
+            this.pnlBackground.Size = new System.Drawing.Size(1181, 654);
+            this.pnlBackground.TabIndex = 1;
             // 
             // NhanTin
             // 
