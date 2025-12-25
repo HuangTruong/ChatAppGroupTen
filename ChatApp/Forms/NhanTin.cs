@@ -406,20 +406,6 @@ namespace ChatApp
             return ten;
         }
 
-        private static string GetUserSubtitle(User user, string userId)
-        {
-            if (user != null && !string.IsNullOrWhiteSpace(user.Email))
-            {
-                return user.Email.Trim();
-            }
-
-            if (!string.IsNullOrWhiteSpace(userId))
-            {
-                return userId;
-            }
-
-            return string.Empty;
-        }
 
         #endregion
 
@@ -598,7 +584,7 @@ namespace ChatApp
 
         #region ====== CHỌN USER & MỞ CUỘC TRÒ CHUYỆN ======
 
-        private void UserItem_Click(object sender, EventArgs e)
+        private async void UserItem_Click(object sender, EventArgs e)
         {
             Conversations conversations = sender as Conversations;
             if (conversations == null) return;
@@ -614,6 +600,10 @@ namespace ChatApp
                 return;
             }
 
+            // Load avatar người dùng (Firebase)
+            string base64 = await _authService.GetAvatarAsync(idNguoiDung);
+            picAnhDaiDienGiua.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
+
             OpenConversation(idNguoiDung);
         }
 
@@ -626,7 +616,6 @@ namespace ChatApp
         private void OpenConversation(string otherUserId)
         {
             idNguoiDangChat = otherUserId;
-
 
             // Chuyển về chế độ chat 1-1
             dangChatNhom = false;

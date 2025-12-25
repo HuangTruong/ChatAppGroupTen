@@ -44,7 +44,6 @@ namespace ChatApp.Controllers
         #endregion
 
         #region ====== CTOR ======
-
         public NhanTinController(string currentUserId, string token)
         {
             _currentUserId = currentUserId;
@@ -340,11 +339,8 @@ namespace ChatApp.Controllers
             }
         }
 
-        private void HandleAddedEvent(
-    string conversationId,
-    ValueAddedEventArgs e,
-    Action<ChatMessage> onMessageAdded,
-    Action<List<ChatMessage>> onReset)
+        private void HandleAddedEvent(string conversationId, ValueAddedEventArgs e, Action<ChatMessage> onMessageAdded,
+                                        Action<List<ChatMessage>> onReset)
         {
             ProcessStreamEvent(
                 conversationId,
@@ -511,7 +507,6 @@ namespace ChatApp.Controllers
                 await Task.CompletedTask;
             });
         }
-
 
         private void DebounceFullReload(string conversationId, Action<List<ChatMessage>> onReset)
         {
