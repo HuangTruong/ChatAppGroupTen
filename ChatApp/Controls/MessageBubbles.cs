@@ -16,11 +16,11 @@ namespace ChatApp.Controls
         private bool IsMine;
 
         // ===== ẢNH: GIỚI HẠN HIỂN THỊ (tránh ảnh to làm vỡ layout) =====
-        private const int IMG_MAX_W = 320;
-        private const int IMG_MAX_H = 240;
+        private const int IMG_MAX_W = 100;
+        private const int IMG_MAX_H = 100;
 
         // Giới hạn bề ngang chữ để nó tự xuống dòng
-        private const int TEXT_MAX_W = 280;
+        private const int TEXT_MAX_W = 2;
 
         /// <summary>
         /// Dịch vụ Auth làm việc với Firebase.
@@ -62,9 +62,9 @@ namespace ChatApp.Controls
             string base64 = await _authService.GetAvatarAsync(senderId);
             picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
         }
-            /// <summary>
-            /// Hiển thị tin nhắn ảnh (thumbnail + caption).
-            /// </summary>
+        /// <summary>
+        /// Hiển thị tin nhắn ảnh (thumbnail + caption).
+        /// </summary>
         public void SetImageMessage(string displayName, Image thumbnail, string caption, string time, bool isMine)
         {
             lblDisplayName.Text = displayName;
@@ -99,7 +99,6 @@ namespace ChatApp.Controls
                 lbl.MaximumSize = new Size(TEXT_MAX_W, 0);
                 lbl.Font = new Font("Segoe UI", 9.5F);
                 lbl.BackColor = Color.Transparent;
-                lbl.Margin = new Padding(0, 4, 0, 0);
 
                 if (ThemeManager.IsDark)
                 {
@@ -168,7 +167,6 @@ namespace ChatApp.Controls
                 AutoSize = true, // Bắt buộc để hiện text dài
                 Font = new Font("Segoe UI", 10.5F),
                 BackColor = Color.Transparent,
-                Margin = new Padding(0, 3, 0, 0)
             };
 
             // Đảm bảo màu chữ luôn tương phản với nền

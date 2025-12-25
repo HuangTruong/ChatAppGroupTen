@@ -128,36 +128,6 @@ namespace ChatApp
             boDieuKhienNhanTin = new NhanTinController(localId, token);
             boDieuKhienNhanTinNhom = new NhanTinNhomController(localId, token);
 
-            // ĐỔI KHUNG CHAT: dùng FlowLayoutPanel thay cho Panel
-            SetupChatFlowPanel();
-
-            // Hook tạo nhóm (Designer có thể chưa gắn event)
-            try
-            {
-                if (btnTaoNhom != null)
-                {
-                    btnTaoNhom.Click -= btnTaoNhom_Click;
-                    btnTaoNhom.Click += btnTaoNhom_Click;
-                }
-            }
-            catch { }
-
-            // Event form
-            Load += NhanTin_Load;
-            FormClosed += NhanTin_FormClosed;
-
-            // Event control
-            btnGui.Click += btnGui_Click;
-            txtNhapTinNhan.KeyDown += TxtNhapTinNhan_KeyDown;
-
-            // ====== SEND FILE: gắn click cho icon gửi file ======
-            PicSendFile.Click -= PicSendFile_Click;
-            PicSendFile.Click += PicSendFile_Click;
-            PicSendFile.Enabled = true;
-            PicSendFile.Visible = true;
-            PicSendFile.Cursor = Cursors.Hand;
-            PicSendFile.BringToFront();
-
             // ====== SEND FILE: bật TLS 1.2 để tải HTTPS ổn định hơn ======
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
             ServicePointManager.Expect100Continue = false;
@@ -167,31 +137,6 @@ namespace ChatApp
         #endregion
 
         #region ====== FLOW CHAT PANEL (flpKhungChat) ======
-
-        /// <summary>
-        /// Cấu hình khung chat dùng FlowLayoutPanel để hiển thị tin theo chiều dọc (cũ -> mới).
-        /// </summary>
-        private void SetupChatFlowPanel()
-        {
-            if (flpKhungChat == null) return;
-
-            flpKhungChat.SuspendLayout();
-            try
-            {
-                flpKhungChat.AutoScroll = true;
-                flpKhungChat.FlowDirection = FlowDirection.TopDown;
-                flpKhungChat.WrapContents = false;
-                flpKhungChat.Padding = new Padding(10, 10, 10, 10);
-            }
-            finally
-            {
-                flpKhungChat.ResumeLayout();
-            }
-
-            // Khi resize form, bubble tự giãn theo bề ngang
-            flpKhungChat.SizeChanged -= FlpKhungChat_SizeChanged;
-            flpKhungChat.SizeChanged += FlpKhungChat_SizeChanged;
-        }
 
         private void FlpKhungChat_SizeChanged(object sender, EventArgs e)
         {
@@ -613,92 +558,103 @@ namespace ChatApp
         /// Thêm 1 bong bóng tin nhắn vào khung chat (FlowLayoutPanel).
         /// </summary>
         private async void AddMessageBubble(ChatMessage msg)
+{
+    if (msg == null) return;
+    if (flpKhungChat == null) return;
+    if (this.IsDisposed) return;
+
+    bool isMine = msg.IsMine;
+
+    // ====== LẤY TÊN NGƯỜI GỬI ======
+    string senderId = msg.SenderId;
+    User thongTinNguoiGui = null;
+
+    try
+    {
+        if (!string.IsNullOrWhiteSpace(senderId))
+            thongTinNguoiGui = await _authService.GetUserByIdAsync(senderId);
+    }
+    catch { }
+
+    string displayName = isMine
+        ? "Bạn"
+        : (thongTinNguoiGui != null && !string.IsNullOrWhiteSpace(thongTinNguoiGui.DisplayName)
+            ? thongTinNguoiGui.DisplayName
+            : "Người dùng");
+
+    string time = FormatTimestamp(msg.Timestamp);
+    string type = (msg.MessageType ?? string.Empty).ToLowerInvariant();
+
+    MessageBubbles bubble = new MessageBubbles
+    {
+        Tag = msg,
+        Margin = new Padding(0, 6, 0, 6)
+    };
+
+    // Giãn bubble theo panel
+    int w = GetBubbleWidth();
+    if (w > 50) bubble.Width = w;
+
+    // ================== ẢNH ==================
+    if (type == "image")
+    {
+        Image thumb = TaoThumbnailTuMessage(msg);
+
+        bubble.SetImageMessage(
+            displayName,
+            thumb,
+            string.Empty,   // không caption cho gọn
+            time,
+            isMine
+        );
+
+        bubble.Cursor = Cursors.Hand;
+        GanClickDeXemAnh(bubble);
+        GanClickDeTaiFile(bubble);
+    }
+    // ================== FILE ==================
+    else if (type == "file")
+    {
+        string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
+        string noiDung = $"{ten} ({FormatBytes(msg.FileSize)})";
+
+        bubble.SetMessage(displayName, noiDung, time, isMine, msg.SenderId);
+
+        bubble.Cursor = Cursors.Hand;
+        GanClickDeTaiFile(bubble);
+    }
+    // ================== TEXT ==================
+    else
+    {
+        bubble.SetMessage(
+            displayName,
+            msg.Text ?? string.Empty,
+            time,
+            isMine,
+            msg.SenderId
+        );
+    }
+
+    // ====== ADD VÀO UI (AN TOÀN THREAD) ======
+    try
+    {
+        if (flpKhungChat.InvokeRequired)
         {
-            if (msg == null) return;
-            if (flpKhungChat == null) return;
-            if (this.IsDisposed) return;
-
-            bool isMine = msg.IsMine;
-
-            // ====== LẤY TÊN NGƯỜI GỬI (GIỮ NGUYÊN LOGIC HIỆN TẠI) ======
-            string senderId = msg.SenderId;
-            User thongTinNguoiGui = null;
-
-            try
+            flpKhungChat.BeginInvoke(new Action(() =>
             {
-                if (!string.IsNullOrWhiteSpace(senderId))
-                {
-                    thongTinNguoiGui = await _authService.GetUserByIdAsync(senderId);
-                }
-            }
-            catch
-            {
-                // ignore
-            }
-
-            string displayName = isMine
-                ? "Bạn"
-                : (thongTinNguoiGui != null && !string.IsNullOrWhiteSpace(thongTinNguoiGui.DisplayName)
-                    ? thongTinNguoiGui.DisplayName
-                    : "Người dùng");
-
-            string message = msg.Text ?? string.Empty;
-            string time = FormatTimestamp(msg.Timestamp);
-
-            MessageBubbles bubble = new MessageBubbles();
-            bubble.SetMessage(displayName, message, time, isMine, msg.SenderId);
-
-            bubble.Tag = msg;
-
-            // FlowLayoutPanel: không cần Dock
-            bubble.Margin = new Padding(0, 6, 0, 6);
-
-            // Giãn theo chiều ngang panel để nhìn đẹp và dễ đọc
-            int w = GetBubbleWidth();
-            if (w > 50) bubble.Width = w;
-
-            // ====== GẮN CLICK THEO LOẠI TIN (FILE / ẢNH) ======
-            try
-            {
-                string type = msg.MessageType ?? string.Empty;
-
-                if (type == string.Empty)
-                {
-                    string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                    message = ten + " (" + FormatBytes(msg.FileSize) + ")";
-                    GanClickDeTaiFile(bubble);
-                }
-                
-            }
-            catch
-            {
-                // ignore
-            }
-
-            // ====== ADD VÀO UI (AN TOÀN THREAD) ======
-            try
-            {
-                if (flpKhungChat.InvokeRequired)
-                {
-                    flpKhungChat.BeginInvoke(new Action(delegate
-                    {
-                        if (this.IsDisposed) return;
-
-                        flpKhungChat.Controls.Add(bubble);
-                        ScrollToBottom();
-                    }));
-                }
-                else
-                {
-                    flpKhungChat.Controls.Add(bubble);
-                    ScrollToBottom();
-                }
-            }
-            catch
-            {
-                // ignore
-            }
+                if (this.IsDisposed) return;
+                flpKhungChat.Controls.Add(bubble);
+                ScrollToBottom();
+            }));
         }
+        else
+        {
+            flpKhungChat.Controls.Add(bubble);
+            ScrollToBottom();
+        }
+    }
+    catch { }
+}
 
         /// <summary>
         /// Chuyển timestamp (ms) thành chuỗi dd/MM/yyyy HH:mm.
@@ -1255,14 +1211,5 @@ namespace ChatApp
         }
 
         #endregion
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-            var f = new NhanTin(idDangNhap, tokenDangNhap);
-            f.TopMost = true;
-            f.Show();
-            this.Close();
-        }
     }
 }

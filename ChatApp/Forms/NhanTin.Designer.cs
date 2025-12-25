@@ -27,6 +27,8 @@
             this.pnlTrai = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlDanhSachChat = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlGiua = new Guna.UI2.WinForms.Guna2Panel();
+            this.pnlKhungChat = new Guna.UI2.WinForms.Guna2Panel();
+            this.flpKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlInput = new Guna.UI2.WinForms.Guna2Panel();
             this.txtNhapTinNhan = new Guna.UI2.WinForms.Guna2TextBox();
             this.PicSendFile = new Guna.UI2.WinForms.Guna2CirclePictureBox();
@@ -42,12 +44,10 @@
             this.btnTaoNhom = new Guna.UI2.WinForms.Guna2Button();
             this.btnSearchFriends = new Guna.UI2.WinForms.Guna2Button();
             this.btnRequest = new Guna.UI2.WinForms.Guna2Button();
-            this.btnRefresh = new Guna.UI2.WinForms.Guna2Button();
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
-            this.pnlKhungChat = new Guna.UI2.WinForms.Guna2Panel();
-            this.flpKhungChat = new System.Windows.Forms.FlowLayoutPanel();
             this.pnlTrai.SuspendLayout();
             this.pnlGiua.SuspendLayout();
+            this.pnlKhungChat.SuspendLayout();
             this.pnlInput.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PicSendFile)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picEmoji)).BeginInit();
@@ -57,7 +57,6 @@
             this.pnlButtons.SuspendLayout();
             this.flpPhai.SuspendLayout();
             this.pnlBackground.SuspendLayout();
-            this.pnlKhungChat.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTrai
@@ -99,6 +98,34 @@
             this.pnlGiua.Size = new System.Drawing.Size(637, 630);
             this.pnlGiua.TabIndex = 0;
             // 
+            // pnlKhungChat
+            // 
+            this.pnlKhungChat.AutoScroll = true;
+            this.pnlKhungChat.BackColor = System.Drawing.Color.Transparent;
+            this.pnlKhungChat.BorderRadius = 10;
+            this.pnlKhungChat.Controls.Add(this.flpKhungChat);
+            this.pnlKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlKhungChat.FillColor = System.Drawing.Color.White;
+            this.pnlKhungChat.Location = new System.Drawing.Point(12, 88);
+            this.pnlKhungChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.pnlKhungChat.Name = "pnlKhungChat";
+            this.pnlKhungChat.Padding = new System.Windows.Forms.Padding(11, 10, 11, 10);
+            this.pnlKhungChat.Size = new System.Drawing.Size(613, 460);
+            this.pnlKhungChat.TabIndex = 2;
+            // 
+            // flpKhungChat
+            // 
+            this.flpKhungChat.AutoScroll = true;
+            this.flpKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpKhungChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flpKhungChat.Location = new System.Drawing.Point(11, 10);
+            this.flpKhungChat.Name = "flpKhungChat";
+            this.flpKhungChat.Padding = new System.Windows.Forms.Padding(8);
+            this.flpKhungChat.Size = new System.Drawing.Size(591, 440);
+            this.flpKhungChat.TabIndex = 0;
+            this.flpKhungChat.WrapContents = false;
+            this.flpKhungChat.SizeChanged += new System.EventHandler(this.FlpKhungChat_SizeChanged);
+            // 
             // pnlInput
             // 
             this.pnlInput.BackColor = System.Drawing.Color.Transparent;
@@ -136,9 +163,11 @@
             this.txtNhapTinNhan.SelectedText = "";
             this.txtNhapTinNhan.Size = new System.Drawing.Size(450, 46);
             this.txtNhapTinNhan.TabIndex = 0;
+            this.txtNhapTinNhan.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtNhapTinNhan_KeyDown);
             // 
             // PicSendFile
             // 
+            this.PicSendFile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.PicSendFile.Dock = System.Windows.Forms.DockStyle.Right;
             this.PicSendFile.Image = global::ChatApp.Properties.Resources.AddFile;
             this.PicSendFile.ImageRotate = 0F;
@@ -150,9 +179,11 @@
             this.PicSendFile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PicSendFile.TabIndex = 3;
             this.PicSendFile.TabStop = false;
+            this.PicSendFile.Click += new System.EventHandler(this.PicSendFile_Click);
             // 
             // picEmoji
             // 
+            this.picEmoji.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picEmoji.Dock = System.Windows.Forms.DockStyle.Right;
             this.picEmoji.Image = global::ChatApp.Properties.Resources.Icon;
             this.picEmoji.ImageRotate = 0F;
@@ -169,6 +200,7 @@
             // btnGui
             // 
             this.btnGui.BorderRadius = 20;
+            this.btnGui.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnGui.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnGui.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnGui.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -181,6 +213,7 @@
             this.btnGui.Size = new System.Drawing.Size(69, 46);
             this.btnGui.TabIndex = 4;
             this.btnGui.Text = "Gửi";
+            this.btnGui.Click += new System.EventHandler(this.btnGui_Click);
             // 
             // pnlNguoiChat
             // 
@@ -268,7 +301,6 @@
             this.flpPhai.Controls.Add(this.btnTaoNhom);
             this.flpPhai.Controls.Add(this.btnSearchFriends);
             this.flpPhai.Controls.Add(this.btnRequest);
-            this.flpPhai.Controls.Add(this.btnRefresh);
             this.flpPhai.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpPhai.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flpPhai.Location = new System.Drawing.Point(5, 5);
@@ -280,6 +312,7 @@
             // btnTaoNhom
             // 
             this.btnTaoNhom.BorderRadius = 20;
+            this.btnTaoNhom.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnTaoNhom.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnTaoNhom.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnTaoNhom.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -292,10 +325,12 @@
             this.btnTaoNhom.Size = new System.Drawing.Size(180, 46);
             this.btnTaoNhom.TabIndex = 6;
             this.btnTaoNhom.Text = "Tạo Nhóm";
+            this.btnTaoNhom.Click += new System.EventHandler(this.btnTaoNhom_Click);
             // 
             // btnSearchFriends
             // 
             this.btnSearchFriends.BorderRadius = 20;
+            this.btnSearchFriends.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnSearchFriends.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnSearchFriends.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnSearchFriends.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -313,6 +348,7 @@
             // btnRequest
             // 
             this.btnRequest.BorderRadius = 20;
+            this.btnRequest.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRequest.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnRequest.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnRequest.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -326,23 +362,6 @@
             this.btnRequest.TabIndex = 8;
             this.btnRequest.Text = "Lời Mời";
             this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
-            // 
-            // btnRefresh
-            // 
-            this.btnRefresh.BorderRadius = 20;
-            this.btnRefresh.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnRefresh.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnRefresh.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnRefresh.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnRefresh.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
-            this.btnRefresh.ForeColor = System.Drawing.Color.White;
-            this.btnRefresh.Location = new System.Drawing.Point(23, 228);
-            this.btnRefresh.Margin = new System.Windows.Forms.Padding(23, 0, 3, 20);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(180, 46);
-            this.btnRefresh.TabIndex = 9;
-            this.btnRefresh.Text = "Tải Lại Trang";
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // pnlBackground
             // 
@@ -360,29 +379,6 @@
             this.pnlBackground.Size = new System.Drawing.Size(1181, 654);
             this.pnlBackground.TabIndex = 1;
             // 
-            // pnlKhungChat
-            // 
-            this.pnlKhungChat.AutoScroll = true;
-            this.pnlKhungChat.BackColor = System.Drawing.Color.Transparent;
-            this.pnlKhungChat.BorderRadius = 10;
-            this.pnlKhungChat.Controls.Add(this.flpKhungChat);
-            this.pnlKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlKhungChat.FillColor = System.Drawing.Color.White;
-            this.pnlKhungChat.Location = new System.Drawing.Point(12, 88);
-            this.pnlKhungChat.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.pnlKhungChat.Name = "pnlKhungChat";
-            this.pnlKhungChat.Padding = new System.Windows.Forms.Padding(11, 10, 11, 10);
-            this.pnlKhungChat.Size = new System.Drawing.Size(613, 460);
-            this.pnlKhungChat.TabIndex = 2;
-            // 
-            // flpKhungChat
-            // 
-            this.flpKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flpKhungChat.Location = new System.Drawing.Point(11, 10);
-            this.flpKhungChat.Name = "flpKhungChat";
-            this.flpKhungChat.Size = new System.Drawing.Size(591, 440);
-            this.flpKhungChat.TabIndex = 0;
-            // 
             // NhanTin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -393,8 +389,11 @@
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Nhắn Tin";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.NhanTin_FormClosed);
+            this.Load += new System.EventHandler(this.NhanTin_Load);
             this.pnlTrai.ResumeLayout(false);
             this.pnlGiua.ResumeLayout(false);
+            this.pnlKhungChat.ResumeLayout(false);
             this.pnlInput.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.PicSendFile)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picEmoji)).EndInit();
@@ -404,7 +403,6 @@
             this.pnlButtons.ResumeLayout(false);
             this.flpPhai.ResumeLayout(false);
             this.pnlBackground.ResumeLayout(false);
-            this.pnlKhungChat.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -430,7 +428,6 @@
         private Guna.UI2.WinForms.Guna2Panel pnlDanhSachChat;
         private Guna.UI2.WinForms.Guna2Panel pnlButtons;
         private Guna.UI2.WinForms.Guna2Button btnGui;
-        private Guna.UI2.WinForms.Guna2Button btnRefresh;
         private Guna.UI2.WinForms.Guna2Panel pnlKhungChat;
         private System.Windows.Forms.FlowLayoutPanel flpKhungChat;
     }
