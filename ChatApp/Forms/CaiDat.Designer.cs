@@ -7,7 +7,6 @@ namespace ChatApp
         private System.ComponentModel.IContainer components = null;
 
         private Guna2Panel pnlMain;
-        private Guna2CirclePictureBox picAvatar;
         private Guna2Button btnDoiAvatar;
         private Guna2TextBox txtTenDangNhap;
         private Guna2TextBox txtMatKhau;
@@ -27,7 +26,6 @@ namespace ChatApp
         private void InitializeComponent()
         {
             this.pnlMain = new Guna.UI2.WinForms.Guna2Panel();
-            this.picAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.btnDoiAvatar = new Guna.UI2.WinForms.Guna2Button();
             this.lblTitle = new System.Windows.Forms.Label();
             this.txtTenDangNhap = new Guna.UI2.WinForms.Guna2TextBox();
@@ -35,6 +33,7 @@ namespace ChatApp
             this.btnDoiMatKhau = new Guna.UI2.WinForms.Guna2Button();
             this.btnDoiTenDangNhap = new Guna.UI2.WinForms.Guna2Button();
             this.btnDong = new Guna.UI2.WinForms.Guna2Button();
+            this.picAvatar = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).BeginInit();
             this.SuspendLayout();
@@ -58,20 +57,6 @@ namespace ChatApp
             this.pnlMain.ShadowDecoration.Enabled = true;
             this.pnlMain.Size = new System.Drawing.Size(747, 388);
             this.pnlMain.TabIndex = 0;
-            // 
-            // picAvatar
-            // 
-            this.picAvatar.BackColor = System.Drawing.Color.Transparent;
-            this.picAvatar.FillColor = System.Drawing.Color.Gainsboro;
-            this.picAvatar.ImageRotate = 0F;
-            this.picAvatar.Location = new System.Drawing.Point(335, 75);
-            this.picAvatar.Name = "picAvatar";
-            this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatar.Size = new System.Drawing.Size(84, 84);
-            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picAvatar.TabIndex = 0;
-            this.picAvatar.TabStop = false;
-            this.picAvatar.UseTransparentBackground = true;
             // 
             // btnDoiAvatar
             // 
@@ -160,6 +145,18 @@ namespace ChatApp
             this.btnDong.Text = "Đóng";
             this.btnDong.Click += new System.EventHandler(this.btnDong_Click);
             // 
+            // picAvatar
+            // 
+            this.picAvatar.BorderRadius = 30;
+            this.picAvatar.FillColor = System.Drawing.Color.Silver;
+            this.picAvatar.ImageRotate = 0F;
+            this.picAvatar.Location = new System.Drawing.Point(332, 75);
+            this.picAvatar.Name = "picAvatar";
+            this.picAvatar.Size = new System.Drawing.Size(87, 85);
+            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picAvatar.TabIndex = 9;
+            this.picAvatar.TabStop = false;
+            // 
             // CatDat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -180,5 +177,7 @@ namespace ChatApp
         }
 
         #endregion
+
+        private Guna2PictureBox picAvatar;
     }
 }

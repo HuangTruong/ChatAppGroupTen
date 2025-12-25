@@ -1,9 +1,11 @@
-﻿using ChatApp.Services.UI;
+﻿using ChatApp.Helpers;
+using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
 using System;
 using System.Drawing;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
 using System.IO;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace ChatApp.Controls
 {
@@ -19,6 +21,11 @@ namespace ChatApp.Controls
 
         // Giới hạn bề ngang chữ để nó tự xuống dòng
         private const int TEXT_MAX_W = 280;
+
+        /// <summary>
+        /// Dịch vụ Auth làm việc với Firebase.
+        /// </summary>
+        private readonly AuthService _authService = new AuthService();
         #endregion
 
         #region ======= CONSTRUCTOR =======
@@ -32,7 +39,7 @@ namespace ChatApp.Controls
 
         #region ======= PUBLIC METHODS =======
 
-        public void SetMessage(string displayName, string message, string time, bool isMine)
+        public async void SetMessage(string displayName, string message, string time, bool isMine, string senderId)
         {
             lblDisplayName.Text = displayName;
             lblTime.Text = time;
@@ -50,6 +57,10 @@ namespace ChatApp.Controls
 
             // 4. Fix: Bubble cao bao nhiêu thì UserControl cao theo (khỏi bị cắt)
             FitBubbleHeight();
+
+            // Load avatar người dùng (Firebase)
+            string base64 = await _authService.GetAvatarAsync(senderId);
+            picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
         }
             /// <summary>
             /// Hiển thị tin nhắn ảnh (thumbnail + caption).

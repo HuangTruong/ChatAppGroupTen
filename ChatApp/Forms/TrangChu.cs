@@ -1,12 +1,13 @@
-﻿using System;
-using System.Drawing;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using FireSharp.Interfaces;
-
+﻿using ChatApp.Controllers;
+using ChatApp.Helpers;
 using ChatApp.Models.Users;
 using ChatApp.Services.Firebase;
 using ChatApp.Services.UI;
+using FireSharp.Interfaces;
+using System;
+using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ChatApp
 {
@@ -41,6 +42,11 @@ namespace ChatApp
         /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
         /// </summary>
         private readonly ThemeService _themeService = new ThemeService();
+
+        // <summary>
+        /// Controller để laod avatar
+        /// </summary>
+        private readonly CaiDatController _controller;
 
         /// <summary>
         /// Form nhắn tin (màn hình chat chính).
@@ -125,93 +131,16 @@ namespace ChatApp
 
             // Nếu sau này bạn muốn: có thể load thêm thông tin user, avatar, status... ở đây
 
-            // Load chế độ ngày đêm
             // Load avatar người dùng (Firebase)
-            await LoadMyAvatarAsync();
+            string base64 = await _authService.GetAvatarAsync(_localId);
+            picAnhDaiDien.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
 
+            // Load chế độ ngày đêm
             bool isDark = await _themeService.GetThemeAsync(_localId);
             ThemeManager.ApplyTheme(this, isDark);
             if (isDark) picDayNight.Image = Properties.Resources.Moon;
             else picDayNight.Image = Properties.Resources.Sun;
         }
-
-
-        /// <summary>
-        /// Load avatar của user hiện tại từ Firebase và set lên PictureBox picAnhDaiDien (nếu có).
-        /// </summary>
-        private async Task LoadMyAvatarAsync()
-        {
-            try
-            {
-                if (picAnhDaiDien == null) return;
-
-                string base64 = await _authService.GetAvatarAsync(_localId).ConfigureAwait(false);
-                Image img = TryDecodeBase64ToImage(base64);
-                if (img == null) return;
-
-                SetPictureBoxImageSafe(picAnhDaiDien, img);
-            }
-            catch
-            {
-                // ignore
-            }
-        }
-
-        private static Image TryDecodeBase64ToImage(string base64)
-        {
-            if (string.IsNullOrWhiteSpace(base64)) return null;
-
-            try
-            {
-                byte[] bytes = Convert.FromBase64String(base64);
-
-                Image img;
-                using (System.IO.MemoryStream ms = new System.IO.MemoryStream(bytes))
-                {
-                    using (Image tmp = Image.FromStream(ms))
-                    {
-                        img = (Image)tmp.Clone();
-                    }
-                }
-
-                return img;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private void SetPictureBoxImageSafe(PictureBox pb, Image newImg)
-        {
-            if (pb == null)
-            {
-                if (newImg != null) newImg.Dispose();
-                return;
-            }
-
-            if (pb.InvokeRequired)
-            {
-                try
-                {
-                    pb.BeginInvoke(new Action(delegate { SetPictureBoxImageSafe(pb, newImg); }));
-                }
-                catch
-                {
-                    if (newImg != null) newImg.Dispose();
-                }
-                return;
-            }
-
-            Image old = pb.Image;
-            pb.Image = newImg;
-
-            if (old != null)
-            {
-                try { old.Dispose(); } catch { }
-            }
-        }
-
         #endregion
 
         #region ====== NHẮN TIN ======

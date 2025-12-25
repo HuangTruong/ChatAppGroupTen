@@ -1,6 +1,7 @@
 ﻿using ChatApp.Controllers;
 using ChatApp.Controls;
 using ChatApp.Forms;
+using ChatApp.Helpers;
 using ChatApp.Models.Groups;
 using ChatApp.Models.Messages;
 using ChatApp.Models.Users;
@@ -260,16 +261,6 @@ namespace ChatApp
             // Load chế độ ngày đêm
             bool isDark = await _themeService.GetThemeAsync(idDangNhap);
             ThemeManager.ApplyTheme(this, isDark);
-
-            // Load trạng thái người dùng offline, online
-            if (await _authService.GetStatusAsync(idDangNhap) == "online")
-            {
-                lblTrangThai.Text = "Online";
-            }
-            else
-            {
-                lblTrangThai.Text = "Offline";
-            }
         }
 
         private void NhanTin_FormClosed(object sender, FormClosedEventArgs e)
@@ -361,7 +352,7 @@ namespace ChatApp
             Conversations conversations = new Conversations();
             conversations.Cursor = Cursors.Hand;
 
-            conversations.SetInfo(GetUserFullName(user), GetUserSubtitle(user, userId));
+            conversations.SetInfo(GetUserFullName(user), user.LocalId);
             conversations.Tag = userId;
 
             conversations.ItemClicked -= UserItem_Click;
@@ -587,7 +578,7 @@ namespace ChatApp
                             message = msg.Text ?? string.Empty;
                         }
 
-                        bubble.SetMessage(newName, message, time, false);
+                        bubble.SetMessage(newName, message, time, false,senderId);
 
                         if (laTinFile)
                         {
@@ -959,7 +950,7 @@ namespace ChatApp
                     message = msg.Text ?? string.Empty;
                 }
 
-                bubble.SetMessage(displayName, message, time, isMine);
+                bubble.SetMessage(displayName, message, time, isMine,msg.SenderId);
 
                 if (laTinFile)
                 {

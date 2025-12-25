@@ -67,6 +67,10 @@ namespace ChatApp
             {
                 picAvatar.Image = img;
             }
+            else
+            {
+                picAvatar.Image = Properties.Resources.DefaultAvatar;
+            }
         }
 
         #endregion
