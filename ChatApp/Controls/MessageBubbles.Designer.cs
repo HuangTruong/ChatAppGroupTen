@@ -52,19 +52,19 @@
             this.flpBubble.Controls.Add(this.lblTime);
             this.flpBubble.Dock = System.Windows.Forms.DockStyle.Left;
             this.flpBubble.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flpBubble.Location = new System.Drawing.Point(52, 0);
-            this.flpBubble.Margin = new System.Windows.Forms.Padding(2);
+            this.flpBubble.Location = new System.Drawing.Point(70, 0);
+            this.flpBubble.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.flpBubble.Name = "flpBubble";
-            this.flpBubble.Size = new System.Drawing.Size(77, 76);
+            this.flpBubble.Size = new System.Drawing.Size(102, 94);
             this.flpBubble.TabIndex = 1;
             // 
             // lblDisplayName
             // 
             this.lblDisplayName.BackColor = System.Drawing.Color.Transparent;
-            this.lblDisplayName.Location = new System.Drawing.Point(2, 2);
-            this.lblDisplayName.Margin = new System.Windows.Forms.Padding(2);
+            this.lblDisplayName.Location = new System.Drawing.Point(3, 2);
+            this.lblDisplayName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblDisplayName.Name = "lblDisplayName";
-            this.lblDisplayName.Size = new System.Drawing.Size(73, 15);
+            this.lblDisplayName.Size = new System.Drawing.Size(96, 18);
             this.lblDisplayName.TabIndex = 0;
             this.lblDisplayName.Text = "{DisplayName}";
             // 
@@ -73,8 +73,8 @@
             this.pnlBubble.AutoSize = true;
             this.pnlBubble.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.pnlBubble.Controls.Add(this.flpMessageContent);
-            this.pnlBubble.Location = new System.Drawing.Point(2, 21);
-            this.pnlBubble.Margin = new System.Windows.Forms.Padding(2);
+            this.pnlBubble.Location = new System.Drawing.Point(3, 24);
+            this.pnlBubble.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlBubble.Name = "pnlBubble";
             this.pnlBubble.Size = new System.Drawing.Size(0, 0);
             this.pnlBubble.TabIndex = 1;
@@ -85,6 +85,7 @@
             this.flpMessageContent.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.flpMessageContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpMessageContent.Location = new System.Drawing.Point(0, 0);
+            this.flpMessageContent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.flpMessageContent.Name = "flpMessageContent";
             this.flpMessageContent.Size = new System.Drawing.Size(0, 0);
             this.flpMessageContent.TabIndex = 1;
@@ -92,21 +93,22 @@
             // lblTime
             // 
             this.lblTime.BackColor = System.Drawing.Color.Transparent;
-            this.lblTime.Location = new System.Drawing.Point(2, 25);
-            this.lblTime.Margin = new System.Windows.Forms.Padding(2);
+            this.lblTime.Location = new System.Drawing.Point(3, 28);
+            this.lblTime.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblTime.Name = "lblTime";
-            this.lblTime.Size = new System.Drawing.Size(34, 15);
+            this.lblTime.Size = new System.Drawing.Size(44, 18);
             this.lblTime.TabIndex = 2;
             this.lblTime.Text = "{Time}";
             // 
             // picAvatar
             // 
             this.picAvatar.ImageRotate = 0F;
-            this.picAvatar.Location = new System.Drawing.Point(2, 2);
-            this.picAvatar.Margin = new System.Windows.Forms.Padding(2);
+            this.picAvatar.Location = new System.Drawing.Point(3, 2);
+            this.picAvatar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.picAvatar.Name = "picAvatar";
             this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatar.Size = new System.Drawing.Size(48, 52);
+            this.picAvatar.Size = new System.Drawing.Size(64, 64);
+            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picAvatar.TabIndex = 0;
             this.picAvatar.TabStop = false;
             // 
@@ -118,9 +120,9 @@
             this.pnlBackGround.Controls.Add(this.pnlAvatar);
             this.pnlBackGround.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlBackGround.Location = new System.Drawing.Point(0, 0);
-            this.pnlBackGround.Margin = new System.Windows.Forms.Padding(2);
+            this.pnlBackGround.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlBackGround.Name = "pnlBackGround";
-            this.pnlBackGround.Size = new System.Drawing.Size(129, 76);
+            this.pnlBackGround.Size = new System.Drawing.Size(172, 94);
             this.pnlBackGround.TabIndex = 0;
             // 
             // pnlAvatar
@@ -130,19 +132,19 @@
             this.pnlAvatar.Controls.Add(this.picAvatar);
             this.pnlAvatar.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlAvatar.Location = new System.Drawing.Point(0, 0);
-            this.pnlAvatar.Margin = new System.Windows.Forms.Padding(2);
+            this.pnlAvatar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlAvatar.Name = "pnlAvatar";
-            this.pnlAvatar.Size = new System.Drawing.Size(52, 76);
+            this.pnlAvatar.Size = new System.Drawing.Size(70, 94);
             this.pnlAvatar.TabIndex = 2;
             // 
             // MessageBubbles
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlBackGround);
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "MessageBubbles";
-            this.Size = new System.Drawing.Size(296, 76);
+            this.Size = new System.Drawing.Size(395, 94);
             this.flpBubble.ResumeLayout(false);
             this.flpBubble.PerformLayout();
             this.pnlBubble.ResumeLayout(false);

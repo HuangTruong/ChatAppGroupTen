@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.pnlBackground = new Guna.UI2.WinForms.Guna2Panel();
-            this.picAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.lblDisplayName = new Guna.UI2.WinForms.Guna2HtmlLabel();
+            this.picAvatar = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).BeginInit();
             this.SuspendLayout();
@@ -44,19 +44,8 @@
             this.pnlBackground.Location = new System.Drawing.Point(5, 5);
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlBackground.Size = new System.Drawing.Size(214, 66);
+            this.pnlBackground.Size = new System.Drawing.Size(1244, 66);
             this.pnlBackground.TabIndex = 0;
-            // 
-            // picAvatar
-            // 
-            this.picAvatar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.picAvatar.ImageRotate = 0F;
-            this.picAvatar.Location = new System.Drawing.Point(5, 5);
-            this.picAvatar.Name = "picAvatar";
-            this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatar.Size = new System.Drawing.Size(56, 56);
-            this.picAvatar.TabIndex = 0;
-            this.picAvatar.TabStop = false;
             // 
             // lblDisplayName
             // 
@@ -66,10 +55,22 @@
             this.lblDisplayName.Location = new System.Drawing.Point(61, 5);
             this.lblDisplayName.Name = "lblDisplayName";
             this.lblDisplayName.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblDisplayName.Size = new System.Drawing.Size(148, 56);
+            this.lblDisplayName.Size = new System.Drawing.Size(1178, 56);
             this.lblDisplayName.TabIndex = 1;
             this.lblDisplayName.Text = "guna2HtmlLabel1";
             this.lblDisplayName.TextAlignment = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // picAvatar
+            // 
+            this.picAvatar.Dock = System.Windows.Forms.DockStyle.Left;
+            this.picAvatar.ImageRotate = 0F;
+            this.picAvatar.Location = new System.Drawing.Point(5, 5);
+            this.picAvatar.Name = "picAvatar";
+            this.picAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picAvatar.Size = new System.Drawing.Size(56, 56);
+            this.picAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picAvatar.TabIndex = 0;
+            this.picAvatar.TabStop = false;
             // 
             // Conversations
             // 
@@ -79,11 +80,12 @@
             this.Name = "Conversations";
             this.Dock = System.Windows.Forms.DockStyle.Top;
             this.Padding = new System.Windows.Forms.Padding(5);
-            this.Size = new System.Drawing.Size(224, 76);
+            this.Size = new System.Drawing.Size(1254, 76);
             this.Tag = "Conversations";
             this.pnlBackground.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picAvatar)).EndInit();
             this.ResumeLayout(false);
+
         }
         #endregion
 

@@ -54,66 +54,24 @@ namespace ChatApp.Controllers
         /// <summary>
         /// Tải avatar người dùng từ Firebase (base64 → Image).
         /// </summary>
-        /// <returns>
-        /// Đối tượng <see cref="Image"/> nếu có avatar, 
-        /// hoặc null nếu không có / bị lỗi.
-        /// </returns>
         public async Task<Image> LoadAvatarAsync()
         {
             try
             {
-                string avatar = await _authService.GetAvatarAsync(_localId).ConfigureAwait(false);
-                return DecodeAvatarToImage(avatar);
-            }
-            catch
-            {
-                return null;
-            }
-        }
+                string base64 = await _authService
+                    .GetAvatarAsync(_localId)
+                    .ConfigureAwait(false);
 
-        private static Image DecodeAvatarToImage(string avatarValue)
-        {
-            if (string.IsNullOrWhiteSpace(avatarValue))
-            {
-                return null;
-            }
+                if (string.IsNullOrWhiteSpace(base64) ||
+                    string.Equals(base64, "null", StringComparison.OrdinalIgnoreCase))
+                    return null;
 
-            string v = avatarValue.Trim();
+                byte[] bytes = Convert.FromBase64String(base64);
 
-            if (string.Equals(v, "null", StringComparison.OrdinalIgnoreCase))
-            {
-                return null;
-            }
-
-            v = v.Trim().Trim('"');
-
-            // Data URI: data:image/png;base64,...
-            int idx = v.IndexOf("base64,", StringComparison.OrdinalIgnoreCase);
-            if (idx >= 0)
-            {
-                v = v.Substring(idx + "base64,".Length);
-            }
-
-            // Remove whitespace/newline
-            v = System.Text.RegularExpressions.Regex.Replace(v, "\\s+", "");
-
-            // base64-url normalize
-            v = v.Replace('-', '+').Replace('_', '/');
-            int mod = v.Length % 4;
-            if (mod != 0)
-            {
-                v = v.PadRight(v.Length + (4 - mod), '=');
-            }
-
-            try
-            {
-                byte[] bytes = Convert.FromBase64String(v);
-
-                // Fix ảnh đen: clone ảnh khỏi stream trước khi trả về.
-                using (var ms = new MemoryStream(bytes))
-                using (var img = Image.FromStream(ms))
+                using (MemoryStream ms = new MemoryStream(bytes))
                 {
-                    return new Bitmap(img);
+                    Image img = Image.FromStream(ms);
+                    return (Image)img.Clone(); // clone để tránh ảnh đen
                 }
             }
             catch
@@ -135,16 +93,18 @@ namespace ChatApp.Controllers
         {
             try
             {
+                if (!File.Exists(filePath)) return false;
+
                 byte[] bytes = File.ReadAllBytes(filePath);
                 string base64 = Convert.ToBase64String(bytes);
 
-                await _authService.UpdateAvatarAsync(_localId, base64);
+                await _authService.UpdateAvatarAsync(_localId, base64).ConfigureAwait(false);
+
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi cập nhật avatar: " + ex.Message,
-                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi cập nhật avatar: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
         }

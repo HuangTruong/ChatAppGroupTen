@@ -245,6 +245,7 @@
             this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
             this.picAnhDaiDienGiua.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.picAnhDaiDienGiua.Size = new System.Drawing.Size(60, 60);
+            this.picAnhDaiDienGiua.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picAnhDaiDienGiua.TabIndex = 0;
             this.picAnhDaiDienGiua.TabStop = false;
             // 

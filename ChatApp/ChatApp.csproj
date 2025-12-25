@@ -303,6 +303,7 @@
     <Compile Include="Forms\XacNhanEmail.Designer.cs">
       <DependentUpon>XacNhanEmail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\ImageBase64.cs" />
     <Compile Include="Helpers\KeySanitizer.cs" />
     <Compile Include="Models\Friends\FriendRequest.cs" />
     <Compile Include="Models\Groups\GroupInfo.cs" />
@@ -486,6 +487,7 @@
     <None Include="Resources\icons8-tick-96.png" />
     <None Include="Resources\icons8-cross-96.png" />
     <None Include="Resources\icons8-add-96.png" />
+    <None Include="Resources\icons8-profile-96.png" />
     <Content Include="Resources\plus.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

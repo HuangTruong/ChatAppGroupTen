@@ -1,4 +1,6 @@
-﻿using ChatApp.Services.UI;
+﻿using ChatApp.Helpers;
+using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -21,6 +23,11 @@ namespace ChatApp.Controls
         /// Sự kiện khi người dùng click vào item
         /// </summary>
         public event EventHandler ItemClicked;
+
+        /// <summary>
+        /// Dịch vụ Auth làm việc với Firebase.
+        /// </summary>
+        private readonly AuthService _authService = new AuthService();
 
         #endregion
 
@@ -45,10 +52,14 @@ namespace ChatApp.Controls
         /// </summary>
         /// <param name="fullName">Tên hiển thị</param>
         /// <param name="userId">Id người dùng</param>
-        public void SetInfo(string fullName, string userId)
+        public async void SetInfo(string fullName, string userId)
         {
             lblDisplayName.Text = fullName;
             UserId = userId;
+
+            // Load avatar người dùng (Firebase)
+            string base64 = await _authService.GetAvatarAsync(UserId);
+            picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
         }
 
         /// <summary>
