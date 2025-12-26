@@ -201,5 +201,40 @@ namespace ChatApp.Services.Firebase
         }
 
         #endregion
+
+        #region ====== HỦY KẾT BẠN (UNFRIEND) ======
+
+        /// <summary>
+        /// Hủy kết bạn giữa hai người dùng:
+        /// 1. Xóa friendId khỏi danh sách của currentLocalId.
+        /// 2. Xóa currentLocalId khỏi danh sách của friendId.
+        /// </summary>
+        public async Task UnfriendAsync(string currentLocalId, string friendId)
+        {
+            try
+            {
+                string safeCurrentId = KeySanitizer.SafeKey(currentLocalId);
+                string safeFriendId = KeySanitizer.SafeKey(friendId);
+
+                // 1. Xóa node bạn bè tại người dùng hiện tại
+                // Path: /friends/{safeCurrentId}/{safeFriendId}
+                string path1 = $"friends/{safeCurrentId}/{safeFriendId}";
+                await _http.DeleteAsync(Db(path1));
+
+                // 2. Xóa node bạn bè tại phía người kia
+                // Path: /friends/{safeFriendId}/{safeCurrentId}
+                string path2 = $"friends/{safeFriendId}/{safeCurrentId}";
+                await _http.DeleteAsync(Db(path2));
+
+                // Lưu ý: Firebase DeleteAsync sẽ trả về thành công ngay cả khi node không tồn tại
+            }
+            catch (Exception ex)
+            {
+                // Bạn có thể log lỗi ở đây tùy vào nhu cầu
+                throw new Exception("Lỗi khi hủy kết bạn: " + ex.Message);
+            }
+        }
+
+        #endregion
     }
 }
