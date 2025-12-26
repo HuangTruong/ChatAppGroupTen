@@ -1,11 +1,14 @@
-﻿using ChatApp.Models.Users;
+﻿using ChatApp.Helpers;
+using ChatApp.Models.Users;
 using ChatApp.Services.Firebase;
 using ChatApp.Services.UI;
 using Guna.UI2.WinForms;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 
 namespace ChatApp.Forms
@@ -32,6 +35,9 @@ namespace ChatApp.Forms
         /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
         /// </summary>
         private readonly ThemeService _themeService = new ThemeService();
+
+        private  readonly GroupService _groupService = new GroupService();
+        public string GroupAvatarBase64 { get; private set; }
         #endregion
 
         #region ====== CTOR ======
@@ -45,13 +51,15 @@ namespace ChatApp.Forms
 
             _friends = (friends ?? new Dictionary<string, User>())
                 .Where(x => x.Value != null)
-                .OrderBy(x => x.Value.FullName ?? x.Value.DisplayName ?? x.Value.Email ?? "")
+                .OrderBy(x => x.Value.DisplayName ?? x.Value.UserName ?? x.Value.Email ?? "")
                 .ToList();
 
             SelectedMemberIds = new List<string>();
+            GroupAvatarBase64 = string.Empty;
 
             LoadFriends();
             LoadTheme();
+            LoadAvatar();
         }
 
         #endregion
@@ -64,7 +72,11 @@ namespace ChatApp.Forms
             bool isDark = await _themeService.GetThemeAsync(LocalId);
             ThemeManager.ApplyTheme(this, isDark);
         }
-
+        private async void LoadAvatar()
+        {
+            string anh = await _groupService.GetAvatarGroupAsync(LocalId);
+            picAvatarPreview.Image = ImageBase64.Base64ToImage (anh);
+        }
         private void LoadFriends()
         {
             pnlMembers.Controls.Clear();
@@ -107,8 +119,8 @@ namespace ChatApp.Forms
         {
             if (u == null) return id ?? "Người dùng";
 
-            return (u.FullName
-                ?? u.DisplayName
+            return (u.DisplayName
+                ?? u.UserName
                 ?? u.Email
                 ?? id).Trim();
         }
@@ -173,5 +185,75 @@ namespace ChatApp.Forms
         }
 
         #endregion
+
+        private void btnAddAvatar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (OpenFileDialog dlg = new OpenFileDialog())
+                {
+                    dlg.Title = "Chọn avatar nhóm";
+                    dlg.Filter = "Ảnh (*.png;*.jpg;*.jpeg;*.bmp;*.gif)|*.png;*.jpg;*.jpeg;*.bmp;*.gif";
+                    dlg.Multiselect = false;
+
+                    if (dlg.ShowDialog(this) != DialogResult.OK) return;
+
+                    string base64 = TryLoadAndResizeImageAsBase64(dlg.FileName, 256);
+                    if (string.IsNullOrWhiteSpace(base64))
+                    {
+                        MessageBox.Show("Không đọc được ảnh. Vui lòng thử ảnh khác.");
+                        return;
+                    }
+
+                    GroupAvatarBase64 = base64;
+                    btnAddAvatar.Text = "Đã chọn Avatar";
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Có lỗi khi chọn avatar. Vui lòng thử lại.");
+            }
+        }
+
+        private static string TryLoadAndResizeImageAsBase64(string filePath, int maxSize)
+        {
+            if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath)) return null;
+
+            using (Image img = Image.FromFile(filePath))
+            {
+                int w = img.Width;
+                int h = img.Height;
+                if (w <= 0 || h <= 0) return null;
+
+                float scale = 1f;
+                if (w > maxSize || h > maxSize)
+                {
+                    float sw = (float)maxSize / (float)w;
+                    float sh = (float)maxSize / (float)h;
+                    scale = sw < sh ? sw : sh;
+                }
+
+                int nw = (int)Math.Max(1, Math.Round(w * scale));
+                int nh = (int)Math.Max(1, Math.Round(h * scale));
+
+                using (Bitmap bmp = new Bitmap(nw, nh))
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                        g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                        g.DrawImage(img, 0, 0, nw, nh);
+                    }
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                        return Convert.ToBase64String(ms.ToArray());
+                    }
+                }
+            }
+        }
+
     }
 }

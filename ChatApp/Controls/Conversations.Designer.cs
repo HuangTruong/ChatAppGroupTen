@@ -98,6 +98,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Conversations";
             this.Padding = new System.Windows.Forms.Padding(4);
+            this.Dock = System.Windows.Forms.DockStyle.Top;
             this.Size = new System.Drawing.Size(1051, 62);
             this.Tag = "Conversations";
             this.pnlBackground.ResumeLayout(false);

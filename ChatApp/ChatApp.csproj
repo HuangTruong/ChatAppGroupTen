@@ -282,14 +282,23 @@
     <Compile Include="Forms\ImageViewerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\QuanLyNhom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\QuanLyNhom.Designer.cs">
+      <DependentUpon>QuanLyNhom.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TaoNhom.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\TaoNhom.Designer.cs">
       <DependentUpon>TaoNhom.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TaoNhomForm.cs">
+    <Compile Include="Forms\ThongTinBanBe.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ThongTinBanBe.Designer.cs">
+      <DependentUpon>ThongTinBanBe.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TimKiemBanBe.cs">
       <SubType>Form</SubType>
@@ -357,6 +366,7 @@
     <Compile Include="Forms\QuenMatKhau.Designer.cs">
       <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </Compile>
+    <Compile Include="Services\Firebase\MessageService.cs" />
     <Compile Include="Services\Firebase\ThemeService.cs" />
     <Compile Include="Services\UI\ThemeColor.cs" />
     <Compile Include="Services\UI\ThemeManager.cs" />
@@ -384,8 +394,14 @@
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\QuanLyNhom.resx">
+      <DependentUpon>QuanLyNhom.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\TaoNhom.resx">
       <DependentUpon>TaoNhom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ThongTinBanBe.resx">
+      <DependentUpon>ThongTinBanBe.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TimKiemBanBe.resx">
       <DependentUpon>TimKiemBanBe.cs</DependentUpon>

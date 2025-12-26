@@ -34,6 +34,19 @@ namespace ChatApp.Controls
         /// </summary>
         private readonly AuthService _authService = new AuthService();
 
+        private readonly GroupService _groupService = new GroupService();
+
+        #endregion
+
+        #region ======= GROUP TAG PREFIX =======
+
+        /// <summary>
+        /// Prefix tag để nhận biết item nhóm (giống NhanTin.cs).
+        /// </summary>
+        private const string GROUP_TAG_PREFIX = "GROUP:";
+
+        private string _lastAvatarKey;
+
         #endregion
 
         #region ======= CONSTRUCTOR =======
@@ -56,17 +69,70 @@ namespace ChatApp.Controls
         /// <summary>
         /// Gán thông tin hiển thị cho item cuộc trò chuyện
         /// </summary>
-        /// <param name="fullName">Tên hiển thị</param>
+        /// <param name="DisplayName">Tên hiển thị</param>
         /// <param name="userId">Id người dùng</param>
-        public async void SetInfo(string fullName, string userId)
-        {
-            lblDisplayName.Text = fullName;
-            UserId = userId;
 
-            // Load avatar người dùng (Firebase)
-            string base64 = await _authService.GetAvatarAsync(UserId);
-            picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
+        #region ======= PUBLIC METHODS =======
+
+        /// <summary>
+        /// (Backward compatible) - Giữ lại signature cũ.
+        /// </summary>
+        public void SetInfo(string DisplayName, string userId, bool lanhom)
+        {
+            // Nếu code cũ truyền lanhom=true thì tự prefix cho đúng format "GROUP:{id}"
+            string key = userId ?? string.Empty;
+            if (lanhom && !key.StartsWith(GROUP_TAG_PREFIX, StringComparison.Ordinal))
+            {
+                key = GROUP_TAG_PREFIX + key;
+            }
+
+            SetInfo(DisplayName, key);
         }
+
+        /// <summary>
+        /// Gán thông tin hiển thị và tự phân biệt avatar user / group bằng prefix "GROUP:".
+        /// </summary>
+        public async void SetInfo(string DisplayName, string idOrTag)
+        {
+            lblDisplayName.Text = DisplayName ?? string.Empty;
+            UserId = idOrTag;
+
+            if (this.IsDisposed) return;
+            if (picAvatar == null || picAvatar.IsDisposed) return;
+
+            // Tránh gọi load avatar trùng nhiều lần
+            if (!string.IsNullOrEmpty(_lastAvatarKey) &&
+                string.Equals(_lastAvatarKey, idOrTag, StringComparison.Ordinal))
+            {
+                return;
+            }
+            _lastAvatarKey = idOrTag;
+
+            try
+            {
+                string key = idOrTag ?? string.Empty;
+
+                // Giống logic NhanTin.cs: Tag có "GROUP:" thì là nhóm
+                if (key.StartsWith(GROUP_TAG_PREFIX, StringComparison.Ordinal))
+                {
+                    string gid = key.Substring(GROUP_TAG_PREFIX.Length);
+                    string base64 = await _groupService.GetAvatarGroupAsync(gid);
+                    picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
+                }
+                else
+                {
+                    string base64 = await _authService.GetAvatarAsync(key);
+                    picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
+                }
+            }
+            catch
+            {
+                // best-effort
+                try { picAvatar.Image = Properties.Resources.DefaultAvatar; } catch { }
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Áp dụng giao diện Light / Dark cho item

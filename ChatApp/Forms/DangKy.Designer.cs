@@ -34,7 +34,7 @@
             this.cbbGender = new Guna.UI2.WinForms.Guna2ComboBox();
             this.lblTittle = new System.Windows.Forms.Label();
             this.pnlLogin = new Guna.UI2.WinForms.Guna2Panel();
-            this.txtFullName = new Guna.UI2.WinForms.Guna2TextBox();
+            this.txtDisplayName = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtConfirmPassword = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
             this.txtUserName = new Guna.UI2.WinForms.Guna2TextBox();
@@ -156,7 +156,7 @@
             this.pnlLogin.BorderRadius = 20;
             this.pnlLogin.Controls.Add(this.dtpBirthday);
             this.pnlLogin.Controls.Add(this.cbbGender);
-            this.pnlLogin.Controls.Add(this.txtFullName);
+            this.pnlLogin.Controls.Add(this.txtDisplayName);
             this.pnlLogin.Controls.Add(this.txtConfirmPassword);
             this.pnlLogin.Controls.Add(this.txtEmail);
             this.pnlLogin.Controls.Add(this.txtUserName);
@@ -174,29 +174,29 @@
             this.pnlLogin.Size = new System.Drawing.Size(400, 420);
             this.pnlLogin.TabIndex = 21;
             // 
-            // txtFullName
+            // txtDisplayName
             // 
-            this.txtFullName.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
-            this.txtFullName.BorderRadius = 15;
-            this.txtFullName.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtFullName.DefaultText = "";
-            this.txtFullName.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
-            this.txtFullName.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
-            this.txtFullName.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtFullName.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
-            this.txtFullName.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
-            this.txtFullName.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtFullName.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.txtFullName.HoverState.BorderColor = System.Drawing.Color.Transparent;
-            this.txtFullName.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.txtFullName.IconLeft = global::ChatApp.Properties.Resources.HoTen;
-            this.txtFullName.Location = new System.Drawing.Point(65, 101);
-            this.txtFullName.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
-            this.txtFullName.Name = "txtFullName";
-            this.txtFullName.PlaceholderText = "Họ Tên";
-            this.txtFullName.SelectedText = "";
-            this.txtFullName.Size = new System.Drawing.Size(270, 40);
-            this.txtFullName.TabIndex = 10;
+            this.txtDisplayName.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
+            this.txtDisplayName.BorderRadius = 15;
+            this.txtDisplayName.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtDisplayName.DefaultText = "";
+            this.txtDisplayName.DisabledState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(208)))), ((int)(((byte)(208)))), ((int)(((byte)(208)))));
+            this.txtDisplayName.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(226)))), ((int)(((byte)(226)))), ((int)(((byte)(226)))));
+            this.txtDisplayName.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtDisplayName.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
+            this.txtDisplayName.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
+            this.txtDisplayName.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
+            this.txtDisplayName.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtDisplayName.HoverState.BorderColor = System.Drawing.Color.Transparent;
+            this.txtDisplayName.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
+            this.txtDisplayName.IconLeft = global::ChatApp.Properties.Resources.HoTen;
+            this.txtDisplayName.Location = new System.Drawing.Point(65, 101);
+            this.txtDisplayName.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
+            this.txtDisplayName.Name = "txtDisplayName";
+            this.txtDisplayName.PlaceholderText = "Họ Tên";
+            this.txtDisplayName.SelectedText = "";
+            this.txtDisplayName.Size = new System.Drawing.Size(270, 40);
+            this.txtDisplayName.TabIndex = 10;
             // 
             // txtConfirmPassword
             // 
@@ -335,7 +335,7 @@
         private Guna.UI2.WinForms.Guna2TextBox txtEmail;
         private Guna.UI2.WinForms.Guna2TextBox txtConfirmPassword;
         private Guna.UI2.WinForms.Guna2TextBox txtPassword;
-        private Guna.UI2.WinForms.Guna2TextBox txtFullName;
+        private Guna.UI2.WinForms.Guna2TextBox txtDisplayName;
         private Guna.UI2.WinForms.Guna2TextBox txtUserName;
         private System.Windows.Forms.Label lblTittle;
         private Guna.UI2.WinForms.Guna2DateTimePicker dtpBirthday;

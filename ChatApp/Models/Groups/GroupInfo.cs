@@ -42,5 +42,7 @@ namespace ChatApp.Models.Groups
         /// Thời điểm tin nhắn cuối (Unix ms).
         /// </summary>
         public long LastMessageAt { get; set; }
+
+        public string Avatar { get; set; }
     }
 }

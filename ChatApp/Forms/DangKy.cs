@@ -98,11 +98,11 @@ namespace ChatApp
             }
 
             // Lấy dữ liệu từ form
-            string displayName = txtUserName.Text.Trim();
+            string userName = txtUserName.Text.Trim();
             string password = txtPassword.Text.Trim();
             string confirmPassword = txtConfirmPassword.Text.Trim();
             string email = txtEmail.Text.Trim();
-            string fullName = txtFullName.Text.Trim();
+            string displayName = txtDisplayName.Text.Trim();
             DateTime birthday = dtpBirthday.Value;
             string gender = cbbGender.Text.Trim();
 
@@ -134,8 +134,8 @@ namespace ChatApp
                 // Tạo đối tượng User mới từ dữ liệu form
                 var newUser = new User
                 {
+                    UserName = userName,
                     DisplayName = displayName,
-                    FullName = fullName,
                     Email = email,
                     Birthday = birthday.ToString("yyyy-MM-dd"),
                     Gender = gender
@@ -151,7 +151,7 @@ namespace ChatApp
                     MessageBoxIcon.Information);
 
                 // Xóa dữ liệu form, đưa về trạng thái mặc định
-                txtFullName.Clear();
+                txtDisplayName.Clear();
                 txtUserName.Clear();
                 txtPassword.Clear();
                 txtConfirmPassword.Clear();

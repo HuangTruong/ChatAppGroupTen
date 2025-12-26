@@ -46,11 +46,11 @@ namespace ChatApp.Controllers
         public async Task DangKyAsync(User user, string password, string confirmpassword)
         {
             // 1. Kiểm tra đủ thông tin bắt buộc
-            if (string.IsNullOrWhiteSpace(user.DisplayName) ||
+            if (string.IsNullOrWhiteSpace(user.UserName) ||
                 string.IsNullOrWhiteSpace(password) ||
                 string.IsNullOrWhiteSpace(confirmpassword) ||
                 string.IsNullOrWhiteSpace(user.Email) ||
-                string.IsNullOrWhiteSpace(user.FullName) ||
+                string.IsNullOrWhiteSpace(user.DisplayName) ||
                 string.IsNullOrWhiteSpace(user.Birthday) ||
                 string.IsNullOrWhiteSpace(user.Gender))
             {
@@ -79,7 +79,7 @@ namespace ChatApp.Controllers
             // 5. Kiểm tra DisplayName không chứa ký tự đặc biệt
             // Chỉ cho phép: a-z, A-Z, 0-9, 
             const string displayNamePattern = @"^[a-zA-Z0-9]+$";
-            if (!Regex.IsMatch(user.DisplayName, displayNamePattern))
+            if (!Regex.IsMatch(user.UserName, displayNamePattern))
             {
                 throw new Exception("Tên hiển thị chỉ được chứa chữ, số (không có khoảng trắng hoặc ký tự đặc biệt khác).");
             }

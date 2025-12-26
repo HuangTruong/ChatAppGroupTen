@@ -67,7 +67,7 @@ namespace ChatApp.Forms
                     var requestControl = new FriendRequestItem();
 
                     // Gán dữ liệu cơ bản (User Profile)
-                    requestControl.SetUserData(localId: user.LocalId, fullName: user.FullName);
+                    requestControl.SetUserData(localId: user.LocalId, DisplayName: user.DisplayName);
 
                     // Cài đặt Sự kiện (Sự kiện nhấn nút Accept/Reject)
                     requestControl.ActionButtonClicked += RequestControl_HandleAction;
