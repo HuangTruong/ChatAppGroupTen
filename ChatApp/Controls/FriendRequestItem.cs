@@ -46,10 +46,10 @@ namespace ChatApp.Controls
         /// <summary>
         /// Gán dữ liệu cơ bản cho Control (ID người gửi và Tên hiển thị).
         /// </summary>
-        public void SetUserData(string localId, string fullName)
+        public void SetUserData(string localId, string DisplayName)
         {
             _requesterId = localId;
-            lblUserName.Text = fullName;
+            lblUserName.Text = DisplayName;
         }
 
         /// <summary>

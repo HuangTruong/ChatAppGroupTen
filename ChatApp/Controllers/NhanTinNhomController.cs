@@ -84,9 +84,13 @@ namespace ChatApp.Controllers
         /// <summary>
         /// Tạo nhóm mới (bao gồm creator).
         /// </summary>
-        public Task<string> CreateGroupAsync(string groupName, List<string> memberIds)
+        //public Task<string> CreateGroupAsync(string groupName, List<string> memberIds)
+        //{
+        //    return _groupService.CreateGroupAsync(_currentUserId, groupName, memberIds, _token);
+        //}
+        public Task<string> CreateGroupAsync(string groupName, List<string> memberIds, string avatarBase64)
         {
-            return _groupService.CreateGroupAsync(_currentUserId, groupName, memberIds, _token);
+            return _groupService.CreateGroupAsync(_currentUserId, groupName, memberIds, avatarBase64, _token);
         }
 
         #endregion

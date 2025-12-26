@@ -66,7 +66,7 @@ namespace ChatApp.Forms
 
                     userControl.SetUserData(
                         localId: user.LocalId,
-                        fullName: user.FullName
+                        DisplayName: user.DisplayName
                     );
 
                     userControl.ActionButtonClicked += UserControl_SendRequest;

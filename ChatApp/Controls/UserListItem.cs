@@ -68,10 +68,10 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
         /// <summary>
         /// Gán LocalId và Tên hiển thị cho Control.
         /// </summary>
-        public void SetUserData(string localId, string fullName)
+        public void SetUserData(string localId, string DisplayName)
         {
             _userId = localId;
-            lblUserName.Text = fullName;
+            lblUserName.Text = DisplayName;
             this.Tag = localId;
         }
 

@@ -3,6 +3,8 @@ using ChatApp.Models.Users;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace ChatApp.Services.Firebase
 {
@@ -152,10 +154,10 @@ namespace ChatApp.Services.Firebase
                 if (u == null)
                     continue;
 
-                if (!string.IsNullOrEmpty(u.DisplayName) &&
-                    string.Equals(u.DisplayName, emailOrUsername, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(u.UserName) &&
+                    string.Equals(u.UserName, emailOrUsername, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Tìm thấy user có DisplayName = username -> trả về Email
+                    // Tìm thấy user có UserName = username -> trả về Email
                     return u.Email;
                 }
             }
@@ -413,5 +415,139 @@ namespace ChatApp.Services.Firebase
         }
 
         #endregion
+
+        #region ====== LOAD/UPDATE PROFILE ======
+
+        /// <summary>
+        /// Lấy profile user dạng JSON raw để đọc linh hoạt các key (userName/displayName/gender/birthday/email...).
+        /// </summary>
+        public async Task<JObject> GetUserProfileRawAsync(string localId)
+        {
+            if (string.IsNullOrWhiteSpace(localId))
+            {
+                return null;
+            }
+
+            string safeId = KeySanitizer.SafeKey(localId);
+            return await _http.GetAsync<JObject>(Db(string.Format("users/{0}", safeId)))
+                              .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Cập nhật userName (tên đăng nhập) trong Realtime Database.
+        /// </summary>
+        public async Task UpdateUserNameAsync(string localId, string newUserName)
+        {
+            string key = KeySanitizer.SafeKey(localId);
+
+            await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
+            {
+                userName = newUserName
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Cập nhật userName (tên đăng nhập) trong Realtime Database.
+        /// </summary>
+        public async Task UpdateDisplayNameAsync(string localId, string newDisplayName)
+        {
+            string key = KeySanitizer.SafeKey(localId);
+
+            await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
+            {
+                displayName = newDisplayName
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Cập nhật giới tính (gender) trong Realtime Database.
+        /// </summary>
+        public async Task UpdateGenderAsync(string localId, string gender)
+        {
+            string key = KeySanitizer.SafeKey(localId);
+
+            await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
+            {
+                gender = gender
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Cập nhật ngày sinh (birthday) trong Realtime Database.
+        /// Lưu dạng chuỗi (vd: dd/MM/yyyy).
+        /// </summary>
+        public async Task UpdateBirthdayAsync(string localId, string birthday)
+        {
+            string key = KeySanitizer.SafeKey(localId);
+
+            await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
+            {
+                birthday = birthday
+            }).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Patch nhiều trường profile cùng lúc (trừ email). Truyền null để bỏ qua field.
+        /// </summary>
+        public async Task UpdateUserProfileAsync(string localId, string userName, string displayName, string gender, string birthday)
+        {
+            string key = KeySanitizer.SafeKey(localId);
+
+            JObject patch = new JObject();
+
+            if (userName != null) patch["userName"] = userName;
+            if (displayName != null) patch["displayName"] = displayName;
+            if (gender != null) patch["gender"] = gender;
+            if (birthday != null) patch["birthday"] = birthday;
+
+            if (!patch.HasValues) return;
+
+            await _http.PatchAsync(Db(string.Format("users/{0}", key)), patch)
+                      .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Check userName đã tồn tại trong /users chưa (loại trừ chính mình).
+        /// </summary>
+        public async Task<bool> UserNameExistsAsync(string userName, string excludeLocalId)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+            {
+                return false;
+            }
+
+            Dictionary<string, User> users = await _http.GetAsync<Dictionary<string, User>>(Db("users"))
+                                                       .ConfigureAwait(false);
+
+            if (users == null) return false;
+
+            string excludeKey = string.IsNullOrWhiteSpace(excludeLocalId)
+                ? null
+                : KeySanitizer.SafeKey(excludeLocalId);
+
+            foreach (var kv in users)
+            {
+                string id = kv.Key;
+                User u = kv.Value;
+                if (u == null) continue;
+
+                if (!string.IsNullOrWhiteSpace(excludeKey) &&
+                    string.Equals(id, excludeKey, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrWhiteSpace(u.UserName) &&
+                    string.Equals(u.UserName.Trim(), userName.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
     }
 }

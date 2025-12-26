@@ -1,6 +1,6 @@
 ﻿namespace ChatApp.Forms
 {
-    partial class TaoNhom
+    partial class QuanLyNhom
     {
         private System.ComponentModel.IContainer components = null;
 
@@ -22,7 +22,8 @@
             this.pnlMembers = new Guna.UI2.WinForms.Guna2Panel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.btnHuy = new Guna.UI2.WinForms.Guna2Button();
-            this.btnAddAvatar = new Guna.UI2.WinForms.Guna2Button();
+            this.btnDoiAvatar = new Guna.UI2.WinForms.Guna2Button();
+            this.btnDoiTenNhom = new Guna.UI2.WinForms.Guna2Button();
             this.btnTao = new Guna.UI2.WinForms.Guna2Button();
             this.pnlHeader = new Guna.UI2.WinForms.Guna2Panel();
             this.picAvatarPreview = new Guna.UI2.WinForms.Guna2CirclePictureBox();
@@ -79,7 +80,8 @@
             // flowLayoutPanel1
             // 
             this.flowLayoutPanel1.Controls.Add(this.btnHuy);
-            this.flowLayoutPanel1.Controls.Add(this.btnAddAvatar);
+            this.flowLayoutPanel1.Controls.Add(this.btnDoiAvatar);
+            this.flowLayoutPanel1.Controls.Add(this.btnDoiTenNhom);
             this.flowLayoutPanel1.Controls.Add(this.btnTao);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
@@ -104,25 +106,41 @@
             this.btnHuy.Name = "btnHuy";
             this.btnHuy.Size = new System.Drawing.Size(125, 42);
             this.btnHuy.TabIndex = 1;
-            this.btnHuy.Text = "Huỷ";
-            this.btnHuy.Click += new System.EventHandler(this.btnHuy_Click);
+            this.btnHuy.Text = "Đóng";
             // 
-            // btnAddAvatar
+            // btnDoiAvatar
             // 
-            this.btnAddAvatar.BorderRadius = 12;
-            this.btnAddAvatar.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
-            this.btnAddAvatar.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
-            this.btnAddAvatar.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
-            this.btnAddAvatar.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
-            this.btnAddAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
-            this.btnAddAvatar.ForeColor = System.Drawing.Color.White;
-            this.btnAddAvatar.Location = new System.Drawing.Point(316, 9);
-            this.btnAddAvatar.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
-            this.btnAddAvatar.Name = "btnAddAvatar";
-            this.btnAddAvatar.Size = new System.Drawing.Size(150, 42);
-            this.btnAddAvatar.TabIndex = 2;
-            this.btnAddAvatar.Text = "Chọn avatar";
-            this.btnAddAvatar.Click += new System.EventHandler(this.btnAddAvatar_Click);
+            this.btnDoiAvatar.BorderRadius = 12;
+            this.btnDoiAvatar.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnDoiAvatar.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnDoiAvatar.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnDoiAvatar.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnDoiAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
+            this.btnDoiAvatar.ForeColor = System.Drawing.Color.White;
+            this.btnDoiAvatar.Location = new System.Drawing.Point(326, 9);
+            this.btnDoiAvatar.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
+            this.btnDoiAvatar.Name = "btnDoiAvatar";
+            this.btnDoiAvatar.Size = new System.Drawing.Size(140, 42);
+            this.btnDoiAvatar.TabIndex = 3;
+            this.btnDoiAvatar.Text = "Đổi avatar";
+            this.btnDoiAvatar.Click += new System.EventHandler(this.btnDoiAvatar_Click);
+            // 
+            // btnDoiTenNhom
+            // 
+            this.btnDoiTenNhom.BorderRadius = 12;
+            this.btnDoiTenNhom.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
+            this.btnDoiTenNhom.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
+            this.btnDoiTenNhom.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
+            this.btnDoiTenNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnDoiTenNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
+            this.btnDoiTenNhom.ForeColor = System.Drawing.Color.White;
+            this.btnDoiTenNhom.Location = new System.Drawing.Point(176, 9);
+            this.btnDoiTenNhom.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
+            this.btnDoiTenNhom.Name = "btnDoiTenNhom";
+            this.btnDoiTenNhom.Size = new System.Drawing.Size(140, 42);
+            this.btnDoiTenNhom.TabIndex = 2;
+            this.btnDoiTenNhom.Text = "Đổi tên";
+            this.btnDoiTenNhom.Click += new System.EventHandler(this.btnDoiTenNhom_Click);
             // 
             // btnTao
             // 
@@ -133,12 +151,12 @@
             this.btnTao.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnTao.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTao.ForeColor = System.Drawing.Color.White;
-            this.btnTao.Location = new System.Drawing.Point(171, 9);
+            this.btnTao.Location = new System.Drawing.Point(26, 9);
             this.btnTao.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.btnTao.Name = "btnTao";
-            this.btnTao.Size = new System.Drawing.Size(135, 42);
+            this.btnTao.Size = new System.Drawing.Size(140, 42);
             this.btnTao.TabIndex = 0;
-            this.btnTao.Text = "Tạo nhóm";
+            this.btnTao.Text = "Thêm thành viên";
             this.btnTao.Click += new System.EventHandler(this.btnTao_Click);
             // 
             // pnlHeader
@@ -201,9 +219,9 @@
             this.lblHint.Padding = new System.Windows.Forms.Padding(8, 6, 0, 0);
             this.lblHint.Size = new System.Drawing.Size(498, 36);
             this.lblHint.TabIndex = 2;
-            this.lblHint.Text = "Chọn thành viên bên dưới • Avatar có thể để trống";
+            this.lblHint.Text = "Tick người cần thêm • Có thể đổi tên/đổi avatar bên dưới";
             // 
-            // TaoNhom
+            // QuanLyNhom
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -211,9 +229,9 @@
             this.Controls.Add(this.pnlBackground);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Name = "TaoNhom";
+            this.Name = "QuanLyNhom";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Tạo nhóm";
+            this.Text = "Quản lý nhóm";
             this.pnlBackground.ResumeLayout(false);
             this.pnlView.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);
@@ -231,7 +249,8 @@
         private Guna.UI2.WinForms.Guna2Button btnTao;
         private Guna.UI2.WinForms.Guna2Button btnHuy;
         private Guna.UI2.WinForms.Guna2Panel pnlMembers;
-        private Guna.UI2.WinForms.Guna2Button btnAddAvatar;
+        private Guna.UI2.WinForms.Guna2Button btnDoiTenNhom;
+        private Guna.UI2.WinForms.Guna2Button btnDoiAvatar;
 
         private Guna.UI2.WinForms.Guna2Panel pnlHeader;
         private Guna.UI2.WinForms.Guna2CirclePictureBox picAvatarPreview;

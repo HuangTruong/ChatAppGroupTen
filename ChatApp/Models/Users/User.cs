@@ -16,12 +16,12 @@
         /// <summary>
         /// Tên hiển thị trong ứng dụng (nickname / username).
         /// </summary>
-        public string DisplayName { get; set; }
+        public string UserName { get; set; }
 
         /// <summary>
         /// Họ tên đầy đủ của người dùng.
         /// </summary>
-        public string FullName { get; set; }
+        public string DisplayName { get; set; }
 
         /// <summary>
         /// Địa chỉ email dùng để đăng nhập và nhận thông báo.
