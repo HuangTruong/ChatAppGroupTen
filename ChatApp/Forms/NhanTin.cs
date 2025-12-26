@@ -93,6 +93,11 @@ namespace ChatApp
         private readonly AuthService _authService = new AuthService();
 
         /// <summary>
+        /// Service để hủy kết bạn.
+        /// </summary>
+        private readonly FriendService _friendService = new FriendService();
+
+        /// <summary>
         /// Cache FullName theo userId để hiển thị sender trong nhóm.
         /// </summary>
         private readonly object _senderNameLock = new object();
@@ -304,7 +309,35 @@ namespace ChatApp
             conversations.ItemClicked -= UserItem_Click;
             conversations.ItemClicked += UserItem_Click;
 
-            conversations.Dock = DockStyle.Top;
+            conversations.picCancelRequest.Visible = true;
+
+            conversations.CancelClicked += async (s, e) => {
+                var confirm = MessageBox.Show($"Bạn có chắc chắn muốn hủy kết bạn với {user.FullName}?",
+                                            "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (confirm == DialogResult.Yes)
+                {
+                    try
+                    {
+                        // 1. Xóa lịch sử tin nhắn (Dùng NhanTinController)
+                        await boDieuKhienNhanTin.DeleteFullConversationAsync(user.LocalId);
+
+                        // 2. Gọi Service hủy kết bạn (Dùng FriendService)
+                        await _friendService.UnfriendAsync(idDangNhap, user.LocalId);
+
+                        pnlDanhSachChat.Controls.Remove(conversations);
+                        conversations.Dispose();
+
+                        MessageBox.Show("Đã hủy kết bạn thành công.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi khi hủy kết bạn: " + ex.Message);
+                    }
+                }
+            };
+
+            conversations.Dock = DockStyle.Top;    
             pnlDanhSachChat.Controls.Add(conversations);
         }
 
@@ -779,6 +812,8 @@ namespace ChatApp
             {
                 subtitle = g.MemberCount > 0 ? (g.MemberCount + " thành viên") : "Nhóm chat";
             }
+
+            item.picCancelRequest.Visible = false;
 
             item.SetInfo(title, subtitle);
             pnlDanhSachChat.Controls.Add(item);

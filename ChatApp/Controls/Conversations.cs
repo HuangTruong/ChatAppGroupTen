@@ -25,6 +25,11 @@ namespace ChatApp.Controls
         public event EventHandler ItemClicked;
 
         /// <summary>
+        /// Sự kiện khi người dùng nhấn nút Hủy lời mời
+        /// </summary>
+        public event EventHandler CancelClicked;
+
+        /// <summary>
         /// Dịch vụ Auth làm việc với Firebase.
         /// </summary>
         private readonly AuthService _authService = new AuthService();
@@ -41,6 +46,7 @@ namespace ChatApp.Controls
             lblDisplayName.Click += OnConversationsClick;
             pnlBackground.Click += OnConversationsClick;
             picAvatar.Click += OnConversationsClick;
+            picCancelRequest.Click += OnCancelRequestClick;
         }
 
         #endregion
@@ -118,6 +124,12 @@ namespace ChatApp.Controls
         private void OnConversationsClick(object sender, EventArgs e)
         {
             ItemClicked?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnCancelRequestClick(object sender, EventArgs e)
+        {
+            // Ngăn sự kiện click lan ra pnlBackground (nếu cần) và kích hoạt sự kiện Cancel
+            CancelClicked?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
