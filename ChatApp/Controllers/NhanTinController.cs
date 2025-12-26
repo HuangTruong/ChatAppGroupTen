@@ -698,36 +698,5 @@ namespace ChatApp.Controllers
         }
 
         #endregion
-
-        #region ====== DELETE CONVERSATION ======
-
-        /// <summary>
-        /// Xóa toàn bộ lịch sử tin nhắn giữa người dùng hiện tại và đối phương.
-        /// </summary>
-        public async Task DeleteFullConversationAsync(string otherUserId)
-        {
-            try
-            {
-                // 1. Xác định ID cuộc trò chuyện dựa trên 2 ID người dùng
-                string conversationId = BuildConversationId(_currentUserId, otherUserId);
-
-                // 2. Đường dẫn node tin nhắn trên Firebase
-                string path = "messages/" + conversationId;
-
-                // 3. Thực hiện lệnh DELETE
-                FirebaseResponse response = await _firebase.DeleteAsync(path);
-
-                if (response.StatusCode != System.Net.HttpStatusCode.OK && response.StatusCode != System.Net.HttpStatusCode.NoContent)
-                {
-                    throw new Exception($"Lỗi Firebase: {response.StatusCode}");
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Lỗi khi xóa lịch sử tin nhắn: " + ex.Message);
-            }
-        }
-
-        #endregion
     }
 }
