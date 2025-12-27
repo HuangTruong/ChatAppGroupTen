@@ -140,6 +140,12 @@ namespace ChatApp
             ThemeManager.ApplyTheme(this, isDark);
             if (isDark) picDayNight.Image = Properties.Resources.Moon;
             else picDayNight.Image = Properties.Resources.Sun;
+
+            // Load image
+            picLogo.Image = Properties.Resources.Logo;
+            picNhanTin.Image = Properties.Resources.NhanTin;
+            picCaiDat.Image = Properties.Resources.CaiDat;
+            picDangXuat.Image = Properties.Resources.DangXuat;
         }
         #endregion
 

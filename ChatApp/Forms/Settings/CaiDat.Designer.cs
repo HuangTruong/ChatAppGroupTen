@@ -90,6 +90,7 @@ namespace ChatApp
             this.pnlMain.Location = new System.Drawing.Point(20, 20);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.ShadowDecoration.BorderRadius = 18;
+            this.pnlMain.ShadowDecoration.Color = System.Drawing.Color.White;
             this.pnlMain.ShadowDecoration.Depth = 8;
             this.pnlMain.ShadowDecoration.Enabled = true;
             this.pnlMain.Size = new System.Drawing.Size(739, 657);
@@ -99,6 +100,7 @@ namespace ChatApp
             // 
             this.lblEmail.BackColor = System.Drawing.Color.Transparent;
             this.lblEmail.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblEmail.ForeColor = System.Drawing.Color.White;
             this.lblEmail.Location = new System.Drawing.Point(115, 561);
             this.lblEmail.Name = "lblEmail";
             this.lblEmail.Size = new System.Drawing.Size(53, 25);
@@ -109,6 +111,7 @@ namespace ChatApp
             // 
             this.lblBirthday.BackColor = System.Drawing.Color.Transparent;
             this.lblBirthday.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblBirthday.ForeColor = System.Drawing.Color.White;
             this.lblBirthday.Location = new System.Drawing.Point(76, 503);
             this.lblBirthday.Name = "lblBirthday";
             this.lblBirthday.Size = new System.Drawing.Size(91, 25);
@@ -119,6 +122,7 @@ namespace ChatApp
             // 
             this.lblGender.BackColor = System.Drawing.Color.Transparent;
             this.lblGender.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGender.ForeColor = System.Drawing.Color.White;
             this.lblGender.Location = new System.Drawing.Point(88, 445);
             this.lblGender.Name = "lblGender";
             this.lblGender.Size = new System.Drawing.Size(80, 25);
@@ -129,6 +133,7 @@ namespace ChatApp
             // 
             this.lblTenHienThi.BackColor = System.Drawing.Color.Transparent;
             this.lblTenHienThi.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTenHienThi.ForeColor = System.Drawing.Color.White;
             this.lblTenHienThi.Location = new System.Drawing.Point(60, 387);
             this.lblTenHienThi.Name = "lblTenHienThi";
             this.lblTenHienThi.Size = new System.Drawing.Size(109, 25);
@@ -139,6 +144,7 @@ namespace ChatApp
             // 
             this.lblMatKhau.BackColor = System.Drawing.Color.Transparent;
             this.lblMatKhau.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblMatKhau.ForeColor = System.Drawing.Color.White;
             this.lblMatKhau.Location = new System.Drawing.Point(82, 329);
             this.lblMatKhau.Name = "lblMatKhau";
             this.lblMatKhau.Size = new System.Drawing.Size(87, 25);
@@ -149,6 +155,7 @@ namespace ChatApp
             // 
             this.lblTenDangNhap.BackColor = System.Drawing.Color.Transparent;
             this.lblTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTenDangNhap.ForeColor = System.Drawing.Color.White;
             this.lblTenDangNhap.Location = new System.Drawing.Point(33, 270);
             this.lblTenDangNhap.Name = "lblTenDangNhap";
             this.lblTenDangNhap.Size = new System.Drawing.Size(133, 25);
@@ -158,7 +165,6 @@ namespace ChatApp
             // picAvatar
             // 
             this.picAvatar.BackColor = System.Drawing.Color.Transparent;
-            this.picAvatar.FillColor = System.Drawing.Color.Silver;
             this.picAvatar.ImageRotate = 0F;
             this.picAvatar.Location = new System.Drawing.Point(317, 78);
             this.picAvatar.Name = "picAvatar";
@@ -170,8 +176,9 @@ namespace ChatApp
             // 
             // btnDong
             // 
-            this.btnDong.BorderRadius = 1;
+            this.btnDong.BorderRadius = 10;
             this.btnDong.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDong.FillColor = System.Drawing.Color.White;
             this.btnDong.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDong.ForeColor = System.Drawing.Color.White;
             this.btnDong.Location = new System.Drawing.Point(308, 603);
@@ -183,6 +190,7 @@ namespace ChatApp
             // 
             // txtTenDangNhap
             // 
+            this.txtTenDangNhap.BorderColor = System.Drawing.Color.White;
             this.txtTenDangNhap.BorderRadius = 10;
             this.txtTenDangNhap.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtTenDangNhap.DefaultText = "";
@@ -190,6 +198,7 @@ namespace ChatApp
             this.txtTenDangNhap.Location = new System.Drawing.Point(191, 262);
             this.txtTenDangNhap.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtTenDangNhap.Name = "txtTenDangNhap";
+            this.txtTenDangNhap.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtTenDangNhap.PlaceholderText = "Nhập tên đăng nhập mới";
             this.txtTenDangNhap.SelectedText = "";
             this.txtTenDangNhap.Size = new System.Drawing.Size(301, 44);
@@ -199,6 +208,7 @@ namespace ChatApp
             // 
             this.btnDoiTenDangNhap.BorderRadius = 10;
             this.btnDoiTenDangNhap.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiTenDangNhap.FillColor = System.Drawing.Color.White;
             this.btnDoiTenDangNhap.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDoiTenDangNhap.ForeColor = System.Drawing.Color.White;
             this.btnDoiTenDangNhap.Location = new System.Drawing.Point(498, 262);
@@ -210,6 +220,7 @@ namespace ChatApp
             // 
             // txtMatKhau
             // 
+            this.txtMatKhau.BorderColor = System.Drawing.Color.White;
             this.txtMatKhau.BorderRadius = 10;
             this.txtMatKhau.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtMatKhau.DefaultText = "";
@@ -217,6 +228,7 @@ namespace ChatApp
             this.txtMatKhau.Location = new System.Drawing.Point(191, 320);
             this.txtMatKhau.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtMatKhau.Name = "txtMatKhau";
+            this.txtMatKhau.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtMatKhau.PlaceholderText = "Nhập mật khẩu mới";
             this.txtMatKhau.SelectedText = "";
             this.txtMatKhau.Size = new System.Drawing.Size(301, 44);
@@ -227,6 +239,7 @@ namespace ChatApp
             // 
             this.btnDoiMatKhau.BorderRadius = 10;
             this.btnDoiMatKhau.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiMatKhau.FillColor = System.Drawing.Color.White;
             this.btnDoiMatKhau.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDoiMatKhau.ForeColor = System.Drawing.Color.White;
             this.btnDoiMatKhau.Location = new System.Drawing.Point(498, 320);
@@ -238,6 +251,7 @@ namespace ChatApp
             // 
             // txtTenHienThi
             // 
+            this.txtTenHienThi.BorderColor = System.Drawing.Color.White;
             this.txtTenHienThi.BorderRadius = 10;
             this.txtTenHienThi.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtTenHienThi.DefaultText = "";
@@ -245,6 +259,7 @@ namespace ChatApp
             this.txtTenHienThi.Location = new System.Drawing.Point(191, 378);
             this.txtTenHienThi.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtTenHienThi.Name = "txtTenHienThi";
+            this.txtTenHienThi.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtTenHienThi.PlaceholderText = "Nhập tên hiển thị";
             this.txtTenHienThi.SelectedText = "";
             this.txtTenHienThi.Size = new System.Drawing.Size(301, 44);
@@ -254,6 +269,7 @@ namespace ChatApp
             // 
             this.btnDoiTenHienThi.BorderRadius = 10;
             this.btnDoiTenHienThi.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiTenHienThi.FillColor = System.Drawing.Color.White;
             this.btnDoiTenHienThi.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDoiTenHienThi.ForeColor = System.Drawing.Color.White;
             this.btnDoiTenHienThi.Location = new System.Drawing.Point(498, 378);
@@ -265,6 +281,7 @@ namespace ChatApp
             // 
             // txtGioiTinh
             // 
+            this.txtGioiTinh.BorderColor = System.Drawing.Color.White;
             this.txtGioiTinh.BorderRadius = 10;
             this.txtGioiTinh.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtGioiTinh.DefaultText = "";
@@ -272,6 +289,7 @@ namespace ChatApp
             this.txtGioiTinh.Location = new System.Drawing.Point(191, 436);
             this.txtGioiTinh.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtGioiTinh.Name = "txtGioiTinh";
+            this.txtGioiTinh.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtGioiTinh.PlaceholderText = "Nhập giới tính";
             this.txtGioiTinh.SelectedText = "";
             this.txtGioiTinh.Size = new System.Drawing.Size(301, 44);
@@ -281,6 +299,7 @@ namespace ChatApp
             // 
             this.btnDoiGioiTinh.BorderRadius = 10;
             this.btnDoiGioiTinh.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiGioiTinh.FillColor = System.Drawing.Color.White;
             this.btnDoiGioiTinh.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDoiGioiTinh.ForeColor = System.Drawing.Color.White;
             this.btnDoiGioiTinh.Location = new System.Drawing.Point(498, 436);
@@ -292,6 +311,7 @@ namespace ChatApp
             // 
             // txtNgaySinh
             // 
+            this.txtNgaySinh.BorderColor = System.Drawing.Color.White;
             this.txtNgaySinh.BorderRadius = 10;
             this.txtNgaySinh.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtNgaySinh.DefaultText = "";
@@ -299,6 +319,7 @@ namespace ChatApp
             this.txtNgaySinh.Location = new System.Drawing.Point(191, 494);
             this.txtNgaySinh.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtNgaySinh.Name = "txtNgaySinh";
+            this.txtNgaySinh.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtNgaySinh.PlaceholderText = "dd/MM/yyyy";
             this.txtNgaySinh.SelectedText = "";
             this.txtNgaySinh.Size = new System.Drawing.Size(301, 44);
@@ -308,6 +329,7 @@ namespace ChatApp
             // 
             this.btnDoiNgaySinh.BorderRadius = 10;
             this.btnDoiNgaySinh.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiNgaySinh.FillColor = System.Drawing.Color.White;
             this.btnDoiNgaySinh.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDoiNgaySinh.ForeColor = System.Drawing.Color.White;
             this.btnDoiNgaySinh.Location = new System.Drawing.Point(498, 494);
@@ -319,6 +341,7 @@ namespace ChatApp
             // 
             // txtEmail
             // 
+            this.txtEmail.BorderColor = System.Drawing.Color.White;
             this.txtEmail.BorderRadius = 10;
             this.txtEmail.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.txtEmail.DefaultText = "";
@@ -327,6 +350,7 @@ namespace ChatApp
             this.txtEmail.Location = new System.Drawing.Point(191, 552);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtEmail.Name = "txtEmail";
+            this.txtEmail.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtEmail.PlaceholderText = "Email";
             this.txtEmail.ReadOnly = true;
             this.txtEmail.SelectedText = "";
@@ -337,6 +361,7 @@ namespace ChatApp
             // 
             this.btnDoiAvatar.BorderRadius = 10;
             this.btnDoiAvatar.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnDoiAvatar.FillColor = System.Drawing.Color.White;
             this.btnDoiAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnDoiAvatar.ForeColor = System.Drawing.Color.White;
             this.btnDoiAvatar.Location = new System.Drawing.Point(300, 201);
@@ -350,6 +375,7 @@ namespace ChatApp
             // 
             this.lblTitle.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblTitle.Font = new System.Drawing.Font("Verdana", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTitle.ForeColor = System.Drawing.Color.White;
             this.lblTitle.Location = new System.Drawing.Point(0, 0);
             this.lblTitle.Name = "lblTitle";
             this.lblTitle.Size = new System.Drawing.Size(739, 60);

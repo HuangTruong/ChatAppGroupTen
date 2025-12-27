@@ -47,11 +47,10 @@
             this.lblUserName.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUserName.Location = new System.Drawing.Point(74, 5);
             this.lblUserName.Name = "lblUserName";
-            this.lblUserName.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblUserName.Size = new System.Drawing.Size(132, 69);
+            this.lblUserName.Size = new System.Drawing.Size(342, 69);
             this.lblUserName.TabIndex = 2;
             this.lblUserName.Text = "{UserName}";
-            this.lblUserName.TextAlignment = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblUserName.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pnlFrame
             // 
@@ -66,7 +65,7 @@
             this.pnlFrame.Location = new System.Drawing.Point(10, 10);
             this.pnlFrame.Name = "pnlFrame";
             this.pnlFrame.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlFrame.Size = new System.Drawing.Size(325, 79);
+            this.pnlFrame.Size = new System.Drawing.Size(535, 79);
             this.pnlFrame.TabIndex = 6;
             // 
             // pbAccept
@@ -75,7 +74,7 @@
             this.pbAccept.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pbAccept.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbAccept.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pbAccept.Location = new System.Drawing.Point(206, 5);
+            this.pbAccept.Location = new System.Drawing.Point(416, 5);
             this.pbAccept.Margin = new System.Windows.Forms.Padding(4);
             this.pbAccept.Name = "pbAccept";
             this.pbAccept.Padding = new System.Windows.Forms.Padding(3);
@@ -89,7 +88,7 @@
             this.pbReject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.pbReject.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbReject.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pbReject.Location = new System.Drawing.Point(263, 5);
+            this.pbReject.Location = new System.Drawing.Point(473, 5);
             this.pbReject.Margin = new System.Windows.Forms.Padding(4);
             this.pbReject.Name = "pbReject";
             this.pbReject.Padding = new System.Windows.Forms.Padding(3);
@@ -120,7 +119,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FriendRequestItem";
             this.Padding = new System.Windows.Forms.Padding(10, 10, 10, 0);
-            this.Size = new System.Drawing.Size(345, 89);
+            this.Size = new System.Drawing.Size(555, 89);
             this.pnlFrame.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbAccept)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbReject)).EndInit();

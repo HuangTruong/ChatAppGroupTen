@@ -44,12 +44,12 @@
             this.pnlBackground.Controls.Add(this.picCancelRequest);
             this.pnlBackground.Controls.Add(this.picAvatar);
             this.pnlBackground.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlBackground.Location = new System.Drawing.Point(5, 5);
+            this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlBackground.Location = new System.Drawing.Point(2, 2);
             this.pnlBackground.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pnlBackground.Name = "pnlBackground";
             this.pnlBackground.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlBackground.Size = new System.Drawing.Size(291, 66);
+            this.pnlBackground.Size = new System.Drawing.Size(297, 66);
             this.pnlBackground.TabIndex = 0;
             // 
             // lblDisplayName
@@ -60,19 +60,20 @@
             this.lblDisplayName.Location = new System.Drawing.Point(61, 5);
             this.lblDisplayName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.lblDisplayName.Name = "lblDisplayName";
-            this.lblDisplayName.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblDisplayName.Size = new System.Drawing.Size(169, 56);
+            this.lblDisplayName.Padding = new System.Windows.Forms.Padding(10, 0, 0, 0);
+            this.lblDisplayName.Size = new System.Drawing.Size(175, 56);
             this.lblDisplayName.TabIndex = 1;
             this.lblDisplayName.Text = "guna2HtmlLabel1";
             this.lblDisplayName.TextAlignment = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblDisplayName.UseSystemCursors = true;
             // 
             // picCancelRequest
             // 
             this.picCancelRequest.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picCancelRequest.Dock = System.Windows.Forms.DockStyle.Right;
             this.picCancelRequest.Image = global::ChatApp.Properties.Resources.Cross;
-            this.picCancelRequest.Location = new System.Drawing.Point(230, 5);
-            this.picCancelRequest.Margin = new System.Windows.Forms.Padding(4);
+            this.picCancelRequest.Location = new System.Drawing.Point(236, 5);
+            this.picCancelRequest.Margin = new System.Windows.Forms.Padding(0);
             this.picCancelRequest.Name = "picCancelRequest";
             this.picCancelRequest.Size = new System.Drawing.Size(56, 56);
             this.picCancelRequest.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -97,10 +98,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.pnlBackground);
+            this.Cursor = System.Windows.Forms.Cursors.Hand;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Conversations";
-            this.Padding = new System.Windows.Forms.Padding(5);
-            this.Size = new System.Drawing.Size(301, 76);
+            this.Padding = new System.Windows.Forms.Padding(2);
+            this.Size = new System.Drawing.Size(301, 70);
             this.Tag = "Conversations";
             this.pnlBackground.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picCancelRequest)).EndInit();

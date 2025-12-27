@@ -72,7 +72,7 @@
             this.pnlDanhSachChat.FillColor = System.Drawing.Color.White;
             this.pnlDanhSachChat.Location = new System.Drawing.Point(12, 12);
             this.pnlDanhSachChat.Name = "pnlDanhSachChat";
-            this.pnlDanhSachChat.Padding = new System.Windows.Forms.Padding(10);
+            this.pnlDanhSachChat.Padding = new System.Windows.Forms.Padding(5);
             this.pnlDanhSachChat.Size = new System.Drawing.Size(236, 606);
             this.pnlDanhSachChat.TabIndex = 0;
             // 
@@ -110,8 +110,9 @@
             this.flpKhungChat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flpKhungChat.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flpKhungChat.Location = new System.Drawing.Point(12, 12);
+            this.flpKhungChat.Margin = new System.Windows.Forms.Padding(0);
             this.flpKhungChat.Name = "flpKhungChat";
-            this.flpKhungChat.Padding = new System.Windows.Forms.Padding(12);
+            this.flpKhungChat.Padding = new System.Windows.Forms.Padding(5);
             this.flpKhungChat.Size = new System.Drawing.Size(589, 436);
             this.flpKhungChat.TabIndex = 0;
             this.flpKhungChat.WrapContents = false;
@@ -135,6 +136,7 @@
             // 
             // txtNhapTinNhan
             // 
+            this.txtNhapTinNhan.BorderColor = System.Drawing.Color.White;
             this.txtNhapTinNhan.BorderRadius = 18;
             this.txtNhapTinNhan.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtNhapTinNhan.DefaultText = "";
@@ -149,9 +151,10 @@
             this.txtNhapTinNhan.Location = new System.Drawing.Point(12, 12);
             this.txtNhapTinNhan.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtNhapTinNhan.Name = "txtNhapTinNhan";
+            this.txtNhapTinNhan.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtNhapTinNhan.PlaceholderText = "Nhập tin nhắn...";
             this.txtNhapTinNhan.SelectedText = "";
-            this.txtNhapTinNhan.Size = new System.Drawing.Size(450, 46);
+            this.txtNhapTinNhan.Size = new System.Drawing.Size(422, 46);
             this.txtNhapTinNhan.TabIndex = 5;
             this.txtNhapTinNhan.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtNhapTinNhan_KeyDown);
             // 
@@ -159,13 +162,12 @@
             // 
             this.PicSendFile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.PicSendFile.Dock = System.Windows.Forms.DockStyle.Right;
-            this.PicSendFile.Image = global::ChatApp.Properties.Resources.AddFile;
             this.PicSendFile.ImageRotate = 0F;
-            this.PicSendFile.Location = new System.Drawing.Point(462, 12);
+            this.PicSendFile.Location = new System.Drawing.Point(434, 12);
             this.PicSendFile.Margin = new System.Windows.Forms.Padding(4);
             this.PicSendFile.Name = "PicSendFile";
             this.PicSendFile.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.PicSendFile.Size = new System.Drawing.Size(35, 46);
+            this.PicSendFile.Size = new System.Drawing.Size(49, 46);
             this.PicSendFile.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PicSendFile.TabIndex = 6;
             this.PicSendFile.TabStop = false;
@@ -175,13 +177,12 @@
             // 
             this.picEmoji.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picEmoji.Dock = System.Windows.Forms.DockStyle.Right;
-            this.picEmoji.Image = global::ChatApp.Properties.Resources.Icon;
             this.picEmoji.ImageRotate = 0F;
-            this.picEmoji.Location = new System.Drawing.Point(497, 12);
+            this.picEmoji.Location = new System.Drawing.Point(483, 12);
             this.picEmoji.Margin = new System.Windows.Forms.Padding(4);
             this.picEmoji.Name = "picEmoji";
             this.picEmoji.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picEmoji.Size = new System.Drawing.Size(35, 46);
+            this.picEmoji.Size = new System.Drawing.Size(49, 46);
             this.picEmoji.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picEmoji.TabIndex = 7;
             this.picEmoji.TabStop = false;
@@ -196,6 +197,7 @@
             this.btnGui.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnGui.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnGui.Dock = System.Windows.Forms.DockStyle.Right;
+            this.btnGui.FillColor = System.Drawing.Color.White;
             this.btnGui.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnGui.ForeColor = System.Drawing.Color.White;
             this.btnGui.Location = new System.Drawing.Point(532, 12);
@@ -224,7 +226,7 @@
             // 
             this.lblTrangThai.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblTrangThai.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblTrangThai.ForeColor = System.Drawing.Color.DimGray;
+            this.lblTrangThai.ForeColor = System.Drawing.Color.White;
             this.lblTrangThai.Location = new System.Drawing.Point(64, 42);
             this.lblTrangThai.Name = "lblTrangThai";
             this.lblTrangThai.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
@@ -236,6 +238,7 @@
             // 
             this.lblTenDangNhapGiua.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblTenDangNhapGiua.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
+            this.lblTenDangNhapGiua.ForeColor = System.Drawing.Color.White;
             this.lblTenDangNhapGiua.Location = new System.Drawing.Point(64, 12);
             this.lblTenDangNhapGiua.Name = "lblTenDangNhapGiua";
             this.lblTenDangNhapGiua.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
@@ -247,7 +250,6 @@
             // 
             this.picAnhDaiDienGiua.BackColor = System.Drawing.Color.Transparent;
             this.picAnhDaiDienGiua.Dock = System.Windows.Forms.DockStyle.Left;
-            this.picAnhDaiDienGiua.FillColor = System.Drawing.Color.DarkGray;
             this.picAnhDaiDienGiua.ImageRotate = 0F;
             this.picAnhDaiDienGiua.Location = new System.Drawing.Point(12, 12);
             this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
@@ -307,6 +309,7 @@
             this.btnTaoNhom.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnTaoNhom.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnTaoNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnTaoNhom.FillColor = System.Drawing.Color.White;
             this.btnTaoNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTaoNhom.ForeColor = System.Drawing.Color.White;
             this.btnTaoNhom.Location = new System.Drawing.Point(12, 18);
@@ -325,6 +328,7 @@
             this.btnSearchFriends.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnSearchFriends.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnSearchFriends.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnSearchFriends.FillColor = System.Drawing.Color.White;
             this.btnSearchFriends.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnSearchFriends.ForeColor = System.Drawing.Color.White;
             this.btnSearchFriends.Location = new System.Drawing.Point(12, 76);
@@ -343,6 +347,7 @@
             this.btnRequest.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnRequest.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnRequest.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnRequest.FillColor = System.Drawing.Color.White;
             this.btnRequest.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnRequest.ForeColor = System.Drawing.Color.White;
             this.btnRequest.Location = new System.Drawing.Point(12, 134);
@@ -361,6 +366,7 @@
             this.btnQuanLyNhom.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnQuanLyNhom.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnQuanLyNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnQuanLyNhom.FillColor = System.Drawing.Color.White;
             this.btnQuanLyNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnQuanLyNhom.ForeColor = System.Drawing.Color.White;
             this.btnQuanLyNhom.Location = new System.Drawing.Point(12, 192);
@@ -379,6 +385,7 @@
             this.btnThongTinBanBe.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnThongTinBanBe.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnThongTinBanBe.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnThongTinBanBe.FillColor = System.Drawing.Color.White;
             this.btnThongTinBanBe.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnThongTinBanBe.ForeColor = System.Drawing.Color.White;
             this.btnThongTinBanBe.Location = new System.Drawing.Point(12, 250);
@@ -395,8 +402,8 @@
             this.pnlBackground.Controls.Add(this.pnlTrai);
             this.pnlBackground.Controls.Add(this.pnlPhai);
             this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.FillColor = System.Drawing.Color.White;
+            this.pnlBackground.FillColor2 = System.Drawing.Color.White;
             this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             this.pnlBackground.Location = new System.Drawing.Point(0, 0);
             this.pnlBackground.Name = "pnlBackground";

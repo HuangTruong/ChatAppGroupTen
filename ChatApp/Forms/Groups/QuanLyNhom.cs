@@ -54,6 +54,7 @@ namespace ChatApp.Forms
 
         #endregion
 
+        #region ====== CONSTRUCTOR ======
         // NEW: thêm groupId vào constructor (giữ code bạn, chỉ thêm tham số)
         public QuanLyNhom(Dictionary<string, User> friends, string groupId, string localId, string token)
         {
@@ -73,27 +74,19 @@ namespace ChatApp.Forms
 
             // load avatar
             LoadAvatar();
-            // Load theme + load list (có lọc member)
-            LoadTheme();
-
             // load friends sau khi form đã tạo xong
-            this.Shown += async (s, e) =>
-            {
-                await LoadFriendsAsync();
-            };
-            
+            LoadFriendsAsync();
+            //Load theme +load list(có lọc member)
+            LoadTheme();
         }
+        #endregion
 
         #region ====== LOAD DATA ======
 
         private async void LoadTheme()
         {
-            try
-            {
-                bool isDark = await _themeService.GetThemeAsync(LocalId);
-                ThemeManager.ApplyTheme(this, isDark);
-            }
-            catch { }
+            bool isDark = await _themeService.GetThemeAsync(LocalId);
+            ThemeManager.ApplyTheme(this, isDark);
         }
 
 

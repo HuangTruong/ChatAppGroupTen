@@ -99,6 +99,7 @@
             this.btnHuy.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnHuy.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnHuy.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnHuy.FillColor = System.Drawing.Color.White;
             this.btnHuy.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnHuy.ForeColor = System.Drawing.Color.White;
             this.btnHuy.Location = new System.Drawing.Point(476, 9);
@@ -117,6 +118,7 @@
             this.btnAddAvatar.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnAddAvatar.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnAddAvatar.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnAddAvatar.FillColor = System.Drawing.Color.White;
             this.btnAddAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnAddAvatar.ForeColor = System.Drawing.Color.White;
             this.btnAddAvatar.Location = new System.Drawing.Point(313, 9);
@@ -135,6 +137,7 @@
             this.btnTao.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnTao.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnTao.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
+            this.btnTao.FillColor = System.Drawing.Color.White;
             this.btnTao.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTao.ForeColor = System.Drawing.Color.White;
             this.btnTao.Location = new System.Drawing.Point(165, 9);
@@ -164,7 +167,7 @@
             // 
             this.lblHint.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblHint.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHint.ForeColor = System.Drawing.Color.DimGray;
+            this.lblHint.ForeColor = System.Drawing.Color.White;
             this.lblHint.Location = new System.Drawing.Point(96, 60);
             this.lblHint.Name = "lblHint";
             this.lblHint.Padding = new System.Windows.Forms.Padding(8, 6, 0, 0);
@@ -174,6 +177,7 @@
             // 
             // txtTenNhom
             // 
+            this.txtTenNhom.BorderColor = System.Drawing.Color.White;
             this.txtTenNhom.BorderRadius = 12;
             this.txtTenNhom.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtTenNhom.DefaultText = "";
@@ -188,6 +192,7 @@
             this.txtTenNhom.Location = new System.Drawing.Point(96, 10);
             this.txtTenNhom.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtTenNhom.Name = "txtTenNhom";
+            this.txtTenNhom.PlaceholderForeColor = System.Drawing.Color.White;
             this.txtTenNhom.PlaceholderText = "Nhập tên nhóm...";
             this.txtTenNhom.SelectedText = "";
             this.txtTenNhom.Size = new System.Drawing.Size(498, 50);
@@ -197,7 +202,6 @@
             // 
             this.picAvatarPreview.BackColor = System.Drawing.Color.Transparent;
             this.picAvatarPreview.Dock = System.Windows.Forms.DockStyle.Left;
-            this.picAvatarPreview.FillColor = System.Drawing.Color.DarkGray;
             this.picAvatarPreview.ImageRotate = 0F;
             this.picAvatarPreview.Location = new System.Drawing.Point(10, 10);
             this.picAvatarPreview.Name = "picAvatarPreview";

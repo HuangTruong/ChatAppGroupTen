@@ -45,11 +45,10 @@
             this.lblUserName.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblUserName.Location = new System.Drawing.Point(74, 5);
             this.lblUserName.Name = "lblUserName";
-            this.lblUserName.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblUserName.Size = new System.Drawing.Size(140, 69);
+            this.lblUserName.Size = new System.Drawing.Size(398, 69);
             this.lblUserName.TabIndex = 2;
             this.lblUserName.Text = "{UserName}";
-            this.lblUserName.TextAlignment = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblUserName.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pnlFrame
             // 
@@ -63,7 +62,7 @@
             this.pnlFrame.Location = new System.Drawing.Point(10, 10);
             this.pnlFrame.Name = "pnlFrame";
             this.pnlFrame.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlFrame.Size = new System.Drawing.Size(276, 79);
+            this.pnlFrame.Size = new System.Drawing.Size(534, 79);
             this.pnlFrame.TabIndex = 4;
             // 
             // pbAvatar
@@ -86,7 +85,7 @@
             this.pbAction.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbAction.Dock = System.Windows.Forms.DockStyle.Right;
             this.pbAction.Image = global::ChatApp.Properties.Resources.Add;
-            this.pbAction.Location = new System.Drawing.Point(214, 5);
+            this.pbAction.Location = new System.Drawing.Point(472, 5);
             this.pbAction.Margin = new System.Windows.Forms.Padding(4);
             this.pbAction.Name = "pbAction";
             this.pbAction.Size = new System.Drawing.Size(57, 69);
@@ -103,7 +102,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "UserListItem";
             this.Padding = new System.Windows.Forms.Padding(10, 10, 10, 0);
-            this.Size = new System.Drawing.Size(296, 89);
+            this.Size = new System.Drawing.Size(554, 89);
             this.pnlFrame.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbAvatar)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAction)).EndInit();

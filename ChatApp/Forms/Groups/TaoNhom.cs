@@ -57,9 +57,9 @@ namespace ChatApp.Forms
             SelectedMemberIds = new List<string>();
             GroupAvatarBase64 = string.Empty;
 
+            LoadAvatar();
             LoadFriends();
             LoadTheme();
-            LoadAvatar();
         }
 
         #endregion

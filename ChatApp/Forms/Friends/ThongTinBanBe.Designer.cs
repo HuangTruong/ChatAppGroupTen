@@ -71,6 +71,7 @@
             this.btnDong.BorderRadius = 14;
             this.btnDong.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnDong.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnDong.FillColor = System.Drawing.Color.White;
             this.btnDong.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnDong.ForeColor = System.Drawing.Color.White;
             this.btnDong.Location = new System.Drawing.Point(195, 455);
@@ -82,6 +83,7 @@
             // 
             // txtNgaySinh
             // 
+            this.txtNgaySinh.BorderColor = System.Drawing.Color.White;
             this.txtNgaySinh.BorderRadius = 14;
             this.txtNgaySinh.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.txtNgaySinh.DefaultText = "";
@@ -104,6 +106,7 @@
             // 
             // txtGioiTinh
             // 
+            this.txtGioiTinh.BorderColor = System.Drawing.Color.White;
             this.txtGioiTinh.BorderRadius = 14;
             this.txtGioiTinh.Cursor = System.Windows.Forms.Cursors.Default;
             this.txtGioiTinh.DefaultText = "";
@@ -126,6 +129,7 @@
             // 
             // txtTen
             // 
+            this.txtTen.BorderColor = System.Drawing.Color.White;
             this.txtTen.BorderRadius = 14;
             this.txtTen.Cursor = System.Windows.Forms.Cursors.Default;
             this.txtTen.DefaultText = "";
@@ -150,6 +154,7 @@
             // 
             this.lblNgaySinh.BackColor = System.Drawing.Color.Transparent;
             this.lblNgaySinh.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNgaySinh.ForeColor = System.Drawing.Color.White;
             this.lblNgaySinh.Location = new System.Drawing.Point(55, 361);
             this.lblNgaySinh.Name = "lblNgaySinh";
             this.lblNgaySinh.Size = new System.Drawing.Size(72, 22);
@@ -160,6 +165,7 @@
             // 
             this.lblGioiTinh.BackColor = System.Drawing.Color.Transparent;
             this.lblGioiTinh.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblGioiTinh.ForeColor = System.Drawing.Color.White;
             this.lblGioiTinh.Location = new System.Drawing.Point(55, 275);
             this.lblGioiTinh.Name = "lblGioiTinh";
             this.lblGioiTinh.Size = new System.Drawing.Size(61, 22);
@@ -170,6 +176,7 @@
             // 
             this.lblTen.BackColor = System.Drawing.Color.Transparent;
             this.lblTen.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTen.ForeColor = System.Drawing.Color.White;
             this.lblTen.Location = new System.Drawing.Point(55, 189);
             this.lblTen.Name = "lblTen";
             this.lblTen.Size = new System.Drawing.Size(79, 22);
@@ -179,7 +186,6 @@
             // picAvatar
             // 
             this.picAvatar.BackColor = System.Drawing.Color.Transparent;
-            this.picAvatar.FillColor = System.Drawing.Color.DarkGray;
             this.picAvatar.ImageRotate = 0F;
             this.picAvatar.Location = new System.Drawing.Point(195, 82);
             this.picAvatar.Name = "picAvatar";
@@ -195,6 +201,7 @@
             this.lblThongTin.BackColor = System.Drawing.Color.Transparent;
             this.lblThongTin.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblThongTin.Font = new System.Drawing.Font("Verdana", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblThongTin.ForeColor = System.Drawing.Color.White;
             this.lblThongTin.Location = new System.Drawing.Point(18, 18);
             this.lblThongTin.Name = "lblThongTin";
             this.lblThongTin.Size = new System.Drawing.Size(444, 58);

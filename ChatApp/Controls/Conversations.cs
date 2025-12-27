@@ -142,12 +142,13 @@ namespace ChatApp.Controls
             #region ===== Appearance =====
 
             // Bo góc + viền
-            pnlBackground.BorderRadius = 16;
+            pnlBackground.BorderRadius = 10;
             pnlBackground.BorderThickness = 1;
 
-            // Đổ bóng nhẹ
+            // Shadow rõ, KHÔNG trong suốt
             pnlBackground.ShadowDecoration.Enabled = true;
-            pnlBackground.ShadowDecoration.Depth = 6;
+            pnlBackground.ShadowDecoration.Depth = 20;
+            pnlBackground.ShadowDecoration.BorderRadius = pnlBackground.BorderRadius;
 
             #endregion
 
@@ -155,12 +156,14 @@ namespace ChatApp.Controls
 
             if (isDark)
             {
-                // 🌙 Dark – Night Sky
-                pnlBackground.FillColor = ColorTranslator.FromHtml("#020617");
-                pnlBackground.BorderColor = ColorTranslator.FromHtml("#1E3A8A");
-                pnlBackground.ShadowDecoration.Color = ColorTranslator.FromHtml("#1D4ED8");
+                // 🌙 Dark – Starry (vừa nổi, shadow rõ)
+                pnlBackground.FillColor = ColorTranslator.FromHtml("#071022");
+                pnlBackground.BorderColor = ColorTranslator.FromHtml("#21D4FD");
 
-                lblDisplayName.ForeColor = ColorTranslator.FromHtml("#E5E7EB");
+                // Shadow màu rõ (alpha cao, không mờ trong suốt nữa)
+                pnlBackground.ShadowDecoration.Color = ColorTranslator.FromHtml("#2EF2FF");
+
+                lblDisplayName.ForeColor = ColorTranslator.FromHtml("#FFFFFF");
             }
 
             #endregion
@@ -169,15 +172,18 @@ namespace ChatApp.Controls
 
             else
             {
-                // ☀ Light – Sky / Modern Blue
-                pnlBackground.FillColor = ColorTranslator.FromHtml("#E0F2FE");
-                pnlBackground.BorderColor = ColorTranslator.FromHtml("#BAE6FD");
-                pnlBackground.ShadowDecoration.Color = ColorTranslator.FromHtml("#93C5FD");
+                // ☀ Light – Fresh Sky (vừa nổi, shadow rõ)
+                pnlBackground.FillColor = ColorTranslator.FromHtml("#FFFFFF");
+                pnlBackground.BorderColor = ColorTranslator.FromHtml("#47A6FF");
 
-                lblDisplayName.ForeColor = ColorTranslator.FromHtml("#0F172A");
+                // Shadow màu rõ (alpha cao)
+                pnlBackground.ShadowDecoration.Color = ColorTranslator.FromHtml("#00C2FF");
+
+                lblDisplayName.ForeColor = ColorTranslator.FromHtml("#0B1B2B");
             }
 
             #endregion
+
         }
 
         #endregion

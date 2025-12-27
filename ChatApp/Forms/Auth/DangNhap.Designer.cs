@@ -159,7 +159,7 @@
             this.txtEmail.Location = new System.Drawing.Point(66, 87);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtEmail.Name = "txtEmail";
-            this.txtEmail.PlaceholderText = "Nhập Email hoặc Tên đăng nhập";
+            this.txtEmail.PlaceholderText = "Email Hoặc Tên Đăng Nhập";
             this.txtEmail.SelectedText = "";
             this.txtEmail.Size = new System.Drawing.Size(320, 45);
             this.txtEmail.TabIndex = 0;
@@ -188,7 +188,7 @@
             this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '●';
-            this.txtPassword.PlaceholderText = "Nhập Mật Khẩu";
+            this.txtPassword.PlaceholderText = "Mật Khẩu";
             this.txtPassword.SelectedText = "";
             this.txtPassword.Size = new System.Drawing.Size(320, 45);
             this.txtPassword.TabIndex = 4;

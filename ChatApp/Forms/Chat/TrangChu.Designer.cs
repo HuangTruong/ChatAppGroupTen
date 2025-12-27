@@ -54,12 +54,13 @@ namespace ChatApp
             // 
             // pnlBackground
             // 
+            this.pnlBackground.BackColor = System.Drawing.Color.White;
             this.pnlBackground.Controls.Add(this.pnlFooter);
             this.pnlBackground.Controls.Add(this.pnlBody);
             this.pnlBackground.Controls.Add(this.pnlHeader);
             this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.FillColor = System.Drawing.Color.White;
+            this.pnlBackground.FillColor2 = System.Drawing.Color.White;
             this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             this.pnlBackground.Location = new System.Drawing.Point(0, 0);
             this.pnlBackground.Name = "pnlBackground";
@@ -68,7 +69,7 @@ namespace ChatApp
             // 
             // pnlFooter
             // 
-            this.pnlFooter.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(187)))), ((int)(((byte)(223)))), ((int)(((byte)(255)))));
+            this.pnlFooter.BackColor = System.Drawing.Color.White;
             this.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pnlFooter.Location = new System.Drawing.Point(0, 565);
             this.pnlFooter.Name = "pnlFooter";
@@ -87,7 +88,7 @@ namespace ChatApp
             this.pnlBody.Location = new System.Drawing.Point(325, 170);
             this.pnlBody.Name = "pnlBody";
             this.pnlBody.ShadowDecoration.BorderRadius = 20;
-            this.pnlBody.ShadowDecoration.Color = System.Drawing.Color.FromArgb(((int)(((byte)(176)))), ((int)(((byte)(190)))), ((int)(((byte)(197)))));
+            this.pnlBody.ShadowDecoration.Color = System.Drawing.Color.White;
             this.pnlBody.ShadowDecoration.Depth = 25;
             this.pnlBody.ShadowDecoration.Enabled = true;
             this.pnlBody.Size = new System.Drawing.Size(525, 316);
@@ -113,7 +114,7 @@ namespace ChatApp
             // 
             this.lblCaiDat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblCaiDat.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
-            this.lblCaiDat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
+            this.lblCaiDat.ForeColor = System.Drawing.Color.White;
             this.lblCaiDat.Location = new System.Drawing.Point(5, 65);
             this.lblCaiDat.Name = "lblCaiDat";
             this.lblCaiDat.Size = new System.Drawing.Size(80, 20);
@@ -124,7 +125,6 @@ namespace ChatApp
             // picCaiDat
             // 
             this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picCaiDat.Image = ((System.Drawing.Image)(resources.GetObject("picCaiDat.Image")));
             this.picCaiDat.ImageRotate = 0F;
             this.picCaiDat.Location = new System.Drawing.Point(5, 5);
             this.picCaiDat.Name = "picCaiDat";
@@ -154,7 +154,7 @@ namespace ChatApp
             // 
             this.lblNhanTin.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblNhanTin.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
-            this.lblNhanTin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
+            this.lblNhanTin.ForeColor = System.Drawing.Color.White;
             this.lblNhanTin.Location = new System.Drawing.Point(5, 65);
             this.lblNhanTin.Name = "lblNhanTin";
             this.lblNhanTin.Size = new System.Drawing.Size(80, 20);
@@ -165,7 +165,6 @@ namespace ChatApp
             // picNhanTin
             // 
             this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picNhanTin.Image = ((System.Drawing.Image)(resources.GetObject("picNhanTin.Image")));
             this.picNhanTin.ImageRotate = 0F;
             this.picNhanTin.Location = new System.Drawing.Point(5, 5);
             this.picNhanTin.Name = "picNhanTin";
@@ -193,7 +192,7 @@ namespace ChatApp
             // 
             this.lblDangXuat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblDangXuat.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
-            this.lblDangXuat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
+            this.lblDangXuat.ForeColor = System.Drawing.Color.White;
             this.lblDangXuat.Location = new System.Drawing.Point(5, 65);
             this.lblDangXuat.Name = "lblDangXuat";
             this.lblDangXuat.Size = new System.Drawing.Size(80, 20);
@@ -204,7 +203,6 @@ namespace ChatApp
             // picDangXuat
             // 
             this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
-            this.picDangXuat.Image = ((System.Drawing.Image)(resources.GetObject("picDangXuat.Image")));
             this.picDangXuat.ImageRotate = 0F;
             this.picDangXuat.Location = new System.Drawing.Point(5, 5);
             this.picDangXuat.Name = "picDangXuat";
@@ -216,7 +214,7 @@ namespace ChatApp
             // 
             // pnlHeader
             // 
-            this.pnlHeader.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(120)))), ((int)(((byte)(215)))));
+            this.pnlHeader.BackColor = System.Drawing.Color.White;
             this.pnlHeader.Controls.Add(this.picDayNight);
             this.pnlHeader.Controls.Add(this.lblTenApp);
             this.pnlHeader.Controls.Add(this.picLogo);
@@ -258,7 +256,6 @@ namespace ChatApp
             // 
             this.picLogo.BackColor = System.Drawing.Color.Transparent;
             this.picLogo.BorderRadius = 14;
-            this.picLogo.Image = ((System.Drawing.Image)(resources.GetObject("picLogo.Image")));
             this.picLogo.ImageRotate = 0F;
             this.picLogo.Location = new System.Drawing.Point(3, 12);
             this.picLogo.Name = "picLogo";
@@ -283,7 +280,6 @@ namespace ChatApp
             this.picAnhDaiDien.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picAnhDaiDien.BackColor = System.Drawing.Color.Transparent;
             this.picAnhDaiDien.BorderRadius = 14;
-            this.picAnhDaiDien.Image = global::ChatApp.Properties.Resources.DefaultAvatar;
             this.picAnhDaiDien.ImageRotate = 0F;
             this.picAnhDaiDien.Location = new System.Drawing.Point(1099, 8);
             this.picAnhDaiDien.Name = "picAnhDaiDien";

@@ -199,7 +199,7 @@
             this.txtDisplayName.Location = new System.Drawing.Point(48, 101);
             this.txtDisplayName.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtDisplayName.Name = "txtDisplayName";
-            this.txtDisplayName.PlaceholderText = "Họ Tên";
+            this.txtDisplayName.PlaceholderText = "Tên Hiển Thị";
             this.txtDisplayName.SelectedText = "";
             this.txtDisplayName.Size = new System.Drawing.Size(305, 40);
             this.txtDisplayName.TabIndex = 10;
@@ -251,6 +251,7 @@
             this.txtEmail.IconLeft = global::ChatApp.Properties.Resources.Email;
             this.txtEmail.IconLeftSize = new System.Drawing.Size(25, 25);
             this.txtEmail.Location = new System.Drawing.Point(48, 227);
+            this.txtEmail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PlaceholderText = "Email";
             this.txtEmail.SelectedText = "";

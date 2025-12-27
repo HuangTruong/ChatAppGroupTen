@@ -148,6 +148,10 @@ namespace ChatApp
             // Áp dụng theme
             bool isDark = await _themeService.GetThemeAsync(idDangNhap);
             ThemeManager.ApplyTheme(this, isDark);
+
+            // Load icon cho gửi file và gửi icon
+            picEmoji.Image = Properties.Resources.Icon;
+            PicSendFile.Image = Properties.Resources.AddFile;
         }
 
         /// <summary>
