@@ -88,6 +88,20 @@ namespace ChatApp.Services.Firebase
             string safeSenderId = KeySanitizer.SafeKey(senderId);
             string safeReceiverId = KeySanitizer.SafeKey(receiverId);
 
+            // Kiểm tra xem đã là bạn bè chưa
+            var friends = await GetFriendListAsync(senderId);
+            if (friends.ContainsKey(safeReceiverId))
+            {
+                throw new InvalidOperationException("Người dùng này đã là bạn bè của bạn.");
+            }
+
+            // Kiểm tra xem đã gửi lời mời chưa
+            var outgoingRequests = await GetOutgoingRequestsAsync(senderId);
+            if (outgoingRequests.ContainsKey(safeReceiverId) && outgoingRequests[safeReceiverId].status == "pending")
+            {
+                throw new InvalidOperationException("Bạn đã gửi lời mời kết bạn đến người dùng này rồi.");
+            }
+
             var requestData = new FriendRequest
             {
                 status = "pending",
@@ -198,6 +212,22 @@ namespace ChatApp.Services.Firebase
             // 2. XÓA node request tại người gửi (senderId)
             // Path: /outgoingRequests/{senderId}/{currentLocalId}
             await _http.DeleteAsync(Db($"outgoingRequests/{safeSenderId}/{safeCurrentId}"));
+        }
+
+        /// <summary>
+        /// Hủy lời mời kết bạn đã gửi (Cancel Friend Request).
+        /// Xóa lời mời ở cả 2 node: outgoingRequests và friendRequests.
+        /// </summary>
+        public async Task CancelFriendRequestAsync(string senderId, string receiverId)
+        {
+            string safeSenderId = KeySanitizer.SafeKey(senderId);
+            string safeReceiverId = KeySanitizer.SafeKey(receiverId);
+
+            // 1. Xóa node tại người gửi: /outgoingRequests/{senderId}/{receiverId}
+            await _http.DeleteAsync(Db($"outgoingRequests/{safeSenderId}/{safeReceiverId}"));
+
+            // 2. Xóa node tại người nhận: /friendRequests/{receiverId}/{senderId}
+            await _http.DeleteAsync(Db($"friendRequests/{safeReceiverId}/{safeSenderId}"));
         }
 
         #endregion

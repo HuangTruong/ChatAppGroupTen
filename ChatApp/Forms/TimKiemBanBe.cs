@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar; // Nên xóa nếu không dùng
 
 namespace ChatApp.Forms
 {
@@ -58,7 +57,15 @@ namespace ChatApp.Forms
             {
                 pnlView.Controls.Clear();
 
+                // 1. Load danh sách users
                 List<User> userList = await _friendController.LoadAllUsersForDisplayAsync();
+
+                // 2. Load danh sách ID đã gửi lời mời
+                var outgoingRequestIds = await _friendController.GetOutgoingRequestIdsAsync();
+
+                // 3. Load theme một lần
+                bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
+                ThemeManager.ApplyTheme(this, isDark);
 
                 foreach (var user in userList)
                 {
@@ -69,16 +76,29 @@ namespace ChatApp.Forms
                         DisplayName: user.DisplayName
                     );
 
-                    userControl.ActionButtonClicked += UserControl_SendRequest;
+                    // Kiểm tra xem đã gửi lời mời chưa
+                    bool hasOutgoingRequest = outgoingRequestIds.Contains(user.LocalId);
+                    
+                    // Set mode: nếu đã gửi thì hiển thị mode "Cancel", chưa thì "Send"
+                    userControl.SetActionMode(hasOutgoingRequest ? UserListItem.ActionMode.Cancel : UserListItem.ActionMode.Send);
+
+                    // Gán event handler
+                    if (hasOutgoingRequest)
+                    {
+                        userControl.ActionButtonClicked -= UserControl_SendRequest;
+                        userControl.ActionButtonClicked += UserControl_CancelRequest;
+                    }
+                    else
+                    {
+                        userControl.ActionButtonClicked -= UserControl_CancelRequest; // Đảm bảo gỡ bỏ nếu có
+                        userControl.ActionButtonClicked += UserControl_SendRequest;
+                    }
 
                     userControl.Dock = DockStyle.Top;
 
                     pnlView.Controls.Add(userControl);
-                    pnlView.Controls.SetChildIndex(userControl, 0); // Để cho thứ tự tin nhắn không bị ngược
+                    pnlView.Controls.SetChildIndex(userControl, 0);
                 }
-                // Load chế độ ngày đêm
-                bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
-                ThemeManager.ApplyTheme(this, isDark);
             }
             catch (Exception ex)
             {
@@ -107,13 +127,44 @@ namespace ChatApp.Forms
 
                 MessageBox.Show("Đã gửi lời mời kết bạn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Tải lại danh sách để cập nhật trạng thái người dùng.
-                // Hiện tại, việc tải lại toàn bộ form sẽ xóa item đã gửi đi.
-                await LoadAllUsersUsingFlowPanel();
+                // Chuyển sang mode Cancel và đổi event handler
+                clickedItem.SetActionMode(UserListItem.ActionMode.Cancel);
+                clickedItem.ActionButtonClicked -= UserControl_SendRequest;
+                clickedItem.ActionButtonClicked += UserControl_CancelRequest;
+                clickedItem.IsActionEnabled = true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Lỗi gửi lời mời: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                clickedItem.IsActionEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Xử lý sự kiện nhấn nút Hủy lời mời từ UserListItem.
+        /// </summary>
+        private async void UserControl_CancelRequest(object sender, string receiverId)
+        {
+            UserListItem clickedItem = (UserListItem)sender;
+
+            try
+            {
+                clickedItem.IsActionEnabled = false;
+
+                // Hủy lời mời qua Controller.
+                await _friendController.CancelFriendRequestAsync(receiverId);
+
+                MessageBox.Show("Đã hủy lời mời kết bạn thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                // Chuyển sang mode Send và đổi event handler
+                clickedItem.SetActionMode(UserListItem.ActionMode.Send);
+                clickedItem.ActionButtonClicked -= UserControl_CancelRequest;
+                clickedItem.ActionButtonClicked += UserControl_SendRequest;
+                clickedItem.IsActionEnabled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi hủy lời mời: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 clickedItem.IsActionEnabled = true;
             }
         }

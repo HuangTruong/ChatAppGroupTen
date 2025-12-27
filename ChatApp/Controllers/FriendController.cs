@@ -46,14 +46,23 @@ namespace ChatApp.Controllers
                     user.LocalId != _localId &&
 
                     // Loại trừ những người đã là bạn bè
-                    !friendIds.Contains(user.LocalId) &&
-
-                    // Loại trừ những người đã gửi lời mời (đang chờ)
-                    !outgoingIds.Contains(user.LocalId)
+                    !friendIds.Contains(user.LocalId)
                 )
                 .ToList();
 
             return filteredUsers;
+        }
+
+        /// <summary>
+        /// Lấy danh sách ID của những người đã được gửi lời mời (pending).
+        /// </summary>
+        public async Task<HashSet<string>> GetOutgoingRequestIdsAsync()
+        {
+            var outgoingDict = await _friendService.GetOutgoingRequestsAsync(_localId);
+            return outgoingDict
+                .Where(kvp => kvp.Value.status == "pending")
+                .Select(kvp => kvp.Key)
+                .ToHashSet();
         }
 
         #endregion
@@ -138,6 +147,22 @@ namespace ChatApp.Controllers
         public async Task RejectFriendRequestAsync(string senderId)
         {
             await _friendService.RejectFriendRequestAsync(_localId, senderId);
+        }
+
+        /// <summary>
+        /// Hủy lời mời kết bạn đã gửi.
+        /// </summary>
+        public async Task CancelFriendRequestAsync(string receiverId)
+        {
+            await _friendService.CancelFriendRequestAsync(_localId, receiverId);
+        }
+
+        /// <summary>
+        /// Hủy kết bạn với người dùng khác.
+        /// </summary>
+        public async Task UnfriendAsync(string friendId)
+        {
+            await _friendService.UnfriendAsync(_localId, friendId);
         }
 
         #endregion

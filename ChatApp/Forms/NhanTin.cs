@@ -95,9 +95,9 @@ namespace ChatApp
         private readonly AuthService _authService = new AuthService();
 
         /// <summary>
-        /// Service để hủy kết bạn.
+        /// Controller để xử lý logic bạn bè.
         /// </summary>
-        private readonly FriendService _friendService = new FriendService();
+        private readonly FriendController _friendController;
 
         /// <summary>
         /// Cache DisplayName theo userId để hiển thị sender trong nhóm.
@@ -134,6 +134,7 @@ namespace ChatApp
 
             boDieuKhienNhanTin = new NhanTinController(localId, token);
             boDieuKhienNhanTinNhom = new NhanTinNhomController(localId, token);
+            _friendController = new FriendController(localId);
 
             // ====== SEND FILE: bật TLS 1.2 để tải HTTPS ổn định hơn ======
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -328,8 +329,8 @@ namespace ChatApp
                         // 1. Xóa lịch sử tin nhắn (Dùng NhanTinController)
                         await boDieuKhienNhanTin.DeleteFullConversationAsync(user.LocalId);
 
-                        // 2. Gọi Service hủy kết bạn (Dùng FriendService)
-                        await _friendService.UnfriendAsync(idDangNhap, user.LocalId);
+                        // 2. Gọi Controller hủy kết bạn (Dùng FriendController)
+                        await _friendController.UnfriendAsync(user.LocalId);
 
                         pnlDanhSachChat.Controls.Remove(conversations);
                         conversations.Dispose();

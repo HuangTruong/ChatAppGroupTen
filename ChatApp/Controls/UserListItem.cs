@@ -23,6 +23,20 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
         /// </summary>
         private string _userId;
 
+        /// <summary>
+        /// Chế độ hành động hiện tại.
+        /// </summary>
+        private ActionMode _currentMode = ActionMode.Send;
+
+        /// <summary>
+        /// Enum định nghĩa các chế độ hành động của button.
+        /// </summary>
+        public enum ActionMode
+        {
+            Send,    // Gửi lời mời (icon +)
+            Cancel   // Hủy lời mời (icon x)
+        }
+
         #endregion
 
         #region ====== HÀM KHỞI TẠO (CONSTRUCTOR) ======
@@ -73,6 +87,26 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
             _userId = localId;
             lblUserName.Text = DisplayName;
             this.Tag = localId;
+        }
+
+        /// <summary>
+        /// Thiết lập chế độ hành động của button (Send hoặc Cancel).
+        /// </summary>
+        public void SetActionMode(ActionMode mode)
+        {
+            _currentMode = mode;
+            
+            // Đổi icon dựa trên mode
+            if (mode == ActionMode.Send)
+            {
+                // Icon gửi lời mời (+)
+                pbAction.Image = Properties.Resources.Add;
+            }
+            else // Cancel
+            {
+                // Icon hủy lời mời (x)
+                pbAction.Image = Properties.Resources.Cross;
+            }
         }
 
         /// <summary>
