@@ -279,15 +279,6 @@
     <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ImageViewer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ImageViewer.Designer.cs">
-      <DependentUpon>ImageViewer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ImageViewerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\QuanLyNhom.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -396,9 +387,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImageViewer.resx">
-      <DependentUpon>ImageViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NhanTin.resx">
       <DependentUpon>NhanTin.cs</DependentUpon>
