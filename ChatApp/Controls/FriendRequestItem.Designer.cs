@@ -73,6 +73,7 @@
             // 
             this.pbAccept.BackgroundImage = global::ChatApp.Properties.Resources.Tick;
             this.pbAccept.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pbAccept.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbAccept.Dock = System.Windows.Forms.DockStyle.Right;
             this.pbAccept.Location = new System.Drawing.Point(206, 5);
             this.pbAccept.Margin = new System.Windows.Forms.Padding(4);
@@ -86,6 +87,7 @@
             // 
             this.pbReject.BackgroundImage = global::ChatApp.Properties.Resources.Cross;
             this.pbReject.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.pbReject.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbReject.Dock = System.Windows.Forms.DockStyle.Right;
             this.pbReject.Location = new System.Drawing.Point(263, 5);
             this.pbReject.Margin = new System.Windows.Forms.Padding(4);

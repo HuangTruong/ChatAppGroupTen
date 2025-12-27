@@ -17,6 +17,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TaoNhom));
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlView = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlMembers = new Guna.UI2.WinForms.Guna2Panel();
@@ -25,9 +26,9 @@
             this.btnAddAvatar = new Guna.UI2.WinForms.Guna2Button();
             this.btnTao = new Guna.UI2.WinForms.Guna2Button();
             this.pnlHeader = new Guna.UI2.WinForms.Guna2Panel();
-            this.picAvatarPreview = new Guna.UI2.WinForms.Guna2CirclePictureBox();
-            this.txtTenNhom = new Guna.UI2.WinForms.Guna2TextBox();
             this.lblHint = new System.Windows.Forms.Label();
+            this.txtTenNhom = new Guna.UI2.WinForms.Guna2TextBox();
+            this.picAvatarPreview = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground.SuspendLayout();
             this.pnlView.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
@@ -39,8 +40,8 @@
             // 
             this.pnlBackground.Controls.Add(this.pnlView);
             this.pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlBackground.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(116)))), ((int)(((byte)(185)))), ((int)(((byte)(255)))));
-            this.pnlBackground.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
+            this.pnlBackground.FillColor = System.Drawing.Color.White;
+            this.pnlBackground.FillColor2 = System.Drawing.Color.White;
             this.pnlBackground.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             this.pnlBackground.Location = new System.Drawing.Point(0, 0);
             this.pnlBackground.Name = "pnlBackground";
@@ -93,6 +94,7 @@
             // btnHuy
             // 
             this.btnHuy.BorderRadius = 12;
+            this.btnHuy.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnHuy.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnHuy.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnHuy.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -110,13 +112,14 @@
             // btnAddAvatar
             // 
             this.btnAddAvatar.BorderRadius = 12;
+            this.btnAddAvatar.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnAddAvatar.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnAddAvatar.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnAddAvatar.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnAddAvatar.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnAddAvatar.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnAddAvatar.ForeColor = System.Drawing.Color.White;
-            this.btnAddAvatar.Location = new System.Drawing.Point(316, 9);
+            this.btnAddAvatar.Location = new System.Drawing.Point(313, 9);
             this.btnAddAvatar.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.btnAddAvatar.Name = "btnAddAvatar";
             this.btnAddAvatar.Size = new System.Drawing.Size(150, 42);
@@ -127,13 +130,14 @@
             // btnTao
             // 
             this.btnTao.BorderRadius = 12;
+            this.btnTao.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnTao.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnTao.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnTao.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
             this.btnTao.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnTao.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTao.ForeColor = System.Drawing.Color.White;
-            this.btnTao.Location = new System.Drawing.Point(171, 9);
+            this.btnTao.Location = new System.Drawing.Point(165, 9);
             this.btnTao.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.btnTao.Name = "btnTao";
             this.btnTao.Size = new System.Drawing.Size(135, 42);
@@ -156,19 +160,17 @@
             this.pnlHeader.Size = new System.Drawing.Size(604, 106);
             this.pnlHeader.TabIndex = 3;
             // 
-            // picAvatarPreview
+            // lblHint
             // 
-            this.picAvatarPreview.BackColor = System.Drawing.Color.Transparent;
-            this.picAvatarPreview.Dock = System.Windows.Forms.DockStyle.Left;
-            this.picAvatarPreview.FillColor = System.Drawing.Color.DarkGray;
-            this.picAvatarPreview.ImageRotate = 0F;
-            this.picAvatarPreview.Location = new System.Drawing.Point(10, 10);
-            this.picAvatarPreview.Name = "picAvatarPreview";
-            this.picAvatarPreview.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAvatarPreview.Size = new System.Drawing.Size(86, 86);
-            this.picAvatarPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picAvatarPreview.TabIndex = 0;
-            this.picAvatarPreview.TabStop = false;
+            this.lblHint.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblHint.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHint.ForeColor = System.Drawing.Color.DimGray;
+            this.lblHint.Location = new System.Drawing.Point(96, 60);
+            this.lblHint.Name = "lblHint";
+            this.lblHint.Padding = new System.Windows.Forms.Padding(8, 6, 0, 0);
+            this.lblHint.Size = new System.Drawing.Size(498, 36);
+            this.lblHint.TabIndex = 2;
+            this.lblHint.Text = "Chọn thành viên bên dưới • Avatar có thể để trống";
             // 
             // txtTenNhom
             // 
@@ -191,17 +193,19 @@
             this.txtTenNhom.Size = new System.Drawing.Size(498, 50);
             this.txtTenNhom.TabIndex = 1;
             // 
-            // lblHint
+            // picAvatarPreview
             // 
-            this.lblHint.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lblHint.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblHint.ForeColor = System.Drawing.Color.DimGray;
-            this.lblHint.Location = new System.Drawing.Point(96, 60);
-            this.lblHint.Name = "lblHint";
-            this.lblHint.Padding = new System.Windows.Forms.Padding(8, 6, 0, 0);
-            this.lblHint.Size = new System.Drawing.Size(498, 36);
-            this.lblHint.TabIndex = 2;
-            this.lblHint.Text = "Chọn thành viên bên dưới • Avatar có thể để trống";
+            this.picAvatarPreview.BackColor = System.Drawing.Color.Transparent;
+            this.picAvatarPreview.Dock = System.Windows.Forms.DockStyle.Left;
+            this.picAvatarPreview.FillColor = System.Drawing.Color.DarkGray;
+            this.picAvatarPreview.ImageRotate = 0F;
+            this.picAvatarPreview.Location = new System.Drawing.Point(10, 10);
+            this.picAvatarPreview.Name = "picAvatarPreview";
+            this.picAvatarPreview.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picAvatarPreview.Size = new System.Drawing.Size(86, 86);
+            this.picAvatarPreview.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picAvatarPreview.TabIndex = 0;
+            this.picAvatarPreview.TabStop = false;
             // 
             // TaoNhom
             // 
@@ -210,10 +214,11 @@
             this.ClientSize = new System.Drawing.Size(668, 520);
             this.Controls.Add(this.pnlBackground);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "TaoNhom";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Tạo nhóm";
+            this.Text = "TẠO NHÓM";
             this.pnlBackground.ResumeLayout(false);
             this.pnlView.ResumeLayout(false);
             this.flowLayoutPanel1.ResumeLayout(false);

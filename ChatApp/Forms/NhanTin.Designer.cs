@@ -15,6 +15,7 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NhanTin));
             this.pnlTrai = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlDanhSachChat = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlGiua = new Guna.UI2.WinForms.Guna2Panel();
@@ -224,10 +225,10 @@
             this.lblTrangThai.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblTrangThai.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblTrangThai.ForeColor = System.Drawing.Color.DimGray;
-            this.lblTrangThai.Location = new System.Drawing.Point(72, 42);
+            this.lblTrangThai.Location = new System.Drawing.Point(64, 42);
             this.lblTrangThai.Name = "lblTrangThai";
             this.lblTrangThai.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblTrangThai.Size = new System.Drawing.Size(529, 22);
+            this.lblTrangThai.Size = new System.Drawing.Size(537, 22);
             this.lblTrangThai.TabIndex = 2;
             this.lblTrangThai.Text = "Trạng thái";
             // 
@@ -235,10 +236,10 @@
             // 
             this.lblTenDangNhapGiua.Dock = System.Windows.Forms.DockStyle.Top;
             this.lblTenDangNhapGiua.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(72, 12);
+            this.lblTenDangNhapGiua.Location = new System.Drawing.Point(64, 12);
             this.lblTenDangNhapGiua.Name = "lblTenDangNhapGiua";
             this.lblTenDangNhapGiua.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            this.lblTenDangNhapGiua.Size = new System.Drawing.Size(529, 30);
+            this.lblTenDangNhapGiua.Size = new System.Drawing.Size(537, 30);
             this.lblTenDangNhapGiua.TabIndex = 1;
             this.lblTenDangNhapGiua.Text = "Chưa chọn cuộc trò chuyện";
             // 
@@ -251,7 +252,7 @@
             this.picAnhDaiDienGiua.Location = new System.Drawing.Point(12, 12);
             this.picAnhDaiDienGiua.Name = "picAnhDaiDienGiua";
             this.picAnhDaiDienGiua.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picAnhDaiDienGiua.Size = new System.Drawing.Size(60, 52);
+            this.picAnhDaiDienGiua.Size = new System.Drawing.Size(52, 52);
             this.picAnhDaiDienGiua.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picAnhDaiDienGiua.TabIndex = 0;
             this.picAnhDaiDienGiua.TabStop = false;
@@ -311,7 +312,7 @@
             this.btnTaoNhom.Location = new System.Drawing.Point(12, 18);
             this.btnTaoNhom.Margin = new System.Windows.Forms.Padding(0, 0, 0, 12);
             this.btnTaoNhom.Name = "btnTaoNhom";
-            this.btnTaoNhom.Size = new System.Drawing.Size(210, 46);
+            this.btnTaoNhom.Size = new System.Drawing.Size(195, 46);
             this.btnTaoNhom.TabIndex = 6;
             this.btnTaoNhom.Text = "Tạo Nhóm";
             this.btnTaoNhom.Click += new System.EventHandler(this.btnTaoNhom_Click);
@@ -329,7 +330,7 @@
             this.btnSearchFriends.Location = new System.Drawing.Point(12, 76);
             this.btnSearchFriends.Margin = new System.Windows.Forms.Padding(0, 0, 0, 12);
             this.btnSearchFriends.Name = "btnSearchFriends";
-            this.btnSearchFriends.Size = new System.Drawing.Size(210, 46);
+            this.btnSearchFriends.Size = new System.Drawing.Size(195, 46);
             this.btnSearchFriends.TabIndex = 7;
             this.btnSearchFriends.Text = "Tìm bạn";
             this.btnSearchFriends.Click += new System.EventHandler(this.btnSearchFriends_Click);
@@ -347,7 +348,7 @@
             this.btnRequest.Location = new System.Drawing.Point(12, 134);
             this.btnRequest.Margin = new System.Windows.Forms.Padding(0, 0, 0, 12);
             this.btnRequest.Name = "btnRequest";
-            this.btnRequest.Size = new System.Drawing.Size(210, 46);
+            this.btnRequest.Size = new System.Drawing.Size(195, 46);
             this.btnRequest.TabIndex = 8;
             this.btnRequest.Text = "Lời mời kết bạn";
             this.btnRequest.Click += new System.EventHandler(this.btnRequest_Click);
@@ -365,7 +366,7 @@
             this.btnQuanLyNhom.Location = new System.Drawing.Point(12, 192);
             this.btnQuanLyNhom.Margin = new System.Windows.Forms.Padding(0, 0, 0, 12);
             this.btnQuanLyNhom.Name = "btnQuanLyNhom";
-            this.btnQuanLyNhom.Size = new System.Drawing.Size(210, 46);
+            this.btnQuanLyNhom.Size = new System.Drawing.Size(195, 46);
             this.btnQuanLyNhom.TabIndex = 9;
             this.btnQuanLyNhom.Text = "Thông tin nhóm";
             this.btnQuanLyNhom.Click += new System.EventHandler(this.btnQuanLyNhom_Click);
@@ -383,7 +384,7 @@
             this.btnThongTinBanBe.Location = new System.Drawing.Point(12, 250);
             this.btnThongTinBanBe.Margin = new System.Windows.Forms.Padding(0, 0, 0, 12);
             this.btnThongTinBanBe.Name = "btnThongTinBanBe";
-            this.btnThongTinBanBe.Size = new System.Drawing.Size(210, 46);
+            this.btnThongTinBanBe.Size = new System.Drawing.Size(195, 46);
             this.btnThongTinBanBe.TabIndex = 10;
             this.btnThongTinBanBe.Text = "Thông tin bạn bè";
             this.btnThongTinBanBe.Click += new System.EventHandler(this.btnThongTinBanBe_Click);
@@ -409,9 +410,11 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1181, 654);
             this.Controls.Add(this.pnlBackground);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Nhắn Tin";
+            this.Text = "NHẮN TIN";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.NhanTin_FormClosed);
             this.Load += new System.EventHandler(this.NhanTin_Load);
             this.pnlTrai.ResumeLayout(false);

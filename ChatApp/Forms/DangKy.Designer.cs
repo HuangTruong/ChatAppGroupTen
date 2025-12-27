@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DangKy));
             this.btnBack = new Guna.UI2.WinForms.Guna2Button();
             this.btnRegister = new Guna.UI2.WinForms.Guna2Button();
             this.dtpBirthday = new Guna.UI2.WinForms.Guna2DateTimePicker();
@@ -48,6 +49,7 @@
             // 
             this.btnBack.BackColor = System.Drawing.Color.Transparent;
             this.btnBack.BorderRadius = 10;
+            this.btnBack.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnBack.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnBack.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnBack.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -72,6 +74,7 @@
             // 
             this.btnRegister.BackColor = System.Drawing.Color.Transparent;
             this.btnRegister.BorderRadius = 10;
+            this.btnRegister.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnRegister.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnRegister.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnRegister.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -97,18 +100,19 @@
             this.dtpBirthday.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
             this.dtpBirthday.BorderRadius = 15;
             this.dtpBirthday.Checked = true;
+            this.dtpBirthday.Cursor = System.Windows.Forms.Cursors.Hand;
             this.dtpBirthday.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.dtpBirthday.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.dtpBirthday.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.dtpBirthday.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dtpBirthday.ForeColor = System.Drawing.Color.Black;
             this.dtpBirthday.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dtpBirthday.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.dtpBirthday.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
-            this.dtpBirthday.Location = new System.Drawing.Point(65, 316);
+            this.dtpBirthday.Location = new System.Drawing.Point(48, 316);
             this.dtpBirthday.MaxDate = new System.DateTime(9998, 12, 31, 0, 0, 0, 0);
             this.dtpBirthday.MinDate = new System.DateTime(1753, 1, 1, 0, 0, 0, 0);
             this.dtpBirthday.Name = "dtpBirthday";
-            this.dtpBirthday.Size = new System.Drawing.Size(270, 35);
+            this.dtpBirthday.Size = new System.Drawing.Size(305, 35);
             this.dtpBirthday.TabIndex = 18;
             this.dtpBirthday.Value = new System.DateTime(2025, 10, 9, 13, 41, 15, 896);
             // 
@@ -117,13 +121,14 @@
             this.cbbGender.BackColor = System.Drawing.Color.Transparent;
             this.cbbGender.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(218)))), ((int)(((byte)(220)))), ((int)(((byte)(224)))));
             this.cbbGender.BorderRadius = 15;
+            this.cbbGender.Cursor = System.Windows.Forms.Cursors.Hand;
             this.cbbGender.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.cbbGender.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbbGender.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.cbbGender.FocusedColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
             this.cbbGender.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.cbbGender.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.cbbGender.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(68)))), ((int)(((byte)(88)))), ((int)(((byte)(112)))));
+            this.cbbGender.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cbbGender.ForeColor = System.Drawing.Color.Black;
             this.cbbGender.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.cbbGender.ItemHeight = 30;
             this.cbbGender.Items.AddRange(new object[] {
@@ -131,23 +136,23 @@
             "Nam",
             "Nữ",
             "Khác"});
-            this.cbbGender.Location = new System.Drawing.Point(65, 269);
+            this.cbbGender.Location = new System.Drawing.Point(48, 269);
             this.cbbGender.Name = "cbbGender";
-            this.cbbGender.Size = new System.Drawing.Size(270, 36);
+            this.cbbGender.Size = new System.Drawing.Size(305, 36);
             this.cbbGender.StartIndex = 0;
             this.cbbGender.TabIndex = 17;
             // 
             // lblTittle
             // 
-            this.lblTittle.AutoSize = true;
-            this.lblTittle.Font = new System.Drawing.Font("Segoe UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTittle.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblTittle.Font = new System.Drawing.Font("Verdana", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTittle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblTittle.Location = new System.Drawing.Point(82, 18);
+            this.lblTittle.Location = new System.Drawing.Point(0, 0);
             this.lblTittle.Name = "lblTittle";
-            this.lblTittle.Size = new System.Drawing.Size(240, 31);
+            this.lblTittle.Size = new System.Drawing.Size(400, 53);
             this.lblTittle.TabIndex = 7;
             this.lblTittle.Text = "ĐĂNG KÝ HỆ THỐNG";
-            this.lblTittle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.lblTittle.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // pnlLogin
             // 
@@ -186,16 +191,17 @@
             this.txtDisplayName.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.txtDisplayName.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.txtDisplayName.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtDisplayName.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtDisplayName.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtDisplayName.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtDisplayName.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtDisplayName.IconLeft = global::ChatApp.Properties.Resources.HoTen;
-            this.txtDisplayName.Location = new System.Drawing.Point(65, 101);
+            this.txtDisplayName.IconLeftSize = new System.Drawing.Size(25, 25);
+            this.txtDisplayName.Location = new System.Drawing.Point(48, 101);
             this.txtDisplayName.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtDisplayName.Name = "txtDisplayName";
             this.txtDisplayName.PlaceholderText = "Họ Tên";
             this.txtDisplayName.SelectedText = "";
-            this.txtDisplayName.Size = new System.Drawing.Size(270, 40);
+            this.txtDisplayName.Size = new System.Drawing.Size(305, 40);
             this.txtDisplayName.TabIndex = 10;
             // 
             // txtConfirmPassword
@@ -210,19 +216,21 @@
             this.txtConfirmPassword.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.txtConfirmPassword.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.txtConfirmPassword.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtConfirmPassword.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtConfirmPassword.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtConfirmPassword.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtConfirmPassword.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtConfirmPassword.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+            this.txtConfirmPassword.IconLeftSize = new System.Drawing.Size(25, 25);
             this.txtConfirmPassword.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtConfirmPassword.IconRightCursor = System.Windows.Forms.Cursors.Hand;
-            this.txtConfirmPassword.Location = new System.Drawing.Point(65, 185);
+            this.txtConfirmPassword.IconRightSize = new System.Drawing.Size(25, 25);
+            this.txtConfirmPassword.Location = new System.Drawing.Point(48, 185);
             this.txtConfirmPassword.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtConfirmPassword.Name = "txtConfirmPassword";
             this.txtConfirmPassword.PasswordChar = '●';
             this.txtConfirmPassword.PlaceholderText = "Xác Nhận Mật Khẩu";
             this.txtConfirmPassword.SelectedText = "";
-            this.txtConfirmPassword.Size = new System.Drawing.Size(270, 40);
+            this.txtConfirmPassword.Size = new System.Drawing.Size(305, 40);
             this.txtConfirmPassword.TabIndex = 12;
             // 
             // txtEmail
@@ -237,15 +245,16 @@
             this.txtEmail.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.txtEmail.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.txtEmail.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.txtEmail.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtEmail.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtEmail.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtEmail.IconLeft = global::ChatApp.Properties.Resources.Email;
-            this.txtEmail.Location = new System.Drawing.Point(65, 227);
+            this.txtEmail.IconLeftSize = new System.Drawing.Size(25, 25);
+            this.txtEmail.Location = new System.Drawing.Point(48, 227);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PlaceholderText = "Email";
             this.txtEmail.SelectedText = "";
-            this.txtEmail.Size = new System.Drawing.Size(270, 40);
+            this.txtEmail.Size = new System.Drawing.Size(305, 40);
             this.txtEmail.TabIndex = 13;
             // 
             // txtUserName
@@ -260,16 +269,17 @@
             this.txtUserName.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.txtUserName.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.txtUserName.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtUserName.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtUserName.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtUserName.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtUserName.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtUserName.IconLeft = global::ChatApp.Properties.Resources.TenDangNhap;
-            this.txtUserName.Location = new System.Drawing.Point(65, 58);
+            this.txtUserName.IconLeftSize = new System.Drawing.Size(25, 25);
+            this.txtUserName.Location = new System.Drawing.Point(48, 58);
             this.txtUserName.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtUserName.Name = "txtUserName";
             this.txtUserName.PlaceholderText = "Tên Đăng Nhập";
             this.txtUserName.SelectedText = "";
-            this.txtUserName.Size = new System.Drawing.Size(270, 40);
+            this.txtUserName.Size = new System.Drawing.Size(305, 40);
             this.txtUserName.TabIndex = 9;
             // 
             // txtPassword
@@ -284,19 +294,21 @@
             this.txtPassword.DisabledState.PlaceholderForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(138)))), ((int)(((byte)(138)))));
             this.txtPassword.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(248)))), ((int)(((byte)(255)))));
             this.txtPassword.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(147)))), ((int)(((byte)(176)))));
-            this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.txtPassword.Font = new System.Drawing.Font("Segoe UI Semibold", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtPassword.HoverState.BorderColor = System.Drawing.Color.Transparent;
             this.txtPassword.HoverState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(240)))), ((int)(((byte)(255)))));
             this.txtPassword.IconLeft = global::ChatApp.Properties.Resources.MatKhau;
+            this.txtPassword.IconLeftSize = new System.Drawing.Size(25, 25);
             this.txtPassword.IconRight = global::ChatApp.Properties.Resources.AnMatKhau;
             this.txtPassword.IconRightCursor = System.Windows.Forms.Cursors.Hand;
-            this.txtPassword.Location = new System.Drawing.Point(65, 143);
+            this.txtPassword.IconRightSize = new System.Drawing.Size(25, 25);
+            this.txtPassword.Location = new System.Drawing.Point(48, 143);
             this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 5, 3, 5);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '●';
             this.txtPassword.PlaceholderText = "Mật Khẩu";
             this.txtPassword.SelectedText = "";
-            this.txtPassword.Size = new System.Drawing.Size(270, 40);
+            this.txtPassword.Size = new System.Drawing.Size(305, 40);
             this.txtPassword.TabIndex = 11;
             this.txtPassword.IconRightClick += new System.EventHandler(this.txtMatKhau_IconRightClick);
             // 
@@ -320,12 +332,12 @@
             this.ClientSize = new System.Drawing.Size(782, 453);
             this.Controls.Add(this.pnlBackground);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DangKy";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Đăng Ký";
+            this.Text = "ĐĂNG KÝ";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DangKy_FormClosed);
             this.pnlLogin.ResumeLayout(false);
-            this.pnlLogin.PerformLayout();
             this.pnlBackground.ResumeLayout(false);
             this.ResumeLayout(false);
 

@@ -41,7 +41,7 @@ namespace ChatApp
         /// <summary>
         /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
         /// </summary>
-        private readonly ThemeService _themeService = new ThemeService();
+        private readonly ThemeService _themeService;
 
         // <summary>
         /// Controller để laod avatar
@@ -242,10 +242,10 @@ namespace ChatApp
         private async void picDayNight_Click(object sender, EventArgs e)
         {
             bool newMode = !ThemeManager.IsDark;
-            ThemeManager.ApplyTheme(this, newMode);
-            await _themeService.SaveThemeAsync(_localId, newMode);
             if (newMode) picDayNight.Image = Properties.Resources.Moon;
             else picDayNight.Image = Properties.Resources.Sun;
+            ThemeManager.ApplyTheme(this, newMode);
+            await _themeService.SaveThemeAsync(_localId, newMode);
         }
         #endregion
 

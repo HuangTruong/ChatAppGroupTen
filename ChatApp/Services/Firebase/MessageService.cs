@@ -17,7 +17,7 @@ using FirebaseAppConfig = ChatApp.Services.Firebase.FirebaseConfig;
 namespace ChatApp.Services.Messages
 {
     /// <summary>
-    /// MessageService: lớp truy cập Firebase (Get/Push/Delete/Stream) + gửi text/file/image.
+    /// MessageService: lớp truy cập Firebase (Get/Push/Delete/Stream) + gửi text/file.
     /// Controller sẽ gọi service này để tách bớt phần IO.
     /// </summary>
     public class MessageService : IDisposable
@@ -59,10 +59,10 @@ namespace ChatApp.Services.Messages
         }
 
         public Task<EventStreamResponse> ListenAsync(
-    string path,
-    EventHandler<ValueAddedEventArgs> added,
-    EventHandler<ValueChangedEventArgs> changed,
-    EventHandler<ValueRemovedEventArgs> removed)
+            string path,
+            EventHandler<ValueAddedEventArgs> added,
+            EventHandler<ValueChangedEventArgs> changed,
+            EventHandler<ValueRemovedEventArgs> removed)
         {
             ValueAddedEventHandler a = null;
             if (added != null)
@@ -168,9 +168,9 @@ namespace ChatApp.Services.Messages
         }
 
         /// <summary>
-        /// Gửi file/ảnh chung một luồng:
-        /// - Ảnh: gửi base64 trực tiếp vào chat.
-        /// - File thường: upload Catbox (hoặc uploader hiện tại) rồi gửi URL.
+        /// Gửi file/ảnh:
+        /// - Bất kỳ loại file nào (kể cả ảnh) đều upload lên host (Catbox, v.v.)
+        /// - Lưu lại URL vào FileUrl, MessageType = "file".
         /// </summary>
         public async Task SendAttachmentAsync(string conversationId, string senderId, string receiverId, string filePath)
         {
@@ -185,9 +185,11 @@ namespace ChatApp.Services.Messages
                 throw new Exception("File không tồn tại.");
             }
 
-            bool isImage = AttachmentClassifier.IsImageFile(filePath, out string mime);
-
             string path = "messages/" + conversationId;
+
+            // Upload file (kể cả ảnh) lên host trung gian
+            FileAttachmentUploader uploader = new FileAttachmentUploader();
+            string urlTai = await uploader.UploadAsync(filePath).ConfigureAwait(false);
 
             ChatMessage msg = new ChatMessage();
             msg.SenderId = senderId;
@@ -195,28 +197,10 @@ namespace ChatApp.Services.Messages
             msg.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             msg.IsMine = true;
 
-            if (isImage)
-            {
-                byte[] bytes = File.ReadAllBytes(filePath);
-
-                msg.MessageType = "image";
-                msg.FileName = fi.Name;
-                msg.FileSize = fi.Length;
-                msg.ImageMimeType = string.IsNullOrWhiteSpace(mime)
-                    ? AttachmentClassifier.GetMimeTypeByExtension(filePath)
-                    : mime;
-                msg.ImageBase64 = Convert.ToBase64String(bytes);
-            }
-            else
-            {
-                FileAttachmentUploader uploader = new FileAttachmentUploader();
-                string urlTai = await uploader.UploadAsync(filePath).ConfigureAwait(false);
-
-                msg.MessageType = "file";
-                msg.FileName = fi.Name;
-                msg.FileSize = fi.Length;
-                msg.FileUrl = urlTai;
-            }
+            msg.MessageType = "file";
+            msg.FileName = fi.Name;
+            msg.FileSize = fi.Length;
+            msg.FileUrl = urlTai;
 
             await _firebase.PushAsync(path, msg).ConfigureAwait(false);
         }

@@ -82,6 +82,7 @@
             // 
             // pbAction
             // 
+            this.pbAction.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pbAction.Dock = System.Windows.Forms.DockStyle.Right;
             this.pbAction.Image = global::ChatApp.Properties.Resources.Add;
             this.pbAction.Location = new System.Drawing.Point(214, 5);

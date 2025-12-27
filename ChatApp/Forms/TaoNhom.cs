@@ -95,24 +95,12 @@ namespace ChatApp.Forms
                     AutoSize = true,
                     Dock = DockStyle.Top,
                     Font = new Font("Segoe UI", 10F),
+                    Cursor = Cursors.Hand,
                 };
 
                 pnlMembers.Controls.Add(chk);
                 y += chk.Height + 12;
             }
-
-            //clbThanhVien.Items.Clear();
-
-            //foreach (var kv in _friends)
-            //{
-            //    string id = kv.Key;
-            //    User u = kv.Value;
-
-            //    clbThanhVien.Items.Add(
-            //        new Item { Id = id, Text = GetName(u, id) },
-            //        false
-            //    );
-            //}
         }
 
         private static string GetName(User u, string id)

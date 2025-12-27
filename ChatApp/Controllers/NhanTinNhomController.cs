@@ -84,10 +84,6 @@ namespace ChatApp.Controllers
         /// <summary>
         /// Tạo nhóm mới (bao gồm creator).
         /// </summary>
-        //public Task<string> CreateGroupAsync(string groupName, List<string> memberIds)
-        //{
-        //    return _groupService.CreateGroupAsync(_currentUserId, groupName, memberIds, _token);
-        //}
         public Task<string> CreateGroupAsync(string groupName, List<string> memberIds, string avatarBase64)
         {
             return _groupService.CreateGroupAsync(_currentUserId, groupName, memberIds, avatarBase64, _token);
@@ -367,9 +363,9 @@ namespace ChatApp.Controllers
         }
 
         /// <summary>
-        /// Gửi file/ảnh trong nhóm:
-        /// - Ảnh: không upload Catbox, gửi trực tiếp base64.
-        /// - File thường: upload Catbox.
+        /// Gửi file trong nhóm:
+        /// - Kể cả ảnh cũng được upload lên host (Catbox) như file thường.
+        /// - Không còn gửi base64 ảnh trực tiếp.
         /// </summary>
         public async Task<ChatMessage> SendGroupAttachmentMessageAsync(string groupId, string filePath)
         {
@@ -379,88 +375,55 @@ namespace ChatApp.Controllers
             FileInfo fi = new FileInfo(filePath);
             if (!fi.Exists) throw new Exception("File không tồn tại.");
 
+            // Chỉ dùng để đổi nội dung preview [Ảnh]/[File], không ảnh base64 nữa
             bool laAnh = AttachmentClassifier.IsImageFile(filePath, out string mime);
 
             long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            if (laAnh)
-            {
-                byte[] bytes = File.ReadAllBytes(filePath);
-                string base64 = Convert.ToBase64String(bytes);
+            // Upload file (kể cả ảnh) lên host trung gian
+            FileAttachmentUploader uploader = new FileAttachmentUploader();
+            string url = await uploader.UploadAsync(filePath).ConfigureAwait(false);
 
-                string mid = await _messageService.SendImageAsync(
-                    gid,
-                    _currentUserId,
-                    fi.Name,
-                    fi.Length,
-                    string.IsNullOrWhiteSpace(mime) ? AttachmentClassifier.GetMimeTypeByExtension(filePath) : mime,
-                    base64,
-                    now,
-                    _token).ConfigureAwait(false);
+            string prefix = laAnh ? "[Ảnh] " : "[File] ";
 
-                try { await _groupService.UpdateLastMessageAsync(gid, "[Ảnh] " + fi.Name, now, _token).ConfigureAwait(false); } catch { }
+            string mid = await _messageService.SendFileAsync(
+                gid,
+                _currentUserId,
+                fi.Name,
+                fi.Length,
+                url,
+                now,
+                _token).ConfigureAwait(false);
 
-                if (!string.IsNullOrEmpty(mid)) MarkKnownIfNew(mid);
+            // Cập nhật preview nhóm
+            try { await _groupService.UpdateLastMessageAsync(gid, prefix + fi.Name, now, _token).ConfigureAwait(false); } catch { }
 
-                ChatMessage msg = new ChatMessage();
-                msg.MessageId = mid;
-                msg.SenderId = _currentUserId;
-                msg.ReceiverId = gid;
-                msg.Text = string.Empty;
-                msg.Timestamp = now;
-                msg.IsMine = true;
+            if (!string.IsNullOrEmpty(mid)) MarkKnownIfNew(mid);
 
-                msg.MessageType = "image";
-                msg.FileName = fi.Name;
-                msg.FileSize = fi.Length;
-                msg.ImageMimeType = string.IsNullOrWhiteSpace(mime) ? AttachmentClassifier.GetMimeTypeByExtension(filePath) : mime;
-                msg.ImageBase64 = base64;
+            ChatMessage msg = new ChatMessage();
+            msg.MessageId = mid;
+            msg.SenderId = _currentUserId;
+            msg.ReceiverId = gid;
+            msg.Text = string.Empty;
+            msg.Timestamp = now;
+            msg.IsMine = true;
 
-                return msg;
-            }
-            else
-            {
-                FileAttachmentUploader uploader = new FileAttachmentUploader();
-                string url = await uploader.UploadAsync(filePath).ConfigureAwait(false);
+            msg.MessageType = "file";
+            msg.FileName = fi.Name;
+            msg.FileSize = fi.Length;
+            msg.FileUrl = url;
 
-                string mid = await _messageService.SendFileAsync(
-                    gid,
-                    _currentUserId,
-                    fi.Name,
-                    fi.Length,
-                    url,
-                    now,
-                    _token).ConfigureAwait(false);
-
-                try { await _groupService.UpdateLastMessageAsync(gid, "[File] " + fi.Name, now, _token).ConfigureAwait(false); } catch { }
-
-                if (!string.IsNullOrEmpty(mid)) MarkKnownIfNew(mid);
-
-                ChatMessage msg = new ChatMessage();
-                msg.MessageId = mid;
-                msg.SenderId = _currentUserId;
-                msg.ReceiverId = gid;
-                msg.Text = string.Empty;
-                msg.Timestamp = now;
-                msg.IsMine = true;
-                msg.MessageType = "file";
-                msg.FileName = fi.Name;
-                msg.FileSize = fi.Length;
-                msg.FileUrl = url;
-
-                return msg;
-            }
+            return msg;
         }
 
         /// <summary>
-        /// Gửi file trong nhóm.
+        /// Gửi file trong nhóm (back-compat method).
         /// </summary>
         public Task<ChatMessage> SendGroupFileMessageAsync(string groupId, string filePath)
         {
             // Giữ tương thích chỗ cũ đang gọi SendGroupFileMessageAsync
             return SendGroupAttachmentMessageAsync(groupId, filePath);
         }
-
 
         #endregion
 

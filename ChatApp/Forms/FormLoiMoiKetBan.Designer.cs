@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormLoiMoiKetBan));
             this.pnlBackground = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlView = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlBackground.SuspendLayout();
@@ -64,9 +65,11 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(668, 520);
             this.Controls.Add(this.pnlBackground);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "FormLoiMoiKetBan";
-            this.Text = "FormLoiMoiKetBan";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "LỜI MỜI KẾT BẠN";
             this.pnlBackground.ResumeLayout(false);
             this.ResumeLayout(false);
 

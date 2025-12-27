@@ -47,6 +47,8 @@ namespace ChatApp.Forms
         /// </summary>
         private async Task LoadFriendRequestsUsingFlowPanel()
         {
+            // Biến để biết đang ở chế độ ngày hay đêm
+            bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
             try
             {
                 pnlView.Controls.Clear();
@@ -58,6 +60,8 @@ namespace ChatApp.Forms
                 if (friendRequests == null || friendRequests.Count == 0)
                 {
                     DisplayEmptyMessage();
+                    // Load chế độ ngày đêm
+                    ThemeManager.ApplyTheme(this, isDark);
                     return;
                 }
 
@@ -79,7 +83,6 @@ namespace ChatApp.Forms
                 }
 
                 // Load chế độ ngày đêm
-                bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
                 ThemeManager.ApplyTheme(this, isDark);
             }
             catch (Exception ex)
@@ -151,6 +154,7 @@ namespace ChatApp.Forms
             // 💥 Quan trọng: Cần set Width bằng với FlowLayoutPanel để căn giữa được
             lblEmpty.Width = pnlView.ClientSize.Width;
 
+            lblEmpty.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
             lblEmpty.TextAlign = ContentAlignment.MiddleCenter;
             lblEmpty.ForeColor = Color.Gray;
             lblEmpty.Height = 50;

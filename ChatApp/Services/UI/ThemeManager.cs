@@ -137,7 +137,7 @@ namespace ChatApp.Services.UI
             if (ctrl is Guna2Button gBtn)
             {
                 // Bo góc + đổ bóng
-                gBtn.BorderRadius = 20;
+                gBtn.BorderRadius = 10;
                 gBtn.BorderThickness = 0;
 
                 gBtn.ShadowDecoration.Enabled = true;
@@ -204,7 +204,7 @@ namespace ChatApp.Services.UI
 
             if (ctrl is Guna2TextBox gTxt)
             {
-                gTxt.BorderRadius = 20;
+                gTxt.BorderRadius = 10;
                 gTxt.BorderThickness = 1;
 
                 if (isDark)

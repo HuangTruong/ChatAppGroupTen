@@ -134,7 +134,8 @@ namespace ChatApp.Forms
                     AutoSize = true,
                     Dock = DockStyle.Top,
                     Font = new Font("Segoe UI", 10F),
-                    Enabled = !existed
+                    Enabled = !existed,
+                    Cursor = Cursors.Hand
                 };
 
                 pnlMembers.Controls.Add(chk);

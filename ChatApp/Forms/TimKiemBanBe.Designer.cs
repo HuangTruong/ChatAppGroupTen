@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TimKiemBanBe));
             this.pnlBackGround = new Guna.UI2.WinForms.Guna2GradientPanel();
             this.pnlView = new Guna.UI2.WinForms.Guna2Panel();
             this.pnlBackGround.SuspendLayout();
@@ -64,9 +65,11 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(628, 554);
             this.Controls.Add(this.pnlBackGround);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TimKiemBanBe";
-            this.Text = "TimKiemBanBe";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "TÌM KIẾM BẠN BÈ";
             this.pnlBackGround.ResumeLayout(false);
             this.ResumeLayout(false);
 

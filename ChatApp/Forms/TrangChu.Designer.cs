@@ -32,12 +32,12 @@ namespace ChatApp
             this.lblDangXuat = new System.Windows.Forms.Label();
             this.picDangXuat = new Guna.UI2.WinForms.Guna2PictureBox();
             this.pnlHeader = new Guna.UI2.WinForms.Guna2Panel();
+            this.picDayNight = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.lblTenApp = new System.Windows.Forms.Label();
             this.picLogo = new Guna.UI2.WinForms.Guna2PictureBox();
             this.lblTenDangNhap = new System.Windows.Forms.Label();
             this.picAnhDaiDien = new Guna.UI2.WinForms.Guna2PictureBox();
             this.sepHeader = new Guna.UI2.WinForms.Guna2Separator();
-            this.picDayNight = new Guna.UI2.WinForms.Guna2CirclePictureBox();
             this.pnlBackground.SuspendLayout();
             this.pnlBody.SuspendLayout();
             this.pnlCaiDat.SuspendLayout();
@@ -47,9 +47,9 @@ namespace ChatApp
             this.pnlDangXuat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).BeginInit();
             this.pnlHeader.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).BeginInit();
             this.SuspendLayout();
             // 
             // pnlBackground
@@ -96,34 +96,39 @@ namespace ChatApp
             // pnlCaiDat
             // 
             this.pnlCaiDat.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pnlCaiDat.AutoSize = true;
             this.pnlCaiDat.BackColor = System.Drawing.Color.Transparent;
+            this.pnlCaiDat.BorderRadius = 10;
             this.pnlCaiDat.Controls.Add(this.lblCaiDat);
             this.pnlCaiDat.Controls.Add(this.picCaiDat);
-            this.pnlCaiDat.Location = new System.Drawing.Point(232, 99);
+            this.pnlCaiDat.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlCaiDat.Location = new System.Drawing.Point(222, 110);
             this.pnlCaiDat.Name = "pnlCaiDat";
+            this.pnlCaiDat.Padding = new System.Windows.Forms.Padding(5);
             this.pnlCaiDat.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.pnlCaiDat.Size = new System.Drawing.Size(68, 89);
+            this.pnlCaiDat.Size = new System.Drawing.Size(90, 90);
             this.pnlCaiDat.TabIndex = 2;
             // 
             // lblCaiDat
             // 
-            this.lblCaiDat.AutoSize = true;
+            this.lblCaiDat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblCaiDat.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
             this.lblCaiDat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblCaiDat.Location = new System.Drawing.Point(9, 63);
+            this.lblCaiDat.Location = new System.Drawing.Point(5, 65);
             this.lblCaiDat.Name = "lblCaiDat";
-            this.lblCaiDat.Size = new System.Drawing.Size(51, 17);
+            this.lblCaiDat.Size = new System.Drawing.Size(80, 20);
             this.lblCaiDat.TabIndex = 2;
             this.lblCaiDat.Text = "Cài Đặt";
+            this.lblCaiDat.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // picCaiDat
             // 
             this.picCaiDat.Dock = System.Windows.Forms.DockStyle.Top;
             this.picCaiDat.Image = ((System.Drawing.Image)(resources.GetObject("picCaiDat.Image")));
             this.picCaiDat.ImageRotate = 0F;
-            this.picCaiDat.Location = new System.Drawing.Point(0, 0);
+            this.picCaiDat.Location = new System.Drawing.Point(5, 5);
             this.picCaiDat.Name = "picCaiDat";
-            this.picCaiDat.Size = new System.Drawing.Size(68, 60);
+            this.picCaiDat.Size = new System.Drawing.Size(80, 60);
             this.picCaiDat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picCaiDat.TabIndex = 0;
             this.picCaiDat.TabStop = false;
@@ -132,34 +137,39 @@ namespace ChatApp
             // pnlNhanTin
             // 
             this.pnlNhanTin.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pnlNhanTin.AutoSize = true;
             this.pnlNhanTin.BackColor = System.Drawing.Color.Transparent;
+            this.pnlNhanTin.BorderRadius = 10;
             this.pnlNhanTin.Controls.Add(this.lblNhanTin);
             this.pnlNhanTin.Controls.Add(this.picNhanTin);
-            this.pnlNhanTin.Location = new System.Drawing.Point(123, 99);
+            this.pnlNhanTin.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlNhanTin.Location = new System.Drawing.Point(116, 110);
             this.pnlNhanTin.Name = "pnlNhanTin";
-            this.pnlNhanTin.Size = new System.Drawing.Size(69, 89);
+            this.pnlNhanTin.Padding = new System.Windows.Forms.Padding(5);
+            this.pnlNhanTin.Size = new System.Drawing.Size(90, 90);
             this.pnlNhanTin.TabIndex = 0;
             this.pnlNhanTin.Click += new System.EventHandler(this.pnlNhanTin_Click);
             // 
             // lblNhanTin
             // 
-            this.lblNhanTin.AutoSize = true;
+            this.lblNhanTin.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblNhanTin.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
             this.lblNhanTin.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblNhanTin.Location = new System.Drawing.Point(3, 63);
+            this.lblNhanTin.Location = new System.Drawing.Point(5, 65);
             this.lblNhanTin.Name = "lblNhanTin";
-            this.lblNhanTin.Size = new System.Drawing.Size(63, 17);
+            this.lblNhanTin.Size = new System.Drawing.Size(80, 20);
             this.lblNhanTin.TabIndex = 1;
             this.lblNhanTin.Text = "Nhắn Tin";
+            this.lblNhanTin.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // picNhanTin
             // 
             this.picNhanTin.Dock = System.Windows.Forms.DockStyle.Top;
             this.picNhanTin.Image = ((System.Drawing.Image)(resources.GetObject("picNhanTin.Image")));
             this.picNhanTin.ImageRotate = 0F;
-            this.picNhanTin.Location = new System.Drawing.Point(0, 0);
+            this.picNhanTin.Location = new System.Drawing.Point(5, 5);
             this.picNhanTin.Name = "picNhanTin";
-            this.picNhanTin.Size = new System.Drawing.Size(69, 60);
+            this.picNhanTin.Size = new System.Drawing.Size(80, 60);
             this.picNhanTin.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picNhanTin.TabIndex = 0;
             this.picNhanTin.TabStop = false;
@@ -167,33 +177,38 @@ namespace ChatApp
             // pnlDangXuat
             // 
             this.pnlDangXuat.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pnlDangXuat.AutoSize = true;
             this.pnlDangXuat.BackColor = System.Drawing.Color.Transparent;
+            this.pnlDangXuat.BorderRadius = 10;
             this.pnlDangXuat.Controls.Add(this.lblDangXuat);
             this.pnlDangXuat.Controls.Add(this.picDangXuat);
-            this.pnlDangXuat.Location = new System.Drawing.Point(335, 99);
+            this.pnlDangXuat.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pnlDangXuat.Location = new System.Drawing.Point(328, 110);
             this.pnlDangXuat.Name = "pnlDangXuat";
-            this.pnlDangXuat.Size = new System.Drawing.Size(79, 89);
+            this.pnlDangXuat.Padding = new System.Windows.Forms.Padding(5);
+            this.pnlDangXuat.Size = new System.Drawing.Size(90, 90);
             this.pnlDangXuat.TabIndex = 1;
             // 
             // lblDangXuat
             // 
-            this.lblDangXuat.AutoSize = true;
+            this.lblDangXuat.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblDangXuat.Font = new System.Drawing.Font("Segoe UI Semibold", 7.8F, System.Drawing.FontStyle.Bold);
             this.lblDangXuat.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblDangXuat.Location = new System.Drawing.Point(3, 63);
+            this.lblDangXuat.Location = new System.Drawing.Point(5, 65);
             this.lblDangXuat.Name = "lblDangXuat";
-            this.lblDangXuat.Size = new System.Drawing.Size(72, 17);
+            this.lblDangXuat.Size = new System.Drawing.Size(80, 20);
             this.lblDangXuat.TabIndex = 3;
             this.lblDangXuat.Text = "Đăng Xuất";
+            this.lblDangXuat.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // picDangXuat
             // 
             this.picDangXuat.Dock = System.Windows.Forms.DockStyle.Top;
             this.picDangXuat.Image = ((System.Drawing.Image)(resources.GetObject("picDangXuat.Image")));
             this.picDangXuat.ImageRotate = 0F;
-            this.picDangXuat.Location = new System.Drawing.Point(0, 0);
+            this.picDangXuat.Location = new System.Drawing.Point(5, 5);
             this.picDangXuat.Name = "picDangXuat";
-            this.picDangXuat.Size = new System.Drawing.Size(79, 60);
+            this.picDangXuat.Size = new System.Drawing.Size(80, 60);
             this.picDangXuat.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picDangXuat.TabIndex = 0;
             this.picDangXuat.TabStop = false;
@@ -213,6 +228,19 @@ namespace ChatApp
             this.pnlHeader.Name = "pnlHeader";
             this.pnlHeader.Size = new System.Drawing.Size(1181, 89);
             this.pnlHeader.TabIndex = 3;
+            // 
+            // picDayNight
+            // 
+            this.picDayNight.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.picDayNight.ImageRotate = 0F;
+            this.picDayNight.Location = new System.Drawing.Point(1017, 12);
+            this.picDayNight.Name = "picDayNight";
+            this.picDayNight.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
+            this.picDayNight.Size = new System.Drawing.Size(64, 64);
+            this.picDayNight.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picDayNight.TabIndex = 9;
+            this.picDayNight.TabStop = false;
+            this.picDayNight.Click += new System.EventHandler(this.picDayNight_Click);
             // 
             // lblTenApp
             // 
@@ -255,7 +283,7 @@ namespace ChatApp
             this.picAnhDaiDien.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picAnhDaiDien.BackColor = System.Drawing.Color.Transparent;
             this.picAnhDaiDien.BorderRadius = 14;
-            this.picAnhDaiDien.Image = ((System.Drawing.Image)(resources.GetObject("picAnhDaiDien.Image")));
+            this.picAnhDaiDien.Image = global::ChatApp.Properties.Resources.DefaultAvatar;
             this.picAnhDaiDien.ImageRotate = 0F;
             this.picAnhDaiDien.Location = new System.Drawing.Point(1099, 8);
             this.picAnhDaiDien.Name = "picAnhDaiDien";
@@ -273,18 +301,6 @@ namespace ChatApp
             this.sepHeader.Size = new System.Drawing.Size(1181, 1);
             this.sepHeader.TabIndex = 8;
             // 
-            // picDayNight
-            // 
-            this.picDayNight.ImageRotate = 0F;
-            this.picDayNight.Location = new System.Drawing.Point(1017, 12);
-            this.picDayNight.Name = "picDayNight";
-            this.picDayNight.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
-            this.picDayNight.Size = new System.Drawing.Size(64, 64);
-            this.picDayNight.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.picDayNight.TabIndex = 9;
-            this.picDayNight.TabStop = false;
-            this.picDayNight.Click += new System.EventHandler(this.picDayNight_Click);
-            // 
             // TrangChu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -292,26 +308,26 @@ namespace ChatApp
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ClientSize = new System.Drawing.Size(1181, 654);
             this.Controls.Add(this.pnlBackground);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "TrangChu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "TRANG CHỦ";
             this.Load += new System.EventHandler(this.TrangChu_Load);
             this.pnlBackground.ResumeLayout(false);
             this.pnlBody.ResumeLayout(false);
+            this.pnlBody.PerformLayout();
             this.pnlCaiDat.ResumeLayout(false);
-            this.pnlCaiDat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picCaiDat)).EndInit();
             this.pnlNhanTin.ResumeLayout(false);
-            this.pnlNhanTin.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picNhanTin)).EndInit();
             this.pnlDangXuat.ResumeLayout(false);
-            this.pnlDangXuat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picDangXuat)).EndInit();
             this.pnlHeader.ResumeLayout(false);
             this.pnlHeader.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.picAnhDaiDien)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.picDayNight)).EndInit();
             this.ResumeLayout(false);
 
         }

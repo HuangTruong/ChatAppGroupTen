@@ -313,9 +313,13 @@ namespace ChatApp
 
             conversations.picCancelRequest.Visible = true;
 
-            conversations.CancelClicked += async (s, e) => {
-                var confirm = MessageBox.Show($"Bạn có chắc chắn muốn hủy kết bạn với {user.DisplayName}?",
-                                            "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            conversations.CancelClicked += async (s, e) =>
+            {
+                var confirm = MessageBox.Show(
+                    string.Format("Bạn có chắc chắn muốn hủy kết bạn với {0}?", user.DisplayName),
+                    "Xác nhận",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
 
                 if (confirm == DialogResult.Yes)
                 {
@@ -339,7 +343,7 @@ namespace ChatApp
                 }
             };
 
-            conversations.Dock = DockStyle.Top;    
+            conversations.Dock = DockStyle.Top;
             pnlDanhSachChat.Controls.Add(conversations);
         }
 
@@ -402,7 +406,6 @@ namespace ChatApp
             // Nếu là group item (Tag = "GROUP:{groupId}")
             if (idNguoiDung.StartsWith(GROUP_TAG_PREFIX, StringComparison.Ordinal))
             {
-                
                 string gid = idNguoiDung.Substring(GROUP_TAG_PREFIX.Length);
                 string base64nhom = await _groupService.GetAvatarGroupAsync(gid);
                 picAnhDaiDienGiua.Image = ImageBase64.Base64ToImage(base64nhom);
@@ -441,7 +444,7 @@ namespace ChatApp
             }
             else
             {
-                lblTenDangNhapGiua.Text = "";
+                lblTenDangNhapGiua.Text = string.Empty;
             }
 
             CapNhatTrangThaiNguoiDangChat(idNguoiDangChat);
@@ -574,6 +577,7 @@ namespace ChatApp
 
         /// <summary>
         /// Thêm 1 bong bóng tin nhắn vào khung chat (FlowLayoutPanel).
+        /// Từ nay: KHÔNG xử lý ảnh riêng, mọi attachment đều là "file".
         /// </summary>
         private async void AddMessageBubble(ChatMessage msg)
         {
@@ -590,11 +594,16 @@ namespace ChatApp
             try
             {
                 if (!string.IsNullOrWhiteSpace(senderId))
+                {
                     thongTinNguoiGui = await _authService.GetUserByIdAsync(senderId);
+                }
             }
-            catch { }
+            catch
+            {
+                // ignore, dùng fallback phía dưới
+            }
 
-            string DisplayName = isMine
+            string displayName = isMine
                 ? "Bạn"
                 : (thongTinNguoiGui != null && !string.IsNullOrWhiteSpace(thongTinNguoiGui.DisplayName)
                     ? thongTinNguoiGui.DisplayName
@@ -603,41 +612,37 @@ namespace ChatApp
             string time = FormatTimestamp(msg.Timestamp);
             string type = (msg.MessageType ?? string.Empty).ToLowerInvariant();
 
-            MessageBubbles bubble = new MessageBubbles
-            {
-                Tag = msg,
-                Margin = new Padding(0, 6, 0, 6)
-            };
+            // ====== TẠO BUBBLE ======
+            MessageBubbles bubble = new MessageBubbles();
+            bubble.Tag = msg;
+            bubble.Margin = new Padding(0, 6, 0, 6);
 
             // Giãn bubble theo panel
             int w = GetBubbleWidth();
-            if (w > 50) bubble.Width = w;
-
-            // ================== ẢNH ==================
-            if (type == "image")
+            if (w > 50)
             {
-                Image thumb = TaoThumbnailTuMessage(msg);
-
-                bubble.SetImageMessage(
-                    DisplayName,
-                    thumb,
-                    string.Empty,   // không caption cho gọn
-                    time,
-                    isMine
-                );
-
-                bubble.Cursor = Cursors.Hand;
-                GanClickDeXemAnh(bubble);
-                GanClickDeTaiFile(bubble);
+                bubble.Width = w;
             }
-            // ================== FILE ==================
-            else if (type == "file")
+
+            // ================== FILE (bao gồm cả "image") ==================
+            if (type == "file" || type == "image")
             {
                 string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
-                string noiDung = $"{ten} ({FormatBytes(msg.FileSize)})";
+                string noiDung;
 
-                bubble.SetMessage(DisplayName, noiDung, time, isMine, msg.SenderId);
+                if (msg.FileSize > 0)
+                {
+                    noiDung = string.Format(
+                        "{0} ({1})",
+                        ten,
+                        FormatBytes(msg.FileSize));
+                }
+                else
+                {
+                    noiDung = ten;
+                }
 
+                bubble.SetMessage(displayName, noiDung, time, isMine, senderId);
                 bubble.Cursor = Cursors.Hand;
                 GanClickDeTaiFile(bubble);
             }
@@ -645,11 +650,11 @@ namespace ChatApp
             else
             {
                 bubble.SetMessage(
-                    DisplayName,
+                    displayName,
                     msg.Text ?? string.Empty,
                     time,
                     isMine,
-                    msg.SenderId
+                    senderId
                 );
             }
 
@@ -658,7 +663,7 @@ namespace ChatApp
             {
                 if (flpKhungChat.InvokeRequired)
                 {
-                    flpKhungChat.BeginInvoke(new Action(() =>
+                    flpKhungChat.BeginInvoke(new Action(delegate
                     {
                         if (this.IsDisposed) return;
                         flpKhungChat.Controls.Add(bubble);
@@ -671,7 +676,10 @@ namespace ChatApp
                     ScrollToBottom();
                 }
             }
-            catch { }
+            catch
+            {
+                // ignore UI errors
+            }
         }
 
         /// <summary>
@@ -785,6 +793,7 @@ namespace ChatApp
             if (g == null) return;
 
             Conversations item = new Conversations();
+            item.Dock = DockStyle.Top;
             item.ItemClicked += UserItem_Click;
 
             // Tag dạng "GROUP:{groupId}"
@@ -895,7 +904,7 @@ namespace ChatApp
                     }
                     else
                     {
-                        newGroupId = await boDieuKhienNhanTinNhom.CreateGroupAsync(groupName, members,null);
+                        newGroupId = await boDieuKhienNhanTinNhom.CreateGroupAsync(groupName, members, null);
                     }
 
                     // Reload list để thấy nhóm mới
@@ -914,7 +923,6 @@ namespace ChatApp
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
         #endregion
 
@@ -1046,14 +1054,10 @@ namespace ChatApp
                     return;
                 }
 
-                if (!string.Equals(msg.MessageType, "file", StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
-
+                // Chỉ cần có URL là cho tải, không quan tâm MessageType (file / image / ...)
                 if (string.IsNullOrWhiteSpace(msg.FileUrl))
                 {
-                    MessageBox.Show("Tin nhắn file không có URL để tải.");
+                    MessageBox.Show("Tin nhắn này không có URL để tải file.");
                     return;
                 }
 
@@ -1103,106 +1107,6 @@ namespace ChatApp
                 dangTaiFile = false;
             }
         }
-
-        #region ====== ẢNH: CLICK ĐỂ XEM FULL + DOWNLOAD ======
-
-        private void GanClickDeXemAnh(Control root)
-        {
-            if (root == null) return;
-
-            root.Click -= BubbleImage_Click;
-            root.Click += BubbleImage_Click;
-
-            foreach (Control child in root.Controls)
-            {
-                GanClickDeXemAnh(child);
-            }
-        }
-
-        private Image TaoThumbnailTuMessage(ChatMessage msg)
-        {
-            if (msg == null) return null;
-            if (string.IsNullOrWhiteSpace(msg.ImageBase64)) return null;
-
-            try
-            {
-                byte[] bytes = Convert.FromBase64String(msg.ImageBase64);
-                // Thumbnail trong chat
-                return TaoThumbnailTuBytes(bytes, 320, 220);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static Image TaoThumbnailTuBytes(byte[] bytes, int maxW, int maxH)
-        {
-            if (bytes == null || bytes.Length == 0) return null;
-
-            using (MemoryStream ms = new MemoryStream(bytes))
-            using (Image img = Image.FromStream(ms))
-            {
-                int w = img.Width;
-                int h = img.Height;
-                if (w <= 0 || h <= 0) return null;
-
-                double scale = Math.Min((double)maxW / w, (double)maxH / h);
-                if (scale > 1) scale = 1;
-
-                int tw = Math.Max(1, (int)Math.Round(w * scale));
-                int th = Math.Max(1, (int)Math.Round(h * scale));
-
-                Bitmap bmp = new Bitmap(tw, th);
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                    g.DrawImage(img, 0, 0, tw, th);
-                }
-                return bmp;
-            }
-        }
-
-        private async void BubbleImage_Click(object sender, EventArgs e)
-        {
-            await Task.Yield();
-
-            ChatMessage msg = LayChatMessageTuTag(sender as Control);
-            if (msg == null) return;
-
-            if (!string.Equals(msg.MessageType, "image", StringComparison.OrdinalIgnoreCase))
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(msg.ImageBase64))
-            {
-                MessageBox.Show("Tin nhắn ảnh bị thiếu dữ liệu (ImageBase64).");
-                return;
-            }
-
-            byte[] bytes;
-            try
-            {
-                bytes = Convert.FromBase64String(msg.ImageBase64);
-            }
-            catch
-            {
-                MessageBox.Show("Ảnh bị lỗi/không đọc được (base64 sai).");
-                return;
-            }
-
-            string fileName = string.IsNullOrWhiteSpace(msg.FileName) ? "image" : msg.FileName;
-
-            using (ImageViewerForm viewer = new ImageViewerForm(bytes, fileName, msg.ImageMimeType))
-            {
-                viewer.ShowDialog(this);
-            }
-        }
-
-        #endregion
 
         #endregion
 
@@ -1272,6 +1176,7 @@ namespace ChatApp
                 f.ShowDialog(this);
             }
         }
+
         #endregion
 
         #region ====== EMOJI ======
@@ -1281,7 +1186,7 @@ namespace ChatApp
             FormEmoji frm = new FormEmoji();
 
             // Nhận emoji từ FormEmoji
-            frm.OnEmojiSelected = (emojiCode) =>
+            frm.OnEmojiSelected = delegate (string emojiCode)
             {
                 // Thêm mã emoji vào văn bản hiện tại
                 txtNhapTinNhan.AppendText(string.Format(" :{0}: ", emojiCode));

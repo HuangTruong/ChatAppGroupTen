@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuenMatKhau));
             this.btnQuayLaiDangNhap = new Guna.UI2.WinForms.Guna2Button();
             this.txtEmail = new Guna.UI2.WinForms.Guna2TextBox();
             this.lblTieuDe = new System.Windows.Forms.Label();
@@ -42,6 +43,7 @@
             // 
             this.btnQuayLaiDangNhap.BackColor = System.Drawing.Color.Transparent;
             this.btnQuayLaiDangNhap.BorderRadius = 10;
+            this.btnQuayLaiDangNhap.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnQuayLaiDangNhap.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnQuayLaiDangNhap.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnQuayLaiDangNhap.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -75,24 +77,25 @@
             this.txtEmail.FocusedState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(9)))), ((int)(((byte)(132)))), ((int)(((byte)(227)))));
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.txtEmail.HoverState.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
-            this.txtEmail.Location = new System.Drawing.Point(69, 94);
+            this.txtEmail.Location = new System.Drawing.Point(49, 90);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.txtEmail.Name = "txtEmail";
             this.txtEmail.PlaceholderText = "Email";
             this.txtEmail.SelectedText = "";
-            this.txtEmail.Size = new System.Drawing.Size(230, 48);
+            this.txtEmail.Size = new System.Drawing.Size(283, 48);
             this.txtEmail.TabIndex = 2;
             // 
             // lblTieuDe
             // 
-            this.lblTieuDe.AutoSize = true;
-            this.lblTieuDe.Font = new System.Drawing.Font("Segoe UI", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTieuDe.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lblTieuDe.Font = new System.Drawing.Font("Verdana", 16.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTieuDe.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(52)))), ((int)(((byte)(54)))));
-            this.lblTieuDe.Location = new System.Drawing.Point(62, 35);
+            this.lblTieuDe.Location = new System.Drawing.Point(0, 0);
             this.lblTieuDe.Name = "lblTieuDe";
-            this.lblTieuDe.Size = new System.Drawing.Size(253, 38);
+            this.lblTieuDe.Size = new System.Drawing.Size(381, 74);
             this.lblTieuDe.TabIndex = 1;
             this.lblTieuDe.Text = "QUÊN MẬT KHẨU";
+            this.lblTieuDe.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // guna2GradientPanel1
             // 
@@ -128,6 +131,7 @@
             // 
             this.btnXacNhan.BackColor = System.Drawing.Color.Transparent;
             this.btnXacNhan.BorderRadius = 10;
+            this.btnXacNhan.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnXacNhan.DisabledState.BorderColor = System.Drawing.Color.DarkGray;
             this.btnXacNhan.DisabledState.CustomBorderColor = System.Drawing.Color.DarkGray;
             this.btnXacNhan.DisabledState.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(169)))), ((int)(((byte)(169)))), ((int)(((byte)(169)))));
@@ -153,12 +157,12 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(94)))), ((int)(((byte)(148)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.guna2GradientPanel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "QuenMatKhau";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Quên Mật Khẩu";
+            this.Text = "QUÊN MẬT KHẨU";
             this.guna2GradientPanel1.ResumeLayout(false);
             this.pnlQuenMatKhau.ResumeLayout(false);
-            this.pnlQuenMatKhau.PerformLayout();
             this.ResumeLayout(false);
 
         }

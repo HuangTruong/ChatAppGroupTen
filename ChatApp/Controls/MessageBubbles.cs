@@ -15,17 +15,11 @@ namespace ChatApp.Controls
 
         private bool IsMine;
 
-        // ===== ẢNH: GIỚI HẠN HIỂN THỊ (tránh ảnh to làm vỡ layout) =====
-        private const int IMG_MAX_W = 100;
-        private const int IMG_MAX_H = 100;
-
-        // Giới hạn bề ngang chữ để nó tự xuống dòng
-        private const int TEXT_MAX_W = 2;
-
         /// <summary>
         /// Dịch vụ Auth làm việc với Firebase.
         /// </summary>
         private readonly AuthService _authService = new AuthService();
+
         #endregion
 
         #region ======= CONSTRUCTOR =======
@@ -39,6 +33,10 @@ namespace ChatApp.Controls
 
         #region ======= PUBLIC METHODS =======
 
+        /// <summary>
+        /// Hiển thị tin nhắn text (bao gồm emoji). 
+        /// Tất cả file/ảnh bên ngoài sẽ được render thành text "TênFile (Size)" từ NhanTin.cs.
+        /// </summary>
         public async void SetMessage(string displayName, string message, string time, bool isMine, string senderId)
         {
             lblDisplayName.Text = displayName;
@@ -58,61 +56,16 @@ namespace ChatApp.Controls
             // 4. Fix: Bubble cao bao nhiêu thì UserControl cao theo (khỏi bị cắt)
             FitBubbleHeight();
 
-            // Load avatar người dùng (Firebase)
-            string base64 = await _authService.GetAvatarAsync(senderId);
-            picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
-        }
-        /// <summary>
-        /// Hiển thị tin nhắn ảnh (thumbnail + caption).
-        /// </summary>
-        public void SetImageMessage(string displayName, Image thumbnail, string caption, string time, bool isMine)
-        {
-            lblDisplayName.Text = displayName;
-            lblTime.Text = time;
-            IsMine = isMine;
-
-            ApplyLayout(isMine);
-            ApplyTheme(ThemeManager.IsDark);
-
-            flpMessageContent.Controls.Clear();
-            flpMessageContent.Padding = new Padding(6);
-
-            PictureBox pic = new PictureBox();
-            pic.SizeMode = PictureBoxSizeMode.Zoom; // Zoom = fit nguyên ảnh, không crop
-            pic.Margin = new Padding(0, 2, 0, 2);
-            pic.Image = thumbnail;
-
-            // Ảnh fit vào khung maxW/maxH, giữ đúng tỷ lệ
-            pic.Size = GetFitSize(thumbnail, IMG_MAX_W, IMG_MAX_H);
-
-            //form ngoài gắn click mở full
-            pic.Cursor = Cursors.Hand;
-            pic.TabStop = false;
-
-            flpMessageContent.Controls.Add(pic);
-
-            if (!string.IsNullOrWhiteSpace(caption))
+            // 5. Load avatar người dùng (Firebase)
+            try
             {
-                Label lbl = new Label();
-                lbl.Text = caption;
-                lbl.AutoSize = true;
-                lbl.MaximumSize = new Size(TEXT_MAX_W, 0);
-                lbl.Font = new Font("Segoe UI", 9.5F);
-                lbl.BackColor = Color.Transparent;
-
-                if (ThemeManager.IsDark)
-                {
-                    lbl.ForeColor = IsMine ? Color.White : Color.FromArgb(229, 231, 235);
-                }
-                else
-                {
-                    lbl.ForeColor = Color.FromArgb(15, 23, 42);
-                }
-
-                flpMessageContent.Controls.Add(lbl);
+                string base64 = await _authService.GetAvatarAsync(senderId);
+                picAvatar.Image = ImageBase64.Base64ToImage(base64) ?? Properties.Resources.DefaultAvatar;
             }
-
-            FitBubbleHeight();
+            catch
+            {
+                picAvatar.Image = Properties.Resources.DefaultAvatar;
+            }
         }
 
         #endregion
@@ -127,14 +80,19 @@ namespace ChatApp.Controls
             string pattern = @"(:[a-zA-Z0-9_]+:)";
             string[] parts = Regex.Split(message, pattern);
 
-            foreach (var part in parts)
+            foreach (string part in parts)
             {
                 if (string.IsNullOrEmpty(part)) continue;
 
                 if (Regex.IsMatch(part, pattern))
                 {
                     string emojiName = part.Trim(':');
-                    string path = Path.Combine(Application.StartupPath, "Resources", "Emoji", emojiName + ".png");
+                    string path = Path.Combine(
+                        Application.StartupPath,
+                        "Resources",
+                        "Emoji",
+                        emojiName + ".png"
+                    );
 
                     if (File.Exists(path))
                     {
@@ -147,11 +105,14 @@ namespace ChatApp.Controls
                         };
                         flpMessageContent.Controls.Add(pic);
                     }
-                    else { AddTextControl(part); }
+                    else
+                    {
+                        AddTextControl(part);
+                    }
                 }
                 else
                 {
-                    // Đây là nơi xử lý văn bản thường
+                    // Văn bản thường
                     AddTextControl(part);
                 }
             }
@@ -164,9 +125,9 @@ namespace ChatApp.Controls
             Label lbl = new Label
             {
                 Text = text,
-                AutoSize = true, // Bắt buộc để hiện text dài
+                AutoSize = true,
                 Font = new Font("Segoe UI", 10.5F),
-                BackColor = Color.Transparent,
+                BackColor = Color.Transparent
             };
 
             // Đảm bảo màu chữ luôn tương phản với nền
@@ -176,45 +137,14 @@ namespace ChatApp.Controls
             }
             else
             {
-                lbl.ForeColor = Color.FromArgb(15, 23, 42); // Màu đen đậm dễ nhìn
+                lbl.ForeColor = Color.FromArgb(15, 23, 42);
             }
 
             flpMessageContent.Controls.Add(lbl);
         }
 
-        #endregion
-
-        #region ======= IMAGE HELPER =======
-
         /// <summary>
-        /// Tính size "fit" theo khung maxW x maxH, giữ tỉ lệ ảnh.
-        /// - Ảnh to: thu nhỏ cho vừa
-        /// - Ảnh nhỏ: giữ nguyên (không upscale)
-        /// </summary>
-        private static Size GetFitSize(Image img, int maxW, int maxH)
-        {
-            if (img == null || img.Width <= 0 || img.Height <= 0)
-            {
-                return new Size(240, 160);
-            }
-
-            double scaleW = (double)maxW / img.Width;
-            double scaleH = (double)maxH / img.Height;
-
-            // Fit vào khung => lấy scale nhỏ hơn (không crop)
-            double scale = Math.Min(scaleW, scaleH);
-
-            // Không upscale (ảnh nhỏ giữ nguyên)
-            if (scale > 1.0) scale = 1.0;
-            if (scale <= 0) scale = 1.0;
-
-            int w = Math.Max(1, (int)Math.Round(img.Width * scale));
-            int h = Math.Max(1, (int)Math.Round(img.Height * scale));
-            return new Size(w, h);
-        }
-
-        /// <summary>
-        /// Khi nội dung (ảnh/text) cao hơn -> bị cắt.
+        /// Khi nội dung (emoji/text) cao hơn -> bị cắt.
         /// => Lấy PreferredSize của pnlBackGround rồi set Height tương ứng.
         /// </summary>
         private void FitBubbleHeight()
@@ -238,6 +168,7 @@ namespace ChatApp.Controls
             }
             catch
             {
+                // ignore
             }
         }
 
@@ -319,7 +250,10 @@ namespace ChatApp.Controls
         protected override void OnHandleCreated(EventArgs e)
         {
             base.OnHandleCreated(e);
-            if (!DesignMode) ApplyTheme(ThemeManager.IsDark);
+            if (!DesignMode)
+            {
+                ApplyTheme(ThemeManager.IsDark);
+            }
         }
 
         #endregion

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ChatApp.Controllers;
+using ChatApp.Services.Firebase;
+using ChatApp.Services.UI;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
-
-using ChatApp.Controllers;
 
 namespace ChatApp
 {
@@ -13,6 +14,11 @@ namespace ChatApp
         private readonly CaiDatController _controller;
         private readonly string _localId;
         private readonly string _token;
+
+        /// <summary>
+        /// Dịch vụ để cập nhật chế độ ngày đêm (dark/light).
+        /// </summary>
+        private readonly ThemeService _themeService = new ThemeService();
 
         #endregion
 
@@ -40,6 +46,10 @@ namespace ChatApp
 
             var img = await _controller.LoadAvatarAsync();
             picAvatar.Image = img ?? Properties.Resources.DefaultAvatar;
+
+            // Load chế độ ngày đêm
+            bool isDark = await _themeService.GetThemeAsync(_localId);
+            ThemeManager.ApplyTheme(this, isDark);
         }
 
         private async void btnDoiAvatar_Click(object sender, EventArgs e)
