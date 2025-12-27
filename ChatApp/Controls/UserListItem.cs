@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ChatApp.Helpers;
+using ChatApp.Services.Firebase;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -27,6 +29,8 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
         /// Chế độ hành động hiện tại.
         /// </summary>
         private ActionMode _currentMode = ActionMode.Send;
+
+        private readonly AuthService _authService = new AuthService();
 
         /// <summary>
         /// Enum định nghĩa các chế độ hành động của button.
@@ -82,11 +86,16 @@ namespace ChatApp.Controls // Hoặc namespace mà bạn đang sử dụng
         /// <summary>
         /// Gán LocalId và Tên hiển thị cho Control.
         /// </summary>
-        public void SetUserData(string localId, string DisplayName)
+        public async void SetUserData(string localId, string DisplayName)
         {
             _userId = localId;
             lblUserName.Text = DisplayName;
             this.Tag = localId;
+            string base64 = null;
+            try { base64 = await _authService.GetAvatarAsync(_userId); } catch { base64 = null; }
+
+            Image img = ImageBase64.Base64ToImage(base64);
+            pbAvatar.Image = img ?? Properties.Resources.DefaultAvatar;
         }
 
         /// <summary>

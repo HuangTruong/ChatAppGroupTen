@@ -230,13 +230,13 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\CaiDatController.cs" />
-    <Compile Include="Controllers\DangKyController.cs" />
-    <Compile Include="Controllers\DangNhapController.cs" />
-    <Compile Include="Controllers\FriendController.cs" />
-    <Compile Include="Controllers\NhanTinController.cs" />
-    <Compile Include="Controllers\NhanTinNhomController.cs" />
-    <Compile Include="Controllers\QuenMatKhauController.cs" />
+    <Compile Include="Controllers\Auth\DangKyController.cs" />
+    <Compile Include="Controllers\Auth\DangNhapController.cs" />
+    <Compile Include="Controllers\Auth\QuenMatKhauController.cs" />
+    <Compile Include="Controllers\Chat\NhanTinController.cs" />
+    <Compile Include="Controllers\Chat\NhanTinNhomController.cs" />
+    <Compile Include="Controllers\Friends\FriendController.cs" />
+    <Compile Include="Controllers\Settings\CaiDatController.cs" />
     <Compile Include="Controls\Conversations.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -261,53 +261,83 @@
     <Compile Include="Controls\UserListItem.Designer.cs">
       <DependentUpon>UserListItem.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\CaiDat.cs">
+    <Compile Include="Forms\Auth\DangKy.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\CaiDat.Designer.cs">
-      <DependentUpon>CaiDat.cs</DependentUpon>
+    <Compile Include="Forms\Auth\DangKy.Designer.cs">
+      <DependentUpon>DangKy.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormEmoji.cs">
+    <Compile Include="Forms\Auth\DangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormEmoji.Designer.cs">
+    <Compile Include="Forms\Auth\DangNhap.Designer.cs">
+      <DependentUpon>DangNhap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Auth\QuenMatKhau.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Auth\QuenMatKhau.Designer.cs">
+      <DependentUpon>QuenMatKhau.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Auth\XacNhanEmail.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Auth\XacNhanEmail.Designer.cs">
+      <DependentUpon>XacNhanEmail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Chat\FormEmoji.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Chat\FormEmoji.Designer.cs">
       <DependentUpon>FormEmoji.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormLoiMoiKetBan.cs">
+    <Compile Include="Forms\Chat\NhanTin.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\FormLoiMoiKetBan.Designer.cs">
+    <Compile Include="Forms\Chat\NhanTin.Designer.cs">
+      <DependentUpon>NhanTin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Chat\TrangChu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Chat\TrangChu.Designer.cs">
+      <DependentUpon>TrangChu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Friends\FormLoiMoiKetBan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Friends\FormLoiMoiKetBan.Designer.cs">
       <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\QuanLyNhom.cs">
+    <Compile Include="Forms\Friends\ThongTinBanBe.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\QuanLyNhom.Designer.cs">
-      <DependentUpon>QuanLyNhom.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\TaoNhom.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TaoNhom.Designer.cs">
-      <DependentUpon>TaoNhom.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ThongTinBanBe.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ThongTinBanBe.Designer.cs">
+    <Compile Include="Forms\Friends\ThongTinBanBe.Designer.cs">
       <DependentUpon>ThongTinBanBe.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\TimKiemBanBe.cs">
+    <Compile Include="Forms\Friends\TimKiemBanBe.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\TimKiemBanBe.Designer.cs">
+    <Compile Include="Forms\Friends\TimKiemBanBe.Designer.cs">
       <DependentUpon>TimKiemBanBe.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\XacNhanEmail.cs">
+    <Compile Include="Forms\Groups\QuanLyNhom.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\XacNhanEmail.Designer.cs">
-      <DependentUpon>XacNhanEmail.cs</DependentUpon>
+    <Compile Include="Forms\Groups\QuanLyNhom.Designer.cs">
+      <DependentUpon>QuanLyNhom.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Groups\TaoNhom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Groups\TaoNhom.Designer.cs">
+      <DependentUpon>TaoNhom.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Settings\CaiDat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Settings\CaiDat.Designer.cs">
+      <DependentUpon>CaiDat.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\ImageBase64.cs" />
     <Compile Include="Helpers\KeySanitizer.cs" />
@@ -316,57 +346,27 @@
     <Compile Include="Models\Messages\ChatMessage.cs" />
     <Compile Include="Models\Themes\ThemeSetting.cs" />
     <Compile Include="Models\Users\User.cs" />
-    <Compile Include="Forms\NhanTin.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\NhanTin.Designer.cs">
-      <DependentUpon>NhanTin.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Services\Attachments\AttachmentClassifier.cs" />
+    <Compile Include="Services\Attachments\FileAttachmentUploader.cs" />
+    <Compile Include="Services\Auth\AuthService.cs" />
     <Compile Include="Services\Auth\EmailVerificationService.cs" />
-    <Compile Include="Services\Email\SmtpEmailSender.cs" />
-    <Compile Include="Services\FileHost\FileAttachmentUploader.cs" />
-    <Compile Include="Services\Firebase\AuthService.cs" />
-    <Compile Include="Services\Firebase\FirebaseConfig.cs" />
-    <Compile Include="Services\Firebase\FriendService.cs" />
-    <Compile Include="Services\Firebase\GroupMessageService.cs" />
-    <Compile Include="Services\Firebase\GroupService.cs" />
-    <Compile Include="Services\Firebase\HttpService.cs" />
-    <Compile Include="Forms\DangKy.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\DangKy.Designer.cs">
-      <DependentUpon>DangKy.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\DangNhap.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\DangNhap.Designer.cs">
-      <DependentUpon>DangNhap.cs</DependentUpon>
-    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Forms\TrangChu.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\TrangChu.Designer.cs">
-      <DependentUpon>TrangChu.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\QuenMatKhau.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\QuenMatKhau.Designer.cs">
-      <DependentUpon>QuenMatKhau.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Services\Firebase\MessageService.cs" />
-    <Compile Include="Services\Firebase\ThemeService.cs" />
+    <Compile Include="Services\Auth\SmtpEmailSender.cs" />
+    <Compile Include="Services\Chat\GroupMessageService.cs" />
+    <Compile Include="Services\Chat\MessageService.cs" />
+    <Compile Include="Services\Common\FirebaseConfig.cs" />
+    <Compile Include="Services\Common\HttpService.cs" />
+    <Compile Include="Services\Friends\FriendService.cs" />
+    <Compile Include="Services\Groups\GroupService.cs" />
     <Compile Include="Services\UI\ThemeColor.cs" />
     <Compile Include="Services\UI\ThemeManager.cs" />
+    <Compile Include="Services\UI\ThemeService.cs" />
     <EmbeddedResource Include="Controls\Conversations.resx">
       <DependentUpon>Conversations.cs</DependentUpon>
     </EmbeddedResource>
@@ -379,49 +379,49 @@
     <EmbeddedResource Include="Controls\UserListItem.resx">
       <DependentUpon>UserListItem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CaiDat.resx">
-      <DependentUpon>CaiDat.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormEmoji.resx">
-      <DependentUpon>FormEmoji.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormLoiMoiKetBan.resx">
-      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\NhanTin.resx">
-      <DependentUpon>NhanTin.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\QuanLyNhom.resx">
-      <DependentUpon>QuanLyNhom.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TaoNhom.resx">
-      <DependentUpon>TaoNhom.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ThongTinBanBe.resx">
-      <DependentUpon>ThongTinBanBe.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TimKiemBanBe.resx">
-      <DependentUpon>TimKiemBanBe.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\XacNhanEmail.resx">
-      <DependentUpon>XacNhanEmail.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DangKy.resx">
+    <EmbeddedResource Include="Forms\Auth\DangKy.resx">
       <DependentUpon>DangKy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DangNhap.resx">
+    <EmbeddedResource Include="Forms\Auth\DangNhap.resx">
       <DependentUpon>DangNhap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Auth\QuenMatKhau.resx">
+      <DependentUpon>QuenMatKhau.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Auth\XacNhanEmail.resx">
+      <DependentUpon>XacNhanEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Chat\FormEmoji.resx">
+      <DependentUpon>FormEmoji.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Chat\NhanTin.resx">
+      <DependentUpon>NhanTin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Chat\TrangChu.resx">
+      <DependentUpon>TrangChu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Friends\FormLoiMoiKetBan.resx">
+      <DependentUpon>FormLoiMoiKetBan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Friends\ThongTinBanBe.resx">
+      <DependentUpon>ThongTinBanBe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Friends\TimKiemBanBe.resx">
+      <DependentUpon>TimKiemBanBe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Groups\QuanLyNhom.resx">
+      <DependentUpon>QuanLyNhom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Groups\TaoNhom.resx">
+      <DependentUpon>TaoNhom.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Settings\CaiDat.resx">
+      <DependentUpon>CaiDat.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TrangChu.resx">
-      <DependentUpon>TrangChu.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\QuenMatKhau.resx">
-      <DependentUpon>QuenMatKhau.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
