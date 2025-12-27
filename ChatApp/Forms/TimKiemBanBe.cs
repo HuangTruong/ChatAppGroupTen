@@ -75,11 +75,10 @@ namespace ChatApp.Forms
 
                     pnlView.Controls.Add(userControl);
                     pnlView.Controls.SetChildIndex(userControl, 0); // Để cho thứ tự tin nhắn không bị ngược
-
-                    // Load chế độ ngày đêm
-                    bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
-                    ThemeManager.ApplyTheme(this, isDark);
                 }
+                // Load chế độ ngày đêm
+                bool isDark = await _themeService.GetThemeAsync(_currentLocalId);
+                ThemeManager.ApplyTheme(this, isDark);
             }
             catch (Exception ex)
             {

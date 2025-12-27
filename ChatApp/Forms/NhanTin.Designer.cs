@@ -414,7 +414,6 @@
             this.Name = "NhanTin";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "NHẮN TIN";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.NhanTin_FormClosed);
             this.Load += new System.EventHandler(this.NhanTin_Load);
             this.pnlTrai.ResumeLayout(false);
