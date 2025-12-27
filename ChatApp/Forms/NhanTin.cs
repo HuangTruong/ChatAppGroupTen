@@ -86,6 +86,11 @@ namespace ChatApp
         // ====== TRACK TIN ĐÃ VẼ (tránh vẽ trùng) ======
         private readonly HashSet<string> _drawnMessageIds = new HashSet<string>(StringComparer.Ordinal);
 
+        // [ADD] lock + version để chặn trùng / listener cũ
+        private readonly object _drawnLock = new object();
+        private int _listenVersion = 0;
+
+
         // Giới hạn số bubble giữ trên UI để không nặng dần
         private const int MAX_UI_MESSAGES = 300;
 
@@ -427,15 +432,27 @@ namespace ChatApp
         /// - Clear UI chat.
         /// - Listen incremental (append tin mới thay vì reload full).
         /// </summary>
+        /// <summary>
+        /// Mở cuộc trò chuyện với 1 user:
+        /// - Cập nhật tên ở panel giữa/phải.
+        /// - Clear UI chat + reset state.
+        /// - Listen incremental.
+        /// </summary>
         private void OpenConversation(string otherUserId)
         {
             idNguoiDangChat = otherUserId;
+
+            // Tăng version để vô hiệu hoá callback cũ
+            _listenVersion++;
 
             // Chuyển về chế độ chat 1-1
             dangChatNhom = false;
 
             // Dừng listen nhóm nếu đang chạy
             try { boDieuKhienNhanTinNhom.StopListen(); } catch { }
+
+            // Clear UI + state (rất quan trọng)
+            ClearChatUIAndState();
 
             User nguoiDung;
             if (tatCaNguoiDung != null && tatCaNguoiDung.TryGetValue(otherUserId, out nguoiDung))
@@ -448,19 +465,25 @@ namespace ChatApp
                 lblTenDangNhapGiua.Text = string.Empty;
             }
 
-            CapNhatTrangThaiNguoiDangChat(idNguoiDangChat);
 
-            // Listen incremental (mượt hơn rất nhiều)
+
+            // Capture version để chặn listener cũ
+            int myVersion = _listenVersion;
+
             boDieuKhienNhanTin.StartListenConversation(
                 otherUserId,
                 onInitialLoaded: delegate (List<ChatMessage> initial)
                 {
                     if (!IsHandleCreated) return;
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, otherUserId, StringComparison.Ordinal)) return;
+
                     try
                     {
-                        BeginInvoke(new Action(delegate
+                        BeginInvoke(new Action(async delegate
                         {
-                            RenderMessages(initial, otherUserId);
+                            if (myVersion != _listenVersion) return;
+                            await RenderMessagesAsync(initial, otherUserId);
                         }));
                     }
                     catch { }
@@ -468,37 +491,29 @@ namespace ChatApp
                 onMessageAdded: delegate (ChatMessage msg)
                 {
                     if (!IsHandleCreated) return;
-                    try
-                    {
-                        BeginInvoke(new Action(delegate
-                        {
-                            AddMessageBubble(msg);
-                        }));
-                    }
-                    catch { }
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, otherUserId, StringComparison.Ordinal)) return;
+
+                    EnqueueIncomingMessage(msg);
                 },
                 onReset: delegate (List<ChatMessage> full)
                 {
                     if (!IsHandleCreated) return;
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, otherUserId, StringComparison.Ordinal)) return;
+
                     try
                     {
-                        BeginInvoke(new Action(delegate
+                        BeginInvoke(new Action(async delegate
                         {
-                            RenderMessages(full, otherUserId);
+                            if (myVersion != _listenVersion) return;
+                            await RenderMessagesAsync(full, otherUserId);
                         }));
                     }
                     catch { }
                 });
         }
 
-        public async void CapNhatTrangThaiNguoiDangChat(string idNguoiDung)
-        {
-            string trangthai = await _authService.GetStatusAsync(idNguoiDung);
-            if (trangthai != null)
-            {
-                lblTrangThai.Text = trangthai;
-            }
-        }
 
         #endregion
 
@@ -510,13 +525,11 @@ namespace ChatApp
         /// - Nếu thêm mới: chỉ append phần mới.
         /// - Nếu số lượng giảm: vẽ lại toàn bộ.
         /// </summary>
-        private void RenderMessages(IList<ChatMessage> messages, string ownerUserId)
+        private async Task RenderMessagesAsync(IList<ChatMessage> messages, string ownerUserId)
         {
             // Nếu user đã đổi cuộc chat thì bỏ qua batch này.
             if (!string.Equals(idNguoiDangChat, ownerUserId, StringComparison.Ordinal))
-            {
                 return;
-            }
 
             if (messages == null || messages.Count == 0)
             {
@@ -525,66 +538,122 @@ namespace ChatApp
                 {
                     flpKhungChat.Controls.Clear();
                     danhSachTinNhanDangVe.Clear();
+                    lock (_drawnLock) { _drawnMessageIds.Clear(); }
                 }
-                finally
-                {
-                    flpKhungChat.ResumeLayout();
-                }
+                finally { flpKhungChat.ResumeLayout(); }
                 return;
             }
 
+
+            List<ChatMessage> ordered = messages
+                .Where(m => m != null)
+                .OrderBy(m => m.Timestamp)
+                .ToList();
+
             int soLuongCu = danhSachTinNhanDangVe.Count;
-            int soLuongMoi = messages.Count;
+            int soLuongMoi = ordered.Count;
 
             flpKhungChat.SuspendLayout();
             try
             {
                 if (soLuongCu == 0 || soLuongMoi < soLuongCu)
                 {
-                    // Lần đầu hoặc có thay đổi bất thường -> vẽ lại toàn bộ
                     flpKhungChat.Controls.Clear();
                     danhSachTinNhanDangVe.Clear();
+                    lock (_drawnLock) { _drawnMessageIds.Clear(); }
 
-                    int i = 0;
-                    while (i < soLuongMoi)
+                    for (int i = 0; i < soLuongMoi; i++)
                     {
-                        ChatMessage tinNhan = messages[i];
-                        AddMessageBubble(tinNhan);
-                        danhSachTinNhanDangVe.Add(tinNhan);
-                        i++;
+                        ChatMessage m = ordered[i];
+                        bool added = await AddMessageBubble(m);
+                        if (added)
+                        {
+                            InsertRenderedMessageToList(m);
+                        }
                     }
                 }
                 else
                 {
-                    // Bình thường thì chỉ vẽ thêm phần mới
-                    int i = soLuongCu;
-                    while (i < soLuongMoi)
+                    for (int i = soLuongCu; i < soLuongMoi; i++)
                     {
-                        ChatMessage tinNhan = messages[i];
-                        AddMessageBubble(tinNhan);
-                        danhSachTinNhanDangVe.Add(tinNhan);
-                        i++;
+                        ChatMessage m = ordered[i];
+                        bool added = await AddMessageBubble(m);
+                        if (added)
+                        {
+                            InsertRenderedMessageToList(m);
+                        }
                     }
                 }
-            }
-            finally
-            {
-                flpKhungChat.ResumeLayout();
-            }
 
-            // Mặc định: sau khi load xong đứng ở tin nhắn cuối
+            }
+            finally { flpKhungChat.ResumeLayout(); }
+
             ScrollToBottom();
         }
 
+
         /// <summary>
         /// Thêm 1 bong bóng tin nhắn vào khung chat (FlowLayoutPanel).
-        /// Từ nay: KHÔNG xử lý ảnh riêng, mọi attachment đều là "file".
+        /// Trả true nếu thật sự add, false nếu bị dedupe/bỏ qua.
         /// </summary>
-        private async void AddMessageBubble(ChatMessage msg)
+
+        #region ====== INSERT ORDER HELPERS ======
+
+        /// <summary>
+        /// Tìm vị trí chèn control theo Timestamp để đảm bảo UI luôn đúng thứ tự thời gian,
+        /// kể cả khi message đến trễ (network/stream).
+        /// </summary>
+        private int FindInsertIndexByTimestamp(long ts)
+        {
+            if (flpKhungChat == null) return 0;
+
+            for (int i = 0; i < flpKhungChat.Controls.Count; i++)
+            {
+                ChatMessage m = flpKhungChat.Controls[i].Tag as ChatMessage;
+
+                // Nếu Tag không phải ChatMessage thì coi như "cuối" để không phá layout.
+                long t = (m != null) ? m.Timestamp : long.MaxValue;
+
+                if (t > ts) return i;
+            }
+
+            return flpKhungChat.Controls.Count;
+        }
+
+        /// <summary>
+        /// Đồng bộ danhSachTinNhanDangVe theo Timestamp (giữ list luôn sorted).
+        /// </summary>
+        private void InsertRenderedMessageToList(ChatMessage msg)
         {
             if (msg == null) return;
-            if (flpKhungChat == null) return;
-            if (this.IsDisposed) return;
+
+            int idx = 0;
+            while (idx < danhSachTinNhanDangVe.Count)
+            {
+                ChatMessage cur = danhSachTinNhanDangVe[idx];
+                long t = (cur != null) ? cur.Timestamp : 0;
+
+                if (t > msg.Timestamp) break;
+                idx++;
+            }
+
+            danhSachTinNhanDangVe.Insert(idx, msg);
+        }
+
+        #endregion
+
+
+        private async Task<bool> AddMessageBubble(ChatMessage msg)
+        {
+            if (msg == null) return false;
+            if (flpKhungChat == null) return false;
+            if (this.IsDisposed) return false;
+
+            // ====== DEDUPE NGAY ĐẦU (CHẶN TRÙNG) ======
+            if (!TryMarkAsDrawn(msg))
+            {
+                return false;
+            }
 
             bool isMine = msg.IsMine;
 
@@ -601,7 +670,7 @@ namespace ChatApp
             }
             catch
             {
-                // ignore, dùng fallback phía dưới
+                // ignore
             }
 
             string displayName = isMine
@@ -613,19 +682,13 @@ namespace ChatApp
             string time = FormatTimestamp(msg.Timestamp);
             string type = (msg.MessageType ?? string.Empty).ToLowerInvariant();
 
-            // ====== TẠO BUBBLE ======
             MessageBubbles bubble = new MessageBubbles();
             bubble.Tag = msg;
             bubble.Margin = new Padding(0, 6, 0, 6);
 
-            // Giãn bubble theo panel
             int w = GetBubbleWidth();
-            if (w > 50)
-            {
-                bubble.Width = w;
-            }
+            if (w > 50) bubble.Width = w;
 
-            // ================== FILE (bao gồm cả "image") ==================
             if (type == "file" || type == "image")
             {
                 string ten = string.IsNullOrEmpty(msg.FileName) ? "file" : msg.FileName;
@@ -633,10 +696,7 @@ namespace ChatApp
 
                 if (msg.FileSize > 0)
                 {
-                    noiDung = string.Format(
-                        "{0} ({1})",
-                        ten,
-                        FormatBytes(msg.FileSize));
+                    noiDung = string.Format("{0} ({1})", ten, FormatBytes(msg.FileSize));
                 }
                 else
                 {
@@ -647,19 +707,11 @@ namespace ChatApp
                 bubble.Cursor = Cursors.Hand;
                 GanClickDeTaiFile(bubble);
             }
-            // ================== TEXT ==================
             else
             {
-                bubble.SetMessage(
-                    displayName,
-                    msg.Text ?? string.Empty,
-                    time,
-                    isMine,
-                    senderId
-                );
+                bubble.SetMessage(displayName, msg.Text ?? string.Empty, time, isMine, senderId);
             }
 
-            // ====== ADD VÀO UI (AN TOÀN THREAD) ======
             try
             {
                 if (flpKhungChat.InvokeRequired)
@@ -667,13 +719,23 @@ namespace ChatApp
                     flpKhungChat.BeginInvoke(new Action(delegate
                     {
                         if (this.IsDisposed) return;
+                        int insertIndex = FindInsertIndexByTimestamp(msg.Timestamp);
+
                         flpKhungChat.Controls.Add(bubble);
+
+                        flpKhungChat.Controls.SetChildIndex(bubble, insertIndex);
+
                         ScrollToBottom();
                     }));
                 }
                 else
                 {
+                    int insertIndex = FindInsertIndexByTimestamp(msg.Timestamp);
+
                     flpKhungChat.Controls.Add(bubble);
+
+                    flpKhungChat.Controls.SetChildIndex(bubble, insertIndex);
+
                     ScrollToBottom();
                 }
             }
@@ -681,7 +743,10 @@ namespace ChatApp
             {
                 // ignore UI errors
             }
+
+            return true;
         }
+
 
         /// <summary>
         /// Chuyển timestamp (ms) thành chuỗi dd/MM/yyyy HH:mm.
@@ -817,17 +882,26 @@ namespace ChatApp
         /// <summary>
         /// Mở cuộc trò chuyện nhóm.
         /// </summary>
+        /// <summary>
+        /// Mở cuộc trò chuyện nhóm.
+        /// </summary>
         private void OpenGroupConversation(string groupId)
         {
             if (string.IsNullOrWhiteSpace(groupId)) return;
 
             idNguoiDangChat = groupId;
+
+            // Tăng version để vô hiệu hoá callback cũ
+            _listenVersion++;
+
             dangChatNhom = true;
 
             // Dừng listen 1-1 để tránh append nhầm
             try { boDieuKhienNhanTin.StopListen(); } catch { }
 
-            // Set tiêu đề
+            // Clear UI + state
+            ClearChatUIAndState();
+
             GroupInfo g;
             if (tatCaNhom != null && tatCaNhom.TryGetValue(groupId, out g) && g != null)
             {
@@ -840,36 +914,44 @@ namespace ChatApp
 
             lblTrangThai.Text = string.Empty;
 
+            int myVersion = _listenVersion;
+
             boDieuKhienNhanTinNhom.StartListenGroup(
                 groupId,
                 onInitialLoaded: delegate (List<ChatMessage> initial)
                 {
                     if (this.IsDisposed) return;
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, groupId, StringComparison.Ordinal)) return;
 
-                    this.BeginInvoke((Action)delegate
+                    BeginInvoke(new Action(async delegate
                     {
-                        RenderMessages(initial, groupId);
-                    });
+                        if (myVersion != _listenVersion) return;
+                        await RenderMessagesAsync(initial, groupId);
+                    }));
                 },
                 onMessageAdded: delegate (ChatMessage msg)
                 {
                     if (this.IsDisposed) return;
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, groupId, StringComparison.Ordinal)) return;
 
-                    this.BeginInvoke((Action)delegate
-                    {
-                        AddMessageBubble(msg);
-                    });
+                    EnqueueIncomingMessage(msg);
                 },
                 onReset: delegate (List<ChatMessage> full)
                 {
                     if (this.IsDisposed) return;
+                    if (myVersion != _listenVersion) return;
+                    if (!string.Equals(idNguoiDangChat, groupId, StringComparison.Ordinal)) return;
 
-                    this.BeginInvoke((Action)delegate
+                    BeginInvoke(new Action(async delegate
                     {
-                        RenderMessages(full, groupId);
-                    });
+                        if (myVersion != _listenVersion) return;
+                        await RenderMessagesAsync(full, groupId);
+                    }));
                 });
         }
+
 
         private async void btnTaoNhom_Click(object sender, EventArgs e)
         {
@@ -1206,6 +1288,161 @@ namespace ChatApp
         }
 
         #endregion
+
+        #region ====== BATCH ADD (PENDING) ======
+
+        private void EnsureFlushTimer()
+        {
+            if (_flushTimer != null) return;
+
+            _flushTimer = new System.Windows.Forms.Timer();
+            _flushTimer.Interval = 80;
+            _flushTimer.Tick += (s, e) => FlushPendingAdds();
+            _flushTimer.Start();
+        }
+
+        private void EnqueueIncomingMessage(ChatMessage msg)
+        {
+            if (msg == null) return;
+
+            lock (_pendingLock)
+            {
+                _pendingAdds.Add(msg);
+            }
+
+            EnsureFlushTimer();
+        }
+
+        private void FlushPendingAdds()
+        {
+            if (this.IsDisposed) return;
+            if (!IsHandleCreated) return;
+
+            List<ChatMessage> batch = null;
+
+            lock (_pendingLock)
+            {
+                if (_pendingAdds.Count == 0) return;
+                batch = new List<ChatMessage>(_pendingAdds);
+                _pendingAdds.Clear();
+            }
+
+            // Sort theo thời gian để đảm bảo đúng thứ tự
+            batch.Sort(delegate (ChatMessage a, ChatMessage b)
+            {
+                long ta = a != null ? a.Timestamp : 0;
+                long tb = b != null ? b.Timestamp : 0;
+                return ta.CompareTo(tb);
+            });
+
+            try
+            {
+                BeginInvoke(new Action(async delegate
+                {
+                    for (int i = 0; i < batch.Count; i++)
+                    {
+                        ChatMessage msg = batch[i];
+                        bool added = await AddMessageBubble(msg);
+                        if (added)
+                        {
+                            InsertRenderedMessageToList(msg);
+                        }
+                    }
+                    ScrollToBottom();
+                }));
+            }
+            catch { }
+        }
+
+        #endregion
+
+        #region ====== CHAT STATE HELPERS (DEDUP + RESET) ======
+
+        /// <summary>
+        /// Clear UI chat + reset state (pending, drawn, danhSachTinNhanDangVe).
+        /// Gọi mỗi khi đổi cuộc chat để tránh append nhầm / trùng.
+        /// </summary>
+        private void ClearChatUIAndState()
+        {
+            // Clear pending batch
+            lock (_pendingLock)
+            {
+                _pendingAdds.Clear();
+            }
+
+            // Reset dedup set
+            lock (_drawnLock)
+            {
+                _drawnMessageIds.Clear();
+            }
+
+            // Reset rendered list + UI
+            try
+            {
+                if (flpKhungChat != null)
+                {
+                    flpKhungChat.SuspendLayout();
+                    try
+                    {
+                        flpKhungChat.Controls.Clear();
+                    }
+                    finally
+                    {
+                        flpKhungChat.ResumeLayout();
+                    }
+                }
+            }
+            catch { }
+
+            danhSachTinNhanDangVe.Clear();
+        }
+
+        /// <summary>
+        /// Build key để dedupe. Ưu tiên MessageId (push key Firebase).
+        /// </summary>
+        private static string BuildMessageKey(ChatMessage msg)
+        {
+            if (msg == null) return string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(msg.MessageId))
+            {
+                return msg.MessageId.Trim();
+            }
+
+            // Fallback: đủ “đặc trưng” để tránh trùng UI trong cùng 1 cuộc chat
+            return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}",
+                msg.Timestamp,
+                msg.SenderId ?? string.Empty,
+                msg.ReceiverId ?? string.Empty,
+                (msg.MessageType ?? string.Empty).ToLowerInvariant(),
+                msg.Text ?? string.Empty,
+                msg.FileUrl ?? string.Empty,
+                msg.FileName ?? string.Empty,
+                msg.FileSize);
+        }
+
+        /// <summary>
+        /// Try mark message as drawn. Trả false nếu đã vẽ rồi.
+        /// </summary>
+        private bool TryMarkAsDrawn(ChatMessage msg)
+        {
+            string key = BuildMessageKey(msg);
+            if (string.IsNullOrWhiteSpace(key)) return true; // không có key thì cho qua (best-effort)
+
+            lock (_drawnLock)
+            {
+                if (_drawnMessageIds.Contains(key))
+                {
+                    return false;
+                }
+
+                _drawnMessageIds.Add(key);
+                return true;
+            }
+        }
+
+        #endregion
+
 
     }
 }

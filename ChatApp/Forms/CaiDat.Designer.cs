@@ -170,7 +170,7 @@ namespace ChatApp
             // 
             // btnDong
             // 
-            this.btnDong.BorderRadius = 12;
+            this.btnDong.BorderRadius = 1;
             this.btnDong.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnDong.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.btnDong.ForeColor = System.Drawing.Color.White;
@@ -322,6 +322,7 @@ namespace ChatApp
             this.txtEmail.BorderRadius = 10;
             this.txtEmail.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.txtEmail.DefaultText = "";
+            this.txtEmail.Enabled = false;
             this.txtEmail.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
             this.txtEmail.Location = new System.Drawing.Point(191, 552);
             this.txtEmail.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

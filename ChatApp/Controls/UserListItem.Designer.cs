@@ -77,6 +77,7 @@
             this.pbAvatar.Name = "pbAvatar";
             this.pbAvatar.ShadowDecoration.Mode = Guna.UI2.WinForms.Enums.ShadowMode.Circle;
             this.pbAvatar.Size = new System.Drawing.Size(69, 69);
+            this.pbAvatar.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbAvatar.TabIndex = 0;
             this.pbAvatar.TabStop = false;
             // 

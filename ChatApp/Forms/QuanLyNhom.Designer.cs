@@ -138,10 +138,10 @@
             this.btnDoiTenNhom.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnDoiTenNhom.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnDoiTenNhom.ForeColor = System.Drawing.Color.White;
-            this.btnDoiTenNhom.Location = new System.Drawing.Point(216, 9);
+            this.btnDoiTenNhom.Location = new System.Drawing.Point(198, 9);
             this.btnDoiTenNhom.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.btnDoiTenNhom.Name = "btnDoiTenNhom";
-            this.btnDoiTenNhom.Size = new System.Drawing.Size(118, 42);
+            this.btnDoiTenNhom.Size = new System.Drawing.Size(136, 42);
             this.btnDoiTenNhom.TabIndex = 2;
             this.btnDoiTenNhom.Text = "Đổi tên";
             this.btnDoiTenNhom.Click += new System.EventHandler(this.btnDoiTenNhom_Click);
@@ -156,7 +156,7 @@
             this.btnTao.DisabledState.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(141)))), ((int)(((byte)(141)))), ((int)(((byte)(141)))));
             this.btnTao.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold);
             this.btnTao.ForeColor = System.Drawing.Color.White;
-            this.btnTao.Location = new System.Drawing.Point(31, 9);
+            this.btnTao.Location = new System.Drawing.Point(13, 9);
             this.btnTao.Margin = new System.Windows.Forms.Padding(10, 3, 3, 3);
             this.btnTao.Name = "btnTao";
             this.btnTao.Size = new System.Drawing.Size(172, 42);

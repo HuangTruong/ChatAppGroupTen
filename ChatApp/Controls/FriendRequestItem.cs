@@ -1,5 +1,8 @@
-﻿using System;
+﻿using ChatApp.Helpers;
+using ChatApp.Services.Firebase;
+using System;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ChatApp.Controls
@@ -28,6 +31,8 @@ namespace ChatApp.Controls
         /// </summary>
         public event ActionButtonClickedEventHandler ActionButtonClicked;
 
+        private readonly AuthService _authService = new AuthService();
+
         public FriendRequestItem()
         {
             InitializeComponent();
@@ -46,10 +51,16 @@ namespace ChatApp.Controls
         /// <summary>
         /// Gán dữ liệu cơ bản cho Control (ID người gửi và Tên hiển thị).
         /// </summary>
-        public void SetUserData(string localId, string DisplayName)
+        public async Task SetUserData(string localId, string DisplayName)
         {
             _requesterId = localId;
             lblUserName.Text = DisplayName;
+            // avatar
+            string base64 = null;
+            try { base64 = await _authService.GetAvatarAsync(_requesterId); } catch { base64 = null; }
+
+            Image img = ImageBase64.Base64ToImage(base64);
+            pbAvatar.Image = img ?? Properties.Resources.DefaultAvatar;
         }
 
         /// <summary>
