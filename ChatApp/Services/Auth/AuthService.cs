@@ -442,7 +442,7 @@ namespace ChatApp.Services.Firebase
 
             await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
             {
-                userName = newUserName
+                UserName = newUserName
             }).ConfigureAwait(false);
         }
 
@@ -455,7 +455,7 @@ namespace ChatApp.Services.Firebase
 
             await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
             {
-                displayName = newDisplayName
+                DisplayName = newDisplayName
             }).ConfigureAwait(false);
         }
 
@@ -468,7 +468,7 @@ namespace ChatApp.Services.Firebase
 
             await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
             {
-                gender = gender
+                Gender = gender
             }).ConfigureAwait(false);
         }
 
@@ -482,7 +482,7 @@ namespace ChatApp.Services.Firebase
 
             await _http.PatchAsync(Db(string.Format("users/{0}", key)), new
             {
-                birthday = birthday
+                Birthday = birthday
             }).ConfigureAwait(false);
         }
 
@@ -495,10 +495,10 @@ namespace ChatApp.Services.Firebase
 
             JObject patch = new JObject();
 
-            if (userName != null) patch["userName"] = userName;
-            if (displayName != null) patch["displayName"] = displayName;
-            if (gender != null) patch["gender"] = gender;
-            if (birthday != null) patch["birthday"] = birthday;
+            if (userName != null) patch["UserName"] = userName;
+            if (displayName != null) patch["DisplayName"] = displayName;
+            if (gender != null) patch["GenDer"] = gender;
+            if (birthday != null) patch["Birthday"] = birthday;
 
             if (!patch.HasValues) return;
 
